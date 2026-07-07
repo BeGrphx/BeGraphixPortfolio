@@ -29,9 +29,9 @@ export function FilteredProjectGrid({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-lg border border-dashed border-neutral-800 px-8 py-16 text-center"
+        className="rounded-lg border border-dashed border-white/20 px-8 py-16 text-center"
       >
-        <p className="text-neutral-400">{t("noCategory")}</p>
+        <p className="text-white/70">{t("noCategory")}</p>
       </motion.div>
     );
   }

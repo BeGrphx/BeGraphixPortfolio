@@ -47,7 +47,7 @@ export default async function HomePage({
   const bottomFade = settings?.heroBottomFade ?? 320;
 
   return (
-    <div className="relative bg-[#080808]">
+    <div className="relative bg-[#080808] text-white">
       <div
         className="pointer-events-none absolute inset-x-0 top-0 z-0 overflow-hidden"
         style={{ height: `calc(78vh + ${Math.round(bottomFade * 0.6)}px)` }}
@@ -62,15 +62,15 @@ export default async function HomePage({
 
       <section className="relative z-10 flex min-h-[72vh] flex-col items-center justify-center px-6 text-center md:px-10">
         <FadeIn className="max-w-4xl">
-          <p className="mb-6 text-xs uppercase tracking-[0.35em] text-muted">
+          <p className="mb-6 text-xs uppercase tracking-[0.35em] text-white/70">
             {t("eyebrow")}
           </p>
-          <h1 className="font-display text-5xl font-medium leading-[1.02] tracking-tight md:text-7xl lg:text-[5.25rem]">
+          <h1 className="font-display text-5xl font-medium leading-[1.02] tracking-tight text-white md:text-7xl lg:text-[5.25rem]">
             {t("titleLine1")}
             <br />
-            <span className="text-muted">{t("titleLine2")}</span>
+            <span className="text-white">{t("titleLine2")}</span>
           </h1>
-          <p className="mx-auto mt-8 max-w-lg text-sm leading-relaxed text-muted md:mt-10 md:text-base">
+          <p className="mx-auto mt-8 max-w-lg text-sm leading-relaxed text-white/80 md:mt-10 md:text-base">
             {t("subtitle")}
           </p>
         </FadeIn>

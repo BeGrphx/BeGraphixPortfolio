@@ -105,17 +105,17 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
         </div>
         <div className="mt-4 flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-medium tracking-tight transition-opacity group-hover:opacity-60 md:text-xl">
+            <h2 className="text-lg font-medium tracking-tight text-white transition-opacity group-hover:opacity-60 md:text-xl">
               {title}
             </h2>
             {project.tags && project.tags.length > 0 && (
-              <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">
+              <p className="mt-1 text-xs uppercase tracking-wider text-white/50">
                 {project.tags.slice(0, 3).join(" · ")}
               </p>
             )}
           </div>
           <motion.span
-            className="text-xs text-neutral-600"
+            className="text-xs text-white/50"
             whileHover={{ x: 4 }}
           >
             →

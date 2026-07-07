@@ -25,11 +25,11 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
 
   if (projects.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-neutral-800 px-8 py-16 text-center">
-        <p className="text-neutral-400">{t("noProjects")}</p>
-        <p className="mt-2 text-sm text-neutral-600">
+      <div className="rounded-lg border border-dashed border-white/20 px-8 py-16 text-center">
+        <p className="text-white/70">{t("noProjects")}</p>
+        <p className="mt-2 text-sm text-white/50">
           {t("addViaStudio")}{" "}
-          <a href="/studio" className="underline hover:text-neutral-400">
+          <a href="/studio" className="underline hover:text-white/80">
             Sanity Studio
           </a>
         </p>
