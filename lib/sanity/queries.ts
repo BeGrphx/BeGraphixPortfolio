@@ -17,7 +17,7 @@ export interface SanityMediaItem {
   label?: string;
 }
 
-export type ProjectType = "professional" | "personal";
+export type ProjectType = "showreel" | "professional" | "personal";
 
 export interface SanityProject {
   _id: string;
@@ -31,8 +31,9 @@ export interface SanityProject {
   credits?: LocalizedValue | string;
   tags?: string[];
   dominantColor?: string;
-  thumbnail: SanityGalleryImage;
+  thumbnail?: SanityGalleryImage;
   hoverPreviewUrl?: string;
+  showreelVideoUrl?: string;
   gallery?: SanityGalleryImage[];
   pdfFile?: { asset: { _ref: string; url?: string } };
   media?: SanityMediaItem[];
@@ -57,7 +58,8 @@ export const projectsQuery = `*[_type == "project"] | order(completedAt desc) {
   tags,
   dominantColor,
   thumbnail,
-  hoverPreviewUrl
+  hoverPreviewUrl,
+  "showreelVideoUrl": coalesce(showreelVideoUrl, showreelVideoFile.asset->url)
 }`;
 
 export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug][0] {
@@ -110,21 +112,3 @@ export const siteSettingsQuery = `*[_type == "siteSettings"] | order(_updatedAt 
 }`;
 
 export type ProjectWithDisplay = SanityProject & { displayTitle: string };
-
-export interface SanityShowreel {
-  _id: string;
-  title: LocalizedValue | string;
-  theme: string;
-  completedAt: string;
-  videoUrl?: string;
-}
-
-export const showreelsQuery = `*[_type == "showreel"] | order(completedAt desc) {
-  _id,
-  title,
-  theme,
-  completedAt,
-  "videoUrl": coalesce(videoUrl, videoFile.asset->url)
-}`;
-
-export type ShowreelWithDisplay = SanityShowreel & { displayTitle: string };

@@ -25,6 +25,7 @@ export const project = defineType({
       type: "string",
       options: {
         list: [
+          { title: "Showreel", value: "showreel" },
           { title: "Professionnel", value: "professional" },
           { title: "Personnel", value: "personal" },
         ],
@@ -37,6 +38,7 @@ export const project = defineType({
       name: "client",
       title: "Client",
       type: "string",
+      hidden: ({ parent }) => parent?.projectType === "showreel",
     }),
     defineField({
       name: "completedAt",
@@ -64,10 +66,25 @@ export const project = defineType({
     }),
     defineField({
       name: "tags",
-      title: "Tags",
+      title: "Tags / Thème",
       type: "array",
       of: [{ type: "string" }],
       options: { layout: "tags" },
+      description: "Pour les showreels : indiquez le thème ici (ex: Motion Design, Vidéo IA).",
+    }),
+    defineField({
+      name: "showreelVideoUrl",
+      title: "URL vidéo showreel (MP4)",
+      type: "url",
+      description: "Lien direct .mp4 — affiché en pleine largeur dans l'onglet Showreel.",
+      hidden: ({ parent }) => parent?.projectType !== "showreel",
+    }),
+    defineField({
+      name: "showreelVideoFile",
+      title: "Ou uploader la vidéo showreel",
+      type: "file",
+      options: { accept: "video/mp4,video/webm" },
+      hidden: ({ parent }) => parent?.projectType !== "showreel",
     }),
     defineField({
       name: "dominantColor",
@@ -90,7 +107,13 @@ export const project = defineType({
       fields: [
         defineField({ name: "alt", title: "Texte alternatif", type: "string" }),
       ],
-      validation: (rule) => rule.required(),
+      hidden: ({ parent }) => parent?.projectType === "showreel",
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const parent = context.parent as { projectType?: string };
+          if (parent?.projectType === "showreel") return true;
+          return value ? true : "La vignette est requise.";
+        }),
     }),
     defineField({
       name: "hoverPreviewUrl",

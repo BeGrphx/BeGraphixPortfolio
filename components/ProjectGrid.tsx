@@ -3,40 +3,36 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
-import type {
-  ProjectWithDisplay,
-  ShowreelWithDisplay,
-} from "@/lib/sanity/queries";
+import type { ProjectWithDisplay } from "@/lib/sanity/queries";
 import { FilteredProjectGrid } from "./FilteredProjectGrid";
 import { ProjectFilter, type FilterValue } from "./ProjectFilter";
 import { ShowreelList } from "./ShowreelList";
 
 interface ProjectGridProps {
   projects: ProjectWithDisplay[];
-  showreels: ShowreelWithDisplay[];
   locale: Locale;
 }
 
-export function ProjectGrid({
-  projects,
-  showreels,
-  locale,
-}: ProjectGridProps) {
+export function ProjectGrid({ projects, locale }: ProjectGridProps) {
   const t = useTranslations("home");
-  const hasShowreels = showreels.length > 0;
+
+  const showreelProjects = projects.filter((p) => p.projectType === "showreel");
+  const gridProjects = projects.filter((p) => p.projectType !== "showreel");
+  const hasShowreels = showreelProjects.length > 0;
+
   const [filter, setFilter] = useState<FilterValue>(
     hasShowreels ? "showreel" : "professional",
   );
 
   const counts = {
-    showreel: showreels.length,
-    professional: projects.filter(
+    showreel: showreelProjects.length,
+    professional: gridProjects.filter(
       (p) => (p.projectType ?? "professional") === "professional",
     ).length,
-    personal: projects.filter((p) => p.projectType === "personal").length,
+    personal: gridProjects.filter((p) => p.projectType === "personal").length,
   };
 
-  if (projects.length === 0 && !hasShowreels) {
+  if (projects.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-white/20 px-8 py-16 text-center">
         <p className="text-white/70">{t("noProjects")}</p>
@@ -61,10 +57,10 @@ export function ProjectGrid({
         />
       </div>
       {filter === "showreel" ? (
-        <ShowreelList showreels={showreels} />
+        <ShowreelList projects={showreelProjects} />
       ) : (
         <FilteredProjectGrid
-          projects={projects}
+          projects={gridProjects}
           filter={filter}
           locale={locale}
         />

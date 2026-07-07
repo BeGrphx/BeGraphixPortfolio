@@ -12,7 +12,8 @@
     "noProjects": "Aucun projet pour le moment.",
     "addViaStudio": "Ajoutez des projets via Sanity Studio.",
     "noCategory": "Aucun projet dans cette catégorie.",
-    "noShowreel": "Ajoutez des showreels dans Sanity Studio → Showreel."
+    "noShowreel": "Créez un projet avec le type « Showreel » dans Sanity Studio.",
+    "noShowreelVideo": "Ajoutez une vidéo MP4 dans le projet showreel."
   },
   "filter": {
     "showreel": "Showreel",
