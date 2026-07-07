@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+import type { Locale } from "@/i18n/routing";
 import type { SanityProject } from "@/lib/sanity/queries";
 import { FilteredProjectGrid } from "./FilteredProjectGrid";
 import { ProjectFilter, type FilterValue } from "./ProjectFilter";
 
 interface ProjectGridProps {
   projects: SanityProject[];
+  locale: Locale;
 }
 
-export function ProjectGrid({ projects }: ProjectGridProps) {
+export function ProjectGrid({ projects, locale }: ProjectGridProps) {
+  const t = useTranslations("home");
   const [filter, setFilter] = useState<FilterValue>("professional");
 
   const counts = {
@@ -22,13 +26,12 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
   if (projects.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-neutral-800 px-8 py-16 text-center">
-        <p className="text-neutral-400">Aucun projet pour le moment.</p>
+        <p className="text-neutral-400">{t("noProjects")}</p>
         <p className="mt-2 text-sm text-neutral-600">
-          Ajoutez des projets via{" "}
+          {t("addViaStudio")}{" "}
           <a href="/studio" className="underline hover:text-neutral-400">
             Sanity Studio
           </a>
-          .
         </p>
       </div>
     );
@@ -37,7 +40,11 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
   return (
     <>
       <ProjectFilter value={filter} onChange={setFilter} counts={counts} />
-      <FilteredProjectGrid projects={projects} filter={filter} />
+      <FilteredProjectGrid
+        projects={projects}
+        filter={filter}
+        locale={locale}
+      />
     </>
   );
 }

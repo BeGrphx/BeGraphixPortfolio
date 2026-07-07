@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FadeIn } from "@/components/FadeIn";
+import type { Locale } from "@/i18n/routing";
 import { client } from "@/lib/sanity/client";
 import { aboutQuery, type SanityAbout } from "@/lib/sanity/queries";
+import { getLocalized } from "@/lib/i18n";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "À propos",
-  description: "Contact et informations — BeGraphix",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "about" });
+  return { title: t("defaultTitle") };
+}
 
 async function getAbout(): Promise<SanityAbout | null> {
   try {
@@ -18,36 +26,41 @@ async function getAbout(): Promise<SanityAbout | null> {
   }
 }
 
-export default async function AboutPage() {
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("about");
   const about = await getAbout();
 
   return (
     <div className="min-h-screen px-6 pb-24 pt-32 md:px-10 md:pt-40">
       <div className="mx-auto max-w-3xl">
         <FadeIn>
-          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-neutral-500">
-            Contact
+          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-muted">
+            {t("contact")}
           </p>
-          <h1 className="mb-12 text-4xl font-medium tracking-tight md:text-5xl">
-            {about?.title ?? "À propos"}
+          <h1 className="font-display text-4xl font-medium tracking-tight md:text-5xl">
+            {getLocalized(about?.title, locale) || t("defaultTitle")}
           </h1>
         </FadeIn>
-
         <FadeIn delay={0.1}>
-          <div className="space-y-8 text-lg leading-relaxed text-neutral-400">
-            {about?.bio ? (
-              <p className="whitespace-pre-line">{about.bio}</p>
+          <div className="mt-12 space-y-8 text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
+            {getLocalized(about?.bio, locale) ? (
+              <p className="whitespace-pre-line">
+                {getLocalized(about?.bio, locale)}
+              </p>
             ) : (
               <p>
-                Motion designer et créateur vidéo IA. Ce texte est modifiable
-                depuis{" "}
-                <a href="/studio" className="underline hover:text-neutral-200">
+                {t("placeholder")}{" "}
+                <a href="/studio" className="underline hover:text-foreground">
                   Sanity Studio
                 </a>
-                .
               </p>
             )}
-
             {about?.email && (
               <p>
                 <a
@@ -58,7 +71,6 @@ export default async function AboutPage() {
                 </a>
               </p>
             )}
-
             {about?.socialLinks && about.socialLinks.length > 0 && (
               <ul className="flex flex-wrap gap-6 pt-4">
                 {about.socialLinks.map((link) => (
@@ -67,7 +79,7 @@ export default async function AboutPage() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-neutral-200"
+                      className="text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:text-foreground"
                     >
                       {link.label}
                     </a>

@@ -8,14 +8,12 @@ export const about = defineType({
     defineField({
       name: "title",
       title: "Titre",
-      type: "string",
-      initialValue: "À propos",
+      type: "localizedString",
     }),
     defineField({
       name: "bio",
       title: "Bio",
-      type: "text",
-      rows: 8,
+      type: "localizedText",
     }),
     defineField({
       name: "email",
@@ -35,9 +33,6 @@ export const about = defineType({
             defineField({ name: "label", title: "Label", type: "string" }),
             defineField({ name: "url", title: "URL", type: "url" }),
           ],
-          preview: {
-            select: { title: "label", subtitle: "url" },
-          },
         },
       ],
     }),

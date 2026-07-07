@@ -1,6 +1,7 @@
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
+import { translateDocumentAction } from "./actions/translateDocumentAction";
 import { apiVersion, dataset, projectId } from "./env";
 import { schema } from "./schemas";
 
@@ -9,6 +10,14 @@ export default defineConfig({
   projectId,
   dataset,
   schema,
+  document: {
+    actions: (prev, context) => {
+      if (context.schemaType === "project" || context.schemaType === "about") {
+        return [...prev, translateDocumentAction];
+      }
+      return prev;
+    },
+  },
   plugins: [
     structureTool({
       structure: (S) =>

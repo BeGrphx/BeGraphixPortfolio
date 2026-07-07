@@ -1,4 +1,10 @@
-export type MediaType = "youtube" | "vimeo" | "instagram" | "linkedin" | "link";
+export type MediaType =
+  | "youtube"
+  | "vimeo"
+  | "instagram"
+  | "linkedin"
+  | "link"
+  | "mux";
 
 export interface ParsedMedia {
   kind: "embed" | "link";

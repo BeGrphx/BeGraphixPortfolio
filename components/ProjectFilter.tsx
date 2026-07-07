@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import type { ProjectType } from "@/lib/sanity/queries";
 
-export type FilterValue = "all" | ProjectType;
+export type FilterValue = ProjectType;
 
 interface ProjectFilterProps {
   value: FilterValue;
@@ -11,16 +12,19 @@ interface ProjectFilterProps {
   counts: { professional: number; personal: number };
 }
 
-const filters: { value: FilterValue; label: string }[] = [
-  { value: "professional", label: "Professionnel" },
-  { value: "personal", label: "Personnel" },
-];
-
 export function ProjectFilter({
   value,
   onChange,
   counts,
 }: ProjectFilterProps) {
+  const t = useTranslations("filter");
+  const tHome = useTranslations("home");
+
+  const filters: { value: FilterValue; label: string }[] = [
+    { value: "professional", label: t("professional") },
+    { value: "personal", label: t("personal") },
+  ];
+
   return (
     <div className="mb-14 flex flex-col gap-6 md:mb-20 md:flex-row md:items-center md:justify-between">
       <div className="relative inline-flex rounded-full border border-neutral-800 p-1">
@@ -37,7 +41,9 @@ export function ProjectFilter({
               type="button"
               onClick={() => onChange(filter.value)}
               className={`relative z-10 px-5 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors duration-300 ${
-                isActive ? "text-background" : "text-neutral-400 hover:text-neutral-200"
+                isActive
+                  ? "text-background"
+                  : "text-neutral-400 hover:text-neutral-200"
               }`}
             >
               {isActive && (
@@ -60,7 +66,7 @@ export function ProjectFilter({
         })}
       </div>
       <p className="text-xs uppercase tracking-[0.2em] text-neutral-600">
-        Tri chronologique
+        {tHome("chronological")}
       </p>
     </div>
   );

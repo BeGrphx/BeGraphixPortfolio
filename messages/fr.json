@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "work": "Work",
+    "about": "About",
+    "presentation": "Présentation"
+  },
+  "home": {
+    "eyebrow": "Motion Design · Vidéo IA",
+    "titleLine1": "Créations visuelles",
+    "titleLine2": "animées & augmentées",
+    "chronological": "Tri chronologique",
+    "noProjects": "Aucun projet pour le moment.",
+    "addViaStudio": "Ajoutez des projets via Sanity Studio.",
+    "noCategory": "Aucun projet dans cette catégorie."
+  },
+  "filter": {
+    "professional": "Professionnel",
+    "personal": "Personnel"
+  },
+  "project": {
+    "back": "Retour",
+    "home": "Home",
+    "invalidUrl": "URL invalide",
+    "watchOn": "Voir sur {platform}",
+    "platforms": {
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "external": "le lien"
+    },
+    "duration": "Durée",
+    "downloadPdf": "Télécharger le PDF"
+  },
+  "about": {
+    "contact": "Contact",
+    "defaultTitle": "À propos",
+    "placeholder": "Motion designer et créateur vidéo IA. Ce texte est modifiable depuis Sanity Studio."
+  },
+  "footer": {
+    "rights": "Tous droits réservés",
+    "presentationHint": "Appuyez sur F pour le mode présentation"
+  },
+  "presentation": {
+    "exit": "Quitter (Échap ou F)",
+    "next": "Suivant",
+    "prev": "Précédent"
+  },
+  "loader": {
+    "loading": "Chargement"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre"
+  }
+}

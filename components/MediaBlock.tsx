@@ -1,6 +1,15 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { useState } from "react";
 import { parseMediaUrl } from "@/lib/media";
 import type { SanityMediaItem } from "@/lib/sanity/queries";
 import { FadeIn } from "./FadeIn";
+
+const MuxPlayer = dynamic(
+  () => import("@mux/mux-player-react").then((m) => m.default),
+  { ssr: false },
+);
 
 interface MediaBlockProps {
   item: SanityMediaItem;
@@ -8,13 +17,48 @@ interface MediaBlockProps {
 }
 
 const defaultLabels: Record<string, string> = {
-  instagram: "Voir sur Instagram",
-  linkedin: "Voir sur LinkedIn",
+  instagram: "Instagram",
+  linkedin: "LinkedIn",
   link: "En savoir plus",
 };
 
 export function MediaBlock({ item, index }: MediaBlockProps) {
-  const parsed = parseMediaUrl(item.url, item.mediaType);
+  const [muted, setMuted] = useState(true);
+
+  if (item.mediaType === "mux" && item.muxPlaybackId) {
+    return (
+      <FadeIn delay={index * 0.08}>
+        <div className="overflow-hidden rounded-sm bg-neutral-950">
+          {item.title && (
+            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-neutral-500">
+              {item.title}
+            </p>
+          )}
+          <div className="relative aspect-video w-full overflow-hidden">
+            <MuxPlayer
+              playbackId={item.muxPlaybackId}
+              muted={muted}
+              streamType="on-demand"
+              className="h-full w-full"
+            />
+          </div>
+          <div className="mt-3 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setMuted((m) => !m)}
+              className="text-xs uppercase tracking-[0.2em] text-neutral-500 hover:text-neutral-300"
+            >
+              {muted ? "🔇 Activer le son" : "🔊 Couper le son"}
+            </button>
+          </div>
+        </div>
+      </FadeIn>
+    );
+  }
+
+  const parsed = item.url
+    ? parseMediaUrl(item.url, item.mediaType as Parameters<typeof parseMediaUrl>[1])
+    : null;
 
   if (!parsed) {
     return (
@@ -67,25 +111,13 @@ export function MediaBlock({ item, index }: MediaBlockProps) {
           }`}
         >
           <iframe
-            src={parsed.embedUrl}
+            src={`${parsed.embedUrl}${parsed.embedUrl.includes("?") ? "&" : "?"}muted=1`}
             title={item.title ?? "Média embarqué"}
             className="absolute inset-0 h-full w-full border-0"
             allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
             allowFullScreen
           />
         </div>
-        {item.label && (
-          <div className="mt-4 flex justify-center">
-            <a
-              href={parsed.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-neutral-300"
-            >
-              {item.label} →
-            </a>
-          </div>
-        )}
       </div>
     </FadeIn>
   );

@@ -1,6 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import type { Locale } from "@/i18n/routing";
 import type { SanityProject } from "@/lib/sanity/queries";
 import { ProjectCard } from "./ProjectCard";
 import type { FilterValue } from "./ProjectFilter";
@@ -8,18 +10,19 @@ import type { FilterValue } from "./ProjectFilter";
 interface FilteredProjectGridProps {
   projects: SanityProject[];
   filter: FilterValue;
+  locale: Locale;
 }
 
 export function FilteredProjectGrid({
   projects,
   filter,
+  locale,
 }: FilteredProjectGridProps) {
-  const filtered =
-    filter === "all"
-      ? projects
-      : projects.filter(
-          (p) => (p.projectType ?? "professional") === filter,
-        );
+  const t = useTranslations("home");
+
+  const filtered = projects.filter(
+    (p) => (p.projectType ?? "professional") === filter,
+  );
 
   if (filtered.length === 0) {
     return (
@@ -28,16 +31,24 @@ export function FilteredProjectGrid({
         animate={{ opacity: 1 }}
         className="rounded-lg border border-dashed border-neutral-800 px-8 py-16 text-center"
       >
-        <p className="text-neutral-400">Aucun projet dans cette catégorie.</p>
+        <p className="text-neutral-400">{t("noCategory")}</p>
       </motion.div>
     );
   }
 
   return (
-    <motion.div layout className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
+    <motion.div
+      layout
+      className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2"
+    >
       <AnimatePresence mode="popLayout">
         {filtered.map((project, index) => (
-          <ProjectCard key={project._id} project={project} index={index} />
+          <ProjectCard
+            key={project._id}
+            project={project}
+            index={index}
+            locale={locale}
+          />
         ))}
       </AnimatePresence>
     </motion.div>

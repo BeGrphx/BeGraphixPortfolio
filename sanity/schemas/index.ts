@@ -1,7 +1,8 @@
 import { type SchemaTypeDefinition } from "sanity";
-import { project } from "./project";
 import { about } from "./about";
+import { localizedString, localizedText } from "./localized";
+import { project } from "./project";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [project, about],
+  types: [localizedString, localizedText, project, about],
 };

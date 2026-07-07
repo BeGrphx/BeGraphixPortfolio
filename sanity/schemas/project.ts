@@ -9,14 +9,14 @@ export const project = defineType({
     defineField({
       name: "title",
       title: "Titre",
-      type: "string",
+      type: "localizedString",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "slug",
       title: "Slug (URL)",
       type: "slug",
-      options: { source: "title", maxLength: 96 },
+      options: { source: "title.fr", maxLength: 96 },
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -42,22 +42,25 @@ export const project = defineType({
       name: "completedAt",
       title: "Date de réalisation",
       type: "date",
-      description: "Utilisée pour le tri chronologique (du plus récent au plus ancien)",
+      description: "Tri chronologique (récent → ancien)",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "duration",
+      title: "Durée du projet",
+      type: "string",
+      description: 'Ex: "2 semaines", "3 mois"',
     }),
     defineField({
       name: "description",
       title: "Description",
-      type: "text",
-      rows: 6,
+      type: "localizedText",
     }),
     defineField({
       name: "credits",
       title: "Crédits / mentions légales",
-      type: "text",
-      rows: 3,
-      description:
-        "Texte affiché en petit (ex: © TF1 / Endemol. All rights reserved…)",
+      type: "localizedText",
+      description: "Texte affiché en petit (ex: © TF1 / Endemol…)",
     }),
     defineField({
       name: "tags",
@@ -67,49 +70,57 @@ export const project = defineType({
       options: { layout: "tags" },
     }),
     defineField({
+      name: "dominantColor",
+      title: "Couleur dominante",
+      type: "string",
+      description: "Hex (#1a2b3c) — teinte la page projet. Laisse vide pour auto.",
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (!value) return true;
+          return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value)
+            ? true
+            : "Format hex requis (#RRGGBB)";
+        }),
+    }),
+    defineField({
       name: "thumbnail",
       title: "Vignette (grille d'accueil)",
       type: "image",
       options: { hotspot: true },
       fields: [
-        defineField({
-          name: "alt",
-          title: "Texte alternatif",
-          type: "string",
-        }),
+        defineField({ name: "alt", title: "Texte alternatif", type: "string" }),
       ],
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "hoverPreviewUrl",
+      title: "Vidéo preview au survol",
+      type: "url",
+      description: "URL MP4 ou Vimeo — jouée au survol sur la grille",
     }),
     defineField({
       name: "gallery",
       title: "Galerie photos",
       type: "array",
-      description:
-        "Ajoutez plusieurs images en une fois : glissez-déposez ou sélection multiple (Ctrl+clic).",
-      components: {
-        input: BulkImageArrayInput,
-      },
-      options: {
-        layout: "grid",
-      },
+      description: "Glissez-déposez plusieurs images d'un coup.",
+      components: { input: BulkImageArrayInput },
+      options: { layout: "grid" },
       of: [
         {
           type: "image",
           options: { hotspot: true },
           fields: [
-            defineField({
-              name: "alt",
-              title: "Texte alternatif",
-              type: "string",
-            }),
-            defineField({
-              name: "caption",
-              title: "Légende (optionnel)",
-              type: "string",
-            }),
+            defineField({ name: "alt", title: "Alt", type: "string" }),
+            defineField({ name: "caption", title: "Légende", type: "string" }),
           ],
         },
       ],
+    }),
+    defineField({
+      name: "pdfFile",
+      title: "Fichier PDF",
+      type: "file",
+      options: { accept: "application/pdf" },
     }),
     defineField({
       name: "media",
@@ -127,10 +138,11 @@ export const project = defineType({
               type: "string",
               options: {
                 list: [
-                  { title: "YouTube (embed)", value: "youtube" },
-                  { title: "Vimeo (embed)", value: "vimeo" },
-                  { title: "Instagram (embed ou lien)", value: "instagram" },
-                  { title: "LinkedIn (lien)", value: "linkedin" },
+                  { title: "Mux (player custom)", value: "mux" },
+                  { title: "YouTube", value: "youtube" },
+                  { title: "Vimeo", value: "vimeo" },
+                  { title: "Instagram", value: "instagram" },
+                  { title: "LinkedIn", value: "linkedin" },
                   { title: "Lien externe", value: "link" },
                 ],
                 layout: "radio",
@@ -138,10 +150,16 @@ export const project = defineType({
               validation: (rule) => rule.required(),
             }),
             defineField({
+              name: "muxPlaybackId",
+              title: "Mux Playback ID",
+              type: "string",
+              hidden: ({ parent }) => parent?.mediaType !== "mux",
+            }),
+            defineField({
               name: "url",
               title: "URL",
               type: "url",
-              validation: (rule) => rule.required(),
+              hidden: ({ parent }) => parent?.mediaType === "mux",
             }),
             defineField({
               name: "title",
@@ -150,22 +168,14 @@ export const project = defineType({
             }),
             defineField({
               name: "label",
-              title: "Texte du bouton (liens)",
+              title: "Texte du bouton",
               type: "string",
-              description: 'Ex: "Watch on Instagram", "Voir sur LinkedIn"',
             }),
           ],
           preview: {
-            select: {
-              title: "title",
-              mediaType: "mediaType",
-              url: "url",
-            },
+            select: { title: "title", mediaType: "mediaType", url: "url" },
             prepare({ title, mediaType, url }) {
-              return {
-                title: title || url,
-                subtitle: mediaType,
-              };
+              return { title: title || url || mediaType, subtitle: mediaType };
             },
           },
         },
@@ -178,28 +188,12 @@ export const project = defineType({
       name: "completedAtDesc",
       by: [{ field: "completedAt", direction: "desc" }],
     },
-    {
-      title: "Date (ancien → récent)",
-      name: "completedAtAsc",
-      by: [{ field: "completedAt", direction: "asc" }],
-    },
   ],
   preview: {
     select: {
-      title: "title",
+      title: "title.fr",
       subtitle: "client",
-      projectType: "projectType",
       media: "thumbnail",
-      completedAt: "completedAt",
-    },
-    prepare({ title, subtitle, projectType, media, completedAt }) {
-      const typeLabel =
-        projectType === "personal" ? "Perso" : "Pro";
-      return {
-        title,
-        subtitle: [subtitle, typeLabel, completedAt].filter(Boolean).join(" · "),
-        media,
-      };
     },
   },
 });

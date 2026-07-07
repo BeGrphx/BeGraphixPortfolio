@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/routing";
+import type { LocalizedValue } from "@/lib/i18n";
 import type { MediaType } from "@/lib/media";
 
 export interface SanityGalleryImage {
@@ -9,7 +11,8 @@ export interface SanityGalleryImage {
 export interface SanityMediaItem {
   _key: string;
   mediaType: MediaType;
-  url: string;
+  url?: string;
+  muxPlaybackId?: string;
   title?: string;
   label?: string;
 }
@@ -18,22 +21,26 @@ export type ProjectType = "professional" | "personal";
 
 export interface SanityProject {
   _id: string;
-  title: string;
+  title: LocalizedValue | string;
   slug: { current: string };
   projectType?: ProjectType;
   client?: string;
   completedAt?: string;
-  description?: string;
-  credits?: string;
+  duration?: string;
+  description?: LocalizedValue | string;
+  credits?: LocalizedValue | string;
   tags?: string[];
+  dominantColor?: string;
   thumbnail: SanityGalleryImage;
+  hoverPreviewUrl?: string;
   gallery?: SanityGalleryImage[];
+  pdfFile?: { asset: { _ref: string; url?: string } };
   media?: SanityMediaItem[];
 }
 
 export interface SanityAbout {
-  title?: string;
-  bio?: string;
+  title?: LocalizedValue | string;
+  bio?: LocalizedValue | string;
   email?: string;
   socialLinks?: { label: string; url: string }[];
 }
@@ -45,9 +52,12 @@ export const projectsQuery = `*[_type == "project"] | order(completedAt desc) {
   projectType,
   client,
   completedAt,
+  duration,
   description,
   tags,
-  thumbnail
+  dominantColor,
+  thumbnail,
+  hoverPreviewUrl
 }`;
 
 export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug][0] {
@@ -57,11 +67,15 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
   projectType,
   client,
   completedAt,
+  duration,
   description,
   credits,
   tags,
+  dominantColor,
   thumbnail,
+  hoverPreviewUrl,
   gallery,
+  pdfFile { asset->{ url } },
   media
 }`;
 

@@ -1,7 +1,4 @@
-import type { Metadata } from "next";
-import { Syne, DM_Sans } from "next/font/google";
-import { Header } from "@/components/Header";
-import "./globals.css";
+import { Syne, DM_Sans, IBM_Plex_Mono } from "next/font/google";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -15,25 +12,22 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "BeGraphix — Motion & AI Video",
-    template: "%s — BeGraphix",
-  },
-  description:
-    "Portfolio de motion design et création vidéo IA — projets, reels et expérimentations visuelles.",
-};
+const ibmMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${syne.variable} ${dmSans.variable}`}>
-      <body className="bg-background text-foreground antialiased">
-        <Header />
-        <main>{children}</main>
+    <html suppressHydrationWarning>
+      <body
+        className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} antialiased`}
+      >
+        {children}
       </body>
     </html>
   );

@@ -1,27 +1,57 @@
 "use client";
 
+import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { Link } from "@/i18n/navigation";
 import { formatProjectDateShort } from "@/lib/media";
+import { getLocalized } from "@/lib/i18n";
+import type { Locale } from "@/i18n/routing";
 import { urlFor } from "@/lib/sanity/image";
 import type { SanityProject } from "@/lib/sanity/queries";
 
 interface ProjectCardProps {
   project: SanityProject;
   index: number;
+  locale: Locale;
 }
 
-export function ProjectCard({ project, index }: ProjectCardProps) {
+function getHoverVideoSrc(url: string): string | null {
+  if (url.endsWith(".mp4") || url.includes(".mp4?")) return url;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo?.[1]) {
+    return `https://player.vimeo.com/video/${vimeo[1]}?autoplay=1&muted=1&loop=1&background=1`;
+  }
+  return null;
+}
+
+export function ProjectCard({ project, index, locale }: ProjectCardProps) {
+  const ref = useRef<HTMLElement>(null);
+  const [hovering, setHovering] = useState(false);
+  const title = getLocalized(project.title, locale);
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
+
   const imageUrl = urlFor(project.thumbnail)
     .width(900)
     .height(600)
     .fit("crop")
     .url();
 
+  const hoverSrc = project.hoverPreviewUrl
+    ? getHoverVideoSrc(project.hoverPreviewUrl)
+    : null;
+  const isMp4 = hoverSrc?.includes(".mp4");
+
   return (
     <motion.article
+      ref={ref}
       layout
+      style={{ y }}
       initial={{ opacity: 0, y: 40, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -20, scale: 0.96 }}
@@ -31,16 +61,40 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         ease: [0.22, 1, 0.36, 1],
       }}
     >
-      <Link href={`/project/${project.slug.current}`} className="group block">
+      <Link
+        href={`/project/${project.slug.current}`}
+        className="group block"
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+      >
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">
           <Image
             src={imageUrl}
-            alt={project.thumbnail.alt ?? project.title}
+            alt={project.thumbnail.alt ?? title}
             fill
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+              hovering && hoverSrc ? "opacity-0" : "opacity-100"
+            }`}
             sizes="(max-width: 768px) 100vw, 50vw"
           />
-          <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/30" />
+          {hovering && hoverSrc && isMp4 && (
+            <video
+              src={hoverSrc}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+          {hovering && hoverSrc && !isMp4 && (
+            <iframe
+              src={hoverSrc}
+              className="absolute inset-0 h-full w-full scale-110 object-cover pointer-events-none"
+              allow="autoplay; fullscreen"
+            />
+          )}
+          <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
           <div className="absolute inset-x-0 bottom-0 translate-y-4 p-6 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
             <p className="text-xs uppercase tracking-[0.2em] text-white/70">
               {project.client}
@@ -53,7 +107,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         <div className="mt-4 flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-medium tracking-tight transition-opacity group-hover:opacity-60 md:text-xl">
-              {project.title}
+              {title}
             </h2>
             {project.tags && project.tags.length > 0 && (
               <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">
@@ -61,9 +115,12 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               </p>
             )}
           </div>
-          <span className="text-xs text-neutral-600 transition-colors group-hover:text-neutral-400">
+          <motion.span
+            className="text-xs text-neutral-600"
+            whileHover={{ x: 4 }}
+          >
             →
-          </span>
+          </motion.span>
         </div>
       </Link>
     </motion.article>
