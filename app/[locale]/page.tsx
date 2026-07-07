@@ -48,7 +48,7 @@ export default async function HomePage({
     <div className="relative">
       <div
         className="pointer-events-none absolute inset-x-0 top-0 z-0"
-        style={{ height: "calc(85vh + 12rem)" }}
+        style={{ height: "calc(72vh + 6rem)" }}
       >
         <HeroBackground
           type={heroType}
@@ -58,25 +58,24 @@ export default async function HomePage({
         />
       </div>
 
-      <section className="relative z-10 min-h-[85vh]">
-        <div className="mx-auto max-w-7xl px-6 pt-32 md:px-10 md:pt-40">
-          <FadeIn>
-            <div className="max-w-2xl">
-              <p className="mb-4 text-xs uppercase tracking-[0.3em] text-muted">
-                {t("eyebrow")}
-              </p>
-              <h1 className="font-display text-4xl font-medium leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
-                {t("titleLine1")}
-                <br />
-                <span className="text-muted">{t("titleLine2")}</span>
-              </h1>
-            </div>
-          </FadeIn>
-        </div>
+      <section className="relative z-10 flex min-h-[72vh] flex-col items-center justify-center px-6 text-center md:px-10">
+        <FadeIn className="max-w-4xl">
+          <p className="mb-6 text-xs uppercase tracking-[0.35em] text-muted">
+            {t("eyebrow")}
+          </p>
+          <h1 className="font-display text-5xl font-medium leading-[1.02] tracking-tight md:text-7xl lg:text-[5.25rem]">
+            {t("titleLine1")}
+            <br />
+            <span className="text-muted">{t("titleLine2")}</span>
+          </h1>
+          <p className="mx-auto mt-8 max-w-lg text-sm leading-relaxed text-muted md:mt-10 md:text-base">
+            {t("subtitle")}
+          </p>
+        </FadeIn>
       </section>
 
       <section className="relative z-10 px-6 pb-24 md:px-10">
-        <div className="mx-auto max-w-7xl pt-6 md:pt-10">
+        <div className="mx-auto max-w-7xl pt-12 md:pt-20">
           <ProjectGrid projects={projects} locale={locale} />
         </div>
       </section>

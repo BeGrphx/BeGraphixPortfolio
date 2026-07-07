@@ -69,7 +69,7 @@ export function VideoBackground({ url, blur, onError }: VideoBackgroundProps) {
           }}
         />
       </div>
-      <div className="absolute inset-0 bg-white/60 dark:bg-black/55" />
+      <div className="absolute inset-0 bg-black/55" />
     </div>
   );
 }

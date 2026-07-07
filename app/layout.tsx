@@ -23,7 +23,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html suppressHydrationWarning>
+    <html className="dark" suppressHydrationWarning>
       <body
         className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} antialiased`}
       >

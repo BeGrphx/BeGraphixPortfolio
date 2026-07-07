@@ -39,7 +39,9 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
 
   return (
     <>
-      <ProjectFilter value={filter} onChange={setFilter} counts={counts} />
+      <div className="mb-14 flex w-full justify-center md:mb-20">
+        <ProjectFilter value={filter} onChange={setFilter} counts={counts} />
+      </div>
       <FilteredProjectGrid
         projects={projects}
         filter={filter}

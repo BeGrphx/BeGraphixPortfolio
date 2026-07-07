@@ -24,8 +24,8 @@ export function ProjectFilter({
     { value: "personal", label: t("personal") },
   ];
 
-  return (
-    <div className="relative mb-14 inline-flex rounded-full border border-neutral-300 p-1 dark:border-neutral-800 md:mb-20">
+    return (
+    <div className="relative mb-14 inline-flex rounded-full border border-neutral-800 p-1 md:mb-20">
       {filters.map((filter) => {
         const isActive = value === filter.value;
         const count =

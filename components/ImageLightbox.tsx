@@ -75,11 +75,15 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={close}
           >
             <button
               type="button"
-              onClick={close}
-              className="absolute right-6 top-6 z-10 text-xs uppercase tracking-[0.2em] text-white/60 hover:text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                close();
+              }}
+              className="absolute right-6 top-6 z-20 rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
             >
               Fermer ✕
             </button>
@@ -88,24 +92,33 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
               <>
                 <button
                   type="button"
-                  onClick={prev}
-                  className="absolute left-4 top-1/2 z-10 -translate-y-1/2 px-4 py-3 text-2xl text-white/70 hover:text-white md:left-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prev();
+                  }}
+                  className="absolute left-0 top-0 z-20 flex h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:w-28"
                   aria-label="Image précédente"
                 >
-                  ←
+                  <span className="text-4xl leading-none">←</span>
                 </button>
                 <button
                   type="button"
-                  onClick={next}
-                  className="absolute right-4 top-1/2 z-10 -translate-y-1/2 px-4 py-3 text-2xl text-white/70 hover:text-white md:right-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    next();
+                  }}
+                  className="absolute right-0 top-0 z-20 flex h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:w-28"
                   aria-label="Image suivante"
                 >
-                  →
+                  <span className="text-4xl leading-none">→</span>
                 </button>
               </>
             )}
 
-            <div className="relative h-[70vh] w-[90vw] max-w-6xl">
+            <div
+              className="relative z-10 h-[70vh] w-[90vw] max-w-6xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Image
                 src={images[index].src}
                 alt={images[index].alt}
@@ -117,13 +130,13 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             </div>
 
             {images[index].caption && (
-              <p className="absolute bottom-8 left-1/2 max-w-xl -translate-x-1/2 text-center text-sm text-white/60">
+              <p className="pointer-events-none absolute bottom-8 left-1/2 z-10 max-w-xl -translate-x-1/2 text-center text-sm text-white/60">
                 {images[index].caption}
               </p>
             )}
 
             {images.length > 1 && (
-              <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-white/40">
+              <p className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 text-xs text-white/40">
                 {index + 1} / {images.length}
               </p>
             )}
