@@ -44,17 +44,19 @@ export default async function HomePage({
       : (rawType as "video" | "organic" | "none" | undefined) ??
         (videoUrl ? "video" : "none");
 
+  const bottomFade = settings?.heroBottomFade ?? 280;
+
   return (
     <div className="relative">
       <div
         className="pointer-events-none absolute inset-x-0 top-0 z-0"
-        style={{ height: "calc(72vh + 6rem)" }}
+        style={{ height: `calc(72vh + ${bottomFade}px)` }}
       >
         <HeroBackground
           type={heroType}
           videoUrl={videoUrl}
           videoBlur={settings?.heroVideoBlur ?? 10}
-          bottomFade={settings?.heroBottomFade ?? 220}
+          bottomFade={bottomFade}
         />
       </div>
 
