@@ -29,11 +29,9 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
   const [hovering, setHovering] = useState(false);
   const title = project.displayTitle;
 
-  const imageUrl = urlFor(project.thumbnail)
-    .width(900)
-    .height(600)
-    .fit("crop")
-    .url();
+  const imageUrl = project.thumbnail
+    ? urlFor(project.thumbnail).width(900).height(600).fit("crop").url()
+    : null;
 
   const hoverSrc = project.hoverPreviewUrl
     ? getHoverVideoSrc(project.hoverPreviewUrl)
@@ -59,15 +57,17 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
         onMouseLeave={() => setHovering(false)}
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">
-          <Image
-            src={imageUrl}
-            alt={project.thumbnail.alt ?? title}
-            fill
-            className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
-              hovering && hoverSrc ? "opacity-0" : "opacity-100"
-            }`}
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={project.thumbnail?.alt ?? title}
+              fill
+              className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+                hovering && hoverSrc ? "opacity-0" : "opacity-100"
+              }`}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          ) : null}
           {hovering && hoverSrc && isMp4 && (
             <video
               src={hoverSrc}
