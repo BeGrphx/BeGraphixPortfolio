@@ -94,11 +94,15 @@ export interface SiteSettings {
   logoUrl?: string;
   heroBackgroundType?: "video" | "organic" | "none";
   showreelVideoUrl?: string;
+  heroVideoBlur?: number;
+  heroBottomFade?: number;
 }
 
 export const siteSettingsQuery = `*[_type == "siteSettings"] | order(_updatedAt desc)[0] {
   "logoUrl": logo.asset->url,
   heroBackgroundType,
+  heroVideoBlur,
+  heroBottomFade,
   "showreelVideoUrl": coalesce(
     showreelVideoUrl,
     showreelVideoFile.asset->url

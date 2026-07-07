@@ -41,6 +41,24 @@ export const siteSettings = defineType({
       options: { accept: "video/mp4,video/webm" },
       hidden: ({ parent }) => parent?.heroBackgroundType !== "video",
     }),
+    defineField({
+      name: "heroVideoBlur",
+      title: "Intensité du flou vidéo",
+      type: "number",
+      description: "0 = net, 24 = très flou. Recommandé : 6–14.",
+      validation: (Rule) => Rule.min(0).max(48),
+      initialValue: 10,
+      hidden: ({ parent }) => parent?.heroBackgroundType !== "video",
+    }),
+    defineField({
+      name: "heroBottomFade",
+      title: "Fondu bas du hero",
+      type: "number",
+      description: "Hauteur de la transition douce vers la grille (px). Recommandé : 120–240.",
+      validation: (Rule) => Rule.min(40).max(400),
+      initialValue: 220,
+      hidden: ({ parent }) => parent?.heroBackgroundType === "none",
+    }),
   ],
   preview: {
     prepare() {

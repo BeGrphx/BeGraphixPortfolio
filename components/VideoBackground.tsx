@@ -4,10 +4,11 @@ import { useEffect, useRef } from "react";
 
 interface VideoBackgroundProps {
   url: string;
+  blur: number;
   onError: () => void;
 }
 
-export function VideoBackground({ url, onError }: VideoBackgroundProps) {
+export function VideoBackground({ url, blur, onError }: VideoBackgroundProps) {
   const ref = useRef<HTMLVideoElement>(null);
   const onErrorRef = useRef(onError);
   onErrorRef.current = onError;
@@ -47,19 +48,27 @@ export function VideoBackground({ url, onError }: VideoBackgroundProps) {
     };
   }, [url]);
 
+  const scale = blur > 0 ? 1.12 + blur / 60 : 1.05;
+
   return (
     <div className="absolute inset-0 overflow-hidden bg-neutral-950">
-      <video
-        ref={ref}
-        key={url}
-        src={url}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
-      />
+      <div className="absolute -inset-[12%]">
+        <video
+          ref={ref}
+          key={url}
+          src={url}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="h-full w-full object-cover"
+          style={{
+            filter: blur > 0 ? `blur(${blur}px)` : undefined,
+            transform: `scale(${scale})`,
+          }}
+        />
+      </div>
       <div className="absolute inset-0 bg-white/60 dark:bg-black/55" />
     </div>
   );

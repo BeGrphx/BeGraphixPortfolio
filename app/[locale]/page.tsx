@@ -1,7 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FadeIn } from "@/components/FadeIn";
 import { HeroBackground } from "@/components/HeroBackground";
-import { HeroDivider } from "@/components/HeroDivider";
 import { ProjectGrid } from "@/components/ProjectGrid";
 import type { Locale } from "@/i18n/routing";
 import { localizeProjects } from "@/lib/localize-project";
@@ -47,9 +46,20 @@ export default async function HomePage({
 
   return (
     <div className="relative">
-      <section className="relative min-h-[85vh] overflow-hidden">
-        <HeroBackground type={heroType} videoUrl={videoUrl} />
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pt-32 md:px-10 md:pt-40">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-0"
+        style={{ height: "calc(85vh + 12rem)" }}
+      >
+        <HeroBackground
+          type={heroType}
+          videoUrl={videoUrl}
+          videoBlur={settings?.heroVideoBlur ?? 10}
+          bottomFade={settings?.heroBottomFade ?? 220}
+        />
+      </div>
+
+      <section className="relative z-10 min-h-[85vh]">
+        <div className="mx-auto max-w-7xl px-6 pt-32 md:px-10 md:pt-40">
           <FadeIn>
             <div className="max-w-2xl">
               <p className="mb-4 text-xs uppercase tracking-[0.3em] text-muted">
@@ -63,11 +73,10 @@ export default async function HomePage({
             </div>
           </FadeIn>
         </div>
-        <HeroDivider />
       </section>
 
-      <section className="relative bg-background px-6 pb-24 md:px-10">
-        <div className="mx-auto max-w-7xl">
+      <section className="relative z-10 px-6 pb-24 md:px-10">
+        <div className="mx-auto max-w-7xl pt-6 md:pt-10">
           <ProjectGrid projects={projects} locale={locale} />
         </div>
       </section>
