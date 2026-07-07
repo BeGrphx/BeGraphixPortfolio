@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useSiteLoader } from "@/components/providers/SiteLoaderProvider";
 
 interface VideoBackgroundProps {
   url: string;
@@ -12,12 +11,9 @@ interface VideoBackgroundProps {
 export function VideoBackground({ url, blur, onError }: VideoBackgroundProps) {
   const ref = useRef<HTMLVideoElement>(null);
   const onErrorRef = useRef(onError);
-  const { contentReady } = useSiteLoader();
   onErrorRef.current = onError;
 
   useEffect(() => {
-    if (!contentReady) return;
-
     const video = ref.current;
     if (!video) return;
 
@@ -50,7 +46,7 @@ export function VideoBackground({ url, blur, onError }: VideoBackgroundProps) {
       video.removeEventListener("loadeddata", tryPlay);
       video.removeEventListener("error", handleError);
     };
-  }, [url, contentReady]);
+  }, [url]);
 
   const scale = blur > 0 ? 1.12 + blur / 60 : 1.05;
 

@@ -29,19 +29,6 @@ html {
   scroll-behavior: auto;
 }
 
-html.begraphix-loading::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 199;
-  background-color: #080808;
-  pointer-events: all;
-}
-
-html.begraphix-loading body {
-  overflow: hidden;
-}
-
 body {
   font-family: var(--font-body), system-ui, sans-serif;
   background-color: var(--color-background);
