@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { BulkImageArrayInput } from "../components/BulkImageArrayInput";
 
 export const project = defineType({
   name: "project",
@@ -83,6 +84,14 @@ export const project = defineType({
       name: "gallery",
       title: "Galerie photos",
       type: "array",
+      description:
+        "Ajoutez plusieurs images en une fois : glissez-déposez ou sélection multiple (Ctrl+clic).",
+      components: {
+        input: BulkImageArrayInput,
+      },
+      options: {
+        layout: "grid",
+      },
       of: [
         {
           type: "image",
