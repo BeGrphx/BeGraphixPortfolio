@@ -17,14 +17,32 @@ interface ImageLightboxProps {
 export function ImageLightbox({ images }: ImageLightboxProps) {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
 
   const close = useCallback(() => setOpen(false), []);
   const prev = useCallback(() => {
+    setDirection(-1);
     setIndex((i) => (i - 1 + images.length) % images.length);
   }, [images.length]);
   const next = useCallback(() => {
+    setDirection(1);
     setIndex((i) => (i + 1) % images.length);
   }, [images.length]);
+
+  const slideVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? "18%" : "-18%",
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (dir: number) => ({
+      x: dir > 0 ? "-18%" : "18%",
+      opacity: 0,
+    }),
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -51,6 +69,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             key={image.src}
             type="button"
             onClick={() => {
+              setDirection(0);
               setIndex(i);
               setOpen(true);
             }}
@@ -116,24 +135,54 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             )}
 
             <div
-              className="relative z-10 h-[70vh] w-[90vw] max-w-6xl"
+              className="relative z-10 h-[70vh] w-[90vw] max-w-6xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
-                src={images[index].src}
-                alt={images[index].alt}
-                fill
-                className="object-contain"
-                priority
-                sizes="90vw"
-              />
+              <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                <motion.div
+                  key={images[index].src}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial={direction === 0 ? false : "enter"}
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                  drag={images.length > 1 ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.12}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -60) next();
+                    else if (info.offset.x > 60) prev();
+                  }}
+                  className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                >
+                  <Image
+                    src={images[index].src}
+                    alt={images[index].alt}
+                    fill
+                    className="pointer-events-none object-contain"
+                    priority
+                    sizes="90vw"
+                    draggable={false}
+                  />
+                </motion.div>
+              </AnimatePresence>
             </div>
 
-            {images[index].caption && (
-              <p className="pointer-events-none absolute bottom-8 left-1/2 z-10 max-w-xl -translate-x-1/2 text-center text-sm text-white/60">
-                {images[index].caption}
-              </p>
-            )}
+            <AnimatePresence mode="wait">
+              {images[index].caption && (
+                <motion.p
+                  key={`caption-${index}`}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                  className="pointer-events-none absolute bottom-8 left-1/2 z-10 max-w-xl -translate-x-1/2 text-center text-sm text-white/60"
+                >
+                  {images[index].caption}
+                </motion.p>
+              )}
+            </AnimatePresence>
 
             {images.length > 1 && (
               <p className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 text-xs text-white/40">
