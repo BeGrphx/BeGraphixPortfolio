@@ -11,9 +11,10 @@ import {
 } from "react";
 
 const STORAGE_KEY = "begraphix-loaded";
-const LOGO_HOLD_MS = 2000;
-const LOGO_EXIT_MS = 700;
-const SCREEN_FADE_MS = 1000;
+const LOGO_HOLD_MS = 400;
+const LOGO_EXIT_MS = 250;
+const SCREEN_FADE_MS = 350;
+const LOGO_ENTER_S = 0.35;
 
 interface SiteLoaderContextValue {
   contentReady: boolean;
@@ -116,7 +117,8 @@ export function SiteLoaderProvider({
                         : { opacity: 1, scale: 1 }
                     }
                     transition={{
-                      duration: phase === "logo-exit" ? LOGO_EXIT_MS / 1000 : 1,
+                      duration:
+                        phase === "logo-exit" ? LOGO_EXIT_MS / 1000 : LOGO_ENTER_S,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                   >
@@ -139,7 +141,8 @@ export function SiteLoaderProvider({
                         : { opacity: 1, scale: 1 }
                     }
                     transition={{
-                      duration: phase === "logo-exit" ? LOGO_EXIT_MS / 1000 : 1,
+                      duration:
+                        phase === "logo-exit" ? LOGO_EXIT_MS / 1000 : LOGO_ENTER_S,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                   >
