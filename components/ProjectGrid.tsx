@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
-import type { SanityProject } from "@/lib/sanity/queries";
+import type { ProjectWithDisplay } from "@/lib/sanity/queries";
 import { FilteredProjectGrid } from "./FilteredProjectGrid";
 import { ProjectFilter, type FilterValue } from "./ProjectFilter";
 
 interface ProjectGridProps {
-  projects: SanityProject[];
+  projects: ProjectWithDisplay[];
   locale: Locale;
 }
 

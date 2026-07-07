@@ -1,11 +1,17 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FadeIn } from "@/components/FadeIn";
-import { PresentationMode } from "@/components/PresentationMode";
+import { HeroBackground } from "@/components/HeroBackground";
+import { HeroDivider } from "@/components/HeroDivider";
 import { ProjectGrid } from "@/components/ProjectGrid";
-import { WebGLHero } from "@/components/WebGLHero";
 import type { Locale } from "@/i18n/routing";
+import { localizeProjects } from "@/lib/localize-project";
 import { client } from "@/lib/sanity/client";
-import { projectsQuery, type SanityProject } from "@/lib/sanity/queries";
+import {
+  projectsQuery,
+  siteSettingsQuery,
+  type SanityProject,
+  type SiteSettings,
+} from "@/lib/sanity/queries";
 
 export const revalidate = 60;
 
@@ -17,6 +23,14 @@ async function getProjects(): Promise<SanityProject[]> {
   }
 }
 
+async function getSiteSettings(): Promise<SiteSettings | null> {
+  try {
+    return await client.fetch(siteSettingsQuery);
+  } catch {
+    return null;
+  }
+}
+
 export default async function HomePage({
   params,
 }: {
@@ -25,16 +39,26 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home");
-  const projects = await getProjects();
+
+  const [projectsRaw, settings] = await Promise.all([
+    getProjects(),
+    getSiteSettings(),
+  ]);
+  const projects = await localizeProjects(projectsRaw, locale);
+
+  const videoUrl =
+    settings?.showreelVideoUrl ||
+    settings?.showreelVideoFile?.asset?.url ||
+    undefined;
+  const heroType = settings?.heroBackgroundType ?? (videoUrl ? "video" : "webgl");
 
   return (
-    <>
-      <PresentationMode projects={projects} locale={locale} />
-      <div className="relative min-h-screen px-6 pb-24 pt-32 md:px-10 md:pt-40">
-        <WebGLHero />
-        <div className="mx-auto max-w-7xl">
+    <div className="relative">
+      <section className="relative min-h-[88vh] overflow-hidden">
+        <HeroBackground type={heroType} videoUrl={videoUrl} />
+        <div className="relative z-10 mx-auto max-w-7xl px-6 pt-32 md:px-10 md:pt-40">
           <FadeIn>
-            <div className="mb-16 max-w-2xl md:mb-24">
+            <div className="max-w-2xl">
               <p className="mb-4 text-xs uppercase tracking-[0.3em] text-muted">
                 {t("eyebrow")}
               </p>
@@ -45,9 +69,15 @@ export default async function HomePage({
               </h1>
             </div>
           </FadeIn>
+        </div>
+        <HeroDivider />
+      </section>
+
+      <section className="relative bg-background px-6 pb-24 md:px-10">
+        <div className="mx-auto max-w-7xl">
           <ProjectGrid projects={projects} locale={locale} />
         </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 }

@@ -1,8 +1,7 @@
 {
   "nav": {
-    "work": "Work",
-    "about": "About",
-    "presentation": "Présentation"
+    "work": "Projets",
+    "about": "À propos"
   },
   "home": {
     "eyebrow": "Motion Design · Vidéo IA",
@@ -36,13 +35,7 @@
     "placeholder": "Motion designer et créateur vidéo IA. Ce texte est modifiable depuis Sanity Studio."
   },
   "footer": {
-    "rights": "Tous droits réservés",
-    "presentationHint": "Appuyez sur F pour le mode présentation"
-  },
-  "presentation": {
-    "exit": "Quitter (Échap ou F)",
-    "next": "Suivant",
-    "prev": "Précédent"
+    "rights": "Tous droits réservés"
   },
   "loader": {
     "loading": "Chargement"

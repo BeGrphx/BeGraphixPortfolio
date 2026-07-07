@@ -6,7 +6,8 @@ import { FadeIn } from "@/components/FadeIn";
 import { MediaBlock } from "@/components/MediaBlock";
 import { PhotoGallery } from "@/components/PhotoGallery";
 import type { Locale } from "@/i18n/routing";
-import { getLocalized } from "@/lib/i18n";
+import { getLocalizedAuto } from "@/lib/i18n";
+import { localizeProjectDetail } from "@/lib/localize-project";
 import { formatProjectDate } from "@/lib/media";
 import { client } from "@/lib/sanity/client";
 import { urlFor } from "@/lib/sanity/image";
@@ -48,8 +49,8 @@ export async function generateMetadata({
   const project = await getProject(slug);
   if (!project) return { title: "Project" };
 
-  const title = getLocalized(project.title, locale);
-  const description = getLocalized(project.description, locale);
+  const title = await getLocalizedAuto(project.title, locale);
+  const description = await getLocalizedAuto(project.description, locale);
   const ogImage = urlFor(project.thumbnail).width(1200).height(630).url();
 
   return {
@@ -78,12 +79,11 @@ export default async function ProjectPage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("project");
-  const project = await getProject(slug);
-  if (!project) notFound();
+  const projectRaw = await getProject(slug);
+  if (!projectRaw) notFound();
 
-  const title = getLocalized(project.title, locale);
-  const description = getLocalized(project.description, locale);
-  const credits = getLocalized(project.credits, locale);
+  const project = await localizeProjectDetail(projectRaw, locale);
+  const { title, description, credits } = project;
   const accent = project.dominantColor ?? "#1a1a1a";
 
   return (

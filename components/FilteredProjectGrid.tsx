@@ -3,12 +3,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
-import type { SanityProject } from "@/lib/sanity/queries";
+import type { ProjectWithDisplay } from "@/lib/sanity/queries";
 import { ProjectCard } from "./ProjectCard";
 import type { FilterValue } from "./ProjectFilter";
 
 interface FilteredProjectGridProps {
-  projects: SanityProject[];
+  projects: ProjectWithDisplay[];
   filter: FilterValue;
   locale: Locale;
 }

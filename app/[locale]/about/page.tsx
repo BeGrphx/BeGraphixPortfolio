@@ -4,7 +4,7 @@ import { FadeIn } from "@/components/FadeIn";
 import type { Locale } from "@/i18n/routing";
 import { client } from "@/lib/sanity/client";
 import { aboutQuery, type SanityAbout } from "@/lib/sanity/queries";
-import { getLocalized } from "@/lib/i18n";
+import { getLocalizedAuto } from "@/lib/i18n";
 
 export const revalidate = 60;
 
@@ -35,6 +35,10 @@ export default async function AboutPage({
   setRequestLocale(locale);
   const t = await getTranslations("about");
   const about = await getAbout();
+  const aboutTitle = about
+    ? await getLocalizedAuto(about.title, locale)
+    : "";
+  const aboutBio = about ? await getLocalizedAuto(about.bio, locale) : "";
 
   return (
     <div className="min-h-screen px-6 pb-24 pt-32 md:px-10 md:pt-40">
@@ -44,15 +48,13 @@ export default async function AboutPage({
             {t("contact")}
           </p>
           <h1 className="font-display text-4xl font-medium tracking-tight md:text-5xl">
-            {getLocalized(about?.title, locale) || t("defaultTitle")}
+            {aboutTitle || t("defaultTitle")}
           </h1>
         </FadeIn>
         <FadeIn delay={0.1}>
           <div className="mt-12 space-y-8 text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
-            {getLocalized(about?.bio, locale) ? (
-              <p className="whitespace-pre-line">
-                {getLocalized(about?.bio, locale)}
-              </p>
+            {aboutBio ? (
+              <p className="whitespace-pre-line">{aboutBio}</p>
             ) : (
               <p>
                 {t("placeholder")}{" "}

@@ -1,8 +1,7 @@
 {
   "nav": {
     "work": "Work",
-    "about": "About",
-    "presentation": "Presentation"
+    "about": "About"
   },
   "home": {
     "eyebrow": "Motion Design · AI Video",
@@ -36,13 +35,7 @@
     "placeholder": "Motion designer and AI video creator. Edit this text in Sanity Studio."
   },
   "footer": {
-    "rights": "All rights reserved",
-    "presentationHint": "Press F for presentation mode"
-  },
-  "presentation": {
-    "exit": "Exit (Esc or F)",
-    "next": "Next",
-    "prev": "Previous"
+    "rights": "All rights reserved"
   },
   "loader": {
     "loading": "Loading"

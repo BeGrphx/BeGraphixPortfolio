@@ -89,3 +89,17 @@ export const aboutQuery = `*[_type == "about"][0] {
 export const projectSlugsQuery = `*[_type == "project" && defined(slug.current)] {
   "slug": slug.current
 }`;
+
+export interface SiteSettings {
+  heroBackgroundType?: "video" | "webgl" | "none";
+  showreelVideoUrl?: string;
+  showreelVideoFile?: { asset?: { url?: string } };
+}
+
+export const siteSettingsQuery = `*[_type == "siteSettings"][0] {
+  heroBackgroundType,
+  showreelVideoUrl,
+  showreelVideoFile { asset->{ url } }
+}`;
+
+export type ProjectWithDisplay = SanityProject & { displayTitle: string };

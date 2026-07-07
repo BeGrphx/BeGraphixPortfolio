@@ -36,6 +36,13 @@ export default defineConfig({
               .child(
                 S.document().schemaType("about").documentId("about"),
               ),
+            S.listItem()
+              .title("Paramètres du site")
+              .child(
+                S.document()
+                  .schemaType("siteSettings")
+                  .documentId("siteSettings"),
+              ),
           ]),
     }),
     visionTool({ defaultApiVersion: apiVersion }),

@@ -5,13 +5,12 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { formatProjectDateShort } from "@/lib/media";
-import { getLocalized } from "@/lib/i18n";
 import type { Locale } from "@/i18n/routing";
+import type { ProjectWithDisplay } from "@/lib/sanity/queries";
 import { urlFor } from "@/lib/sanity/image";
-import type { SanityProject } from "@/lib/sanity/queries";
 
 interface ProjectCardProps {
-  project: SanityProject;
+  project: ProjectWithDisplay;
   index: number;
   locale: Locale;
 }
@@ -28,7 +27,7 @@ function getHoverVideoSrc(url: string): string | null {
 export function ProjectCard({ project, index, locale }: ProjectCardProps) {
   const ref = useRef<HTMLElement>(null);
   const [hovering, setHovering] = useState(false);
-  const title = getLocalized(project.title, locale);
+  const title = project.displayTitle;
 
   const { scrollYProgress } = useScroll({
     target: ref,
