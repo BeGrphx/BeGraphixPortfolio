@@ -11,8 +11,9 @@ import {
 } from "react";
 
 const STORAGE_KEY = "begraphix-loaded";
-const ENTER_HOLD_MS = 2000;
-const TOTAL_MS = 3000;
+const LOGO_HOLD_MS = 2000;
+const LOGO_EXIT_MS = 700;
+const SCREEN_FADE_MS = 1000;
 
 interface SiteLoaderContextValue {
   contentReady: boolean;
@@ -53,7 +54,9 @@ export function SiteLoaderProvider({
     if (typeof window === "undefined") return false;
     return !!sessionStorage.getItem(STORAGE_KEY);
   });
-  const [phase, setPhase] = useState<"enter" | "exit">("enter");
+  const [phase, setPhase] = useState<"enter" | "logo-exit" | "screen-fade">(
+    "enter",
+  );
 
   useEffect(() => {
     if (sessionStorage.getItem(STORAGE_KEY)) {
@@ -67,93 +70,90 @@ export function SiteLoaderProvider({
     setShowLoader(true);
     setContentReady(false);
 
-    const enterDone = setTimeout(() => setPhase("exit"), ENTER_HOLD_MS);
-    const reveal = setTimeout(() => {
+    const logoExit = setTimeout(() => setPhase("logo-exit"), LOGO_HOLD_MS);
+    const screenFade = setTimeout(() => {
       setContentReady(true);
-      markReady();
-    }, TOTAL_MS - 350);
-    const hide = setTimeout(() => {
+      setPhase("screen-fade");
+    }, LOGO_HOLD_MS + LOGO_EXIT_MS);
+    const finish = setTimeout(() => {
       sessionStorage.setItem(STORAGE_KEY, "1");
+      markReady();
       setShowLoader(false);
-    }, TOTAL_MS);
+    }, LOGO_HOLD_MS + LOGO_EXIT_MS + SCREEN_FADE_MS);
 
     return () => {
-      clearTimeout(enterDone);
-      clearTimeout(reveal);
-      clearTimeout(hide);
+      clearTimeout(logoExit);
+      clearTimeout(screenFade);
+      clearTimeout(finish);
     };
   }, []);
 
   return (
     <SiteLoaderContext.Provider value={{ contentReady }}>
       {showLoader && (
-        <AnimatePresence>
+        <div className="fixed inset-0 z-[200]">
           <motion.div
-            key="loader"
-            className="fixed inset-0 z-[200] flex items-center justify-center"
+            className="absolute inset-0 bg-background"
             initial={{ opacity: 1 }}
-            animate={{ opacity: phase === "exit" ? 0 : 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: 0.85,
-              delay: phase === "exit" ? 0.35 : 0,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-background"
-              initial={{ opacity: 1 }}
-              animate={{ opacity: phase === "exit" ? 0 : 1 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            />
+            animate={{ opacity: phase === "screen-fade" ? 0 : 1 }}
+            transition={{ duration: SCREEN_FADE_MS / 1000, ease: [0.4, 0, 0.2, 1] }}
+          />
 
-            {logoUrl ? (
+          <AnimatePresence>
+            {phase !== "screen-fade" && (
               <motion.div
-                className="relative z-10 h-24 w-64 md:h-28 md:w-72"
-                initial={{ opacity: 0, scale: 0.35 }}
-                animate={
-                  phase === "exit"
-                    ? { opacity: 0, scale: 1.65 }
-                    : { opacity: 1, scale: 1 }
-                }
-                transition={{
-                  duration: phase === "exit" ? 0.9 : 1,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
+                key="logo"
+                className="absolute inset-0 flex items-center justify-center"
+                initial={false}
               >
-                <Image
-                  src={logoUrl}
-                  alt="BeGraphix"
-                  fill
-                  unoptimized
-                  className="object-contain"
-                  priority
-                />
+                {logoUrl ? (
+                  <motion.div
+                    className="relative h-24 w-64 md:h-28 md:w-72"
+                    initial={{ opacity: 0, scale: 0.35 }}
+                    animate={
+                      phase === "logo-exit"
+                        ? { opacity: 0, scale: 1.65 }
+                        : { opacity: 1, scale: 1 }
+                    }
+                    transition={{
+                      duration: phase === "logo-exit" ? LOGO_EXIT_MS / 1000 : 1,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                  >
+                    <Image
+                      src={logoUrl}
+                      alt="BeGraphix"
+                      fill
+                      unoptimized
+                      className="object-contain"
+                      priority
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.p
+                    className="font-display text-3xl font-medium tracking-tight md:text-4xl"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={
+                      phase === "logo-exit"
+                        ? { opacity: 0, scale: 1.5 }
+                        : { opacity: 1, scale: 1 }
+                    }
+                    transition={{
+                      duration: phase === "logo-exit" ? LOGO_EXIT_MS / 1000 : 1,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                  >
+                    BeGraphix
+                  </motion.p>
+                )}
               </motion.div>
-            ) : (
-              <motion.p
-                className="relative z-10 font-display text-3xl font-medium tracking-tight md:text-4xl"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={
-                  phase === "exit"
-                    ? { opacity: 0, scale: 1.5 }
-                    : { opacity: 1, scale: 1 }
-                }
-                transition={{
-                  duration: phase === "exit" ? 0.9 : 1,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              >
-                BeGraphix
-              </motion.p>
             )}
-          </motion.div>
-        </AnimatePresence>
+          </AnimatePresence>
+        </div>
       )}
 
       <div
-        className="transition-opacity duration-700 ease-out"
-        style={{ opacity: contentReady ? 1 : 0 }}
+        className={contentReady ? "opacity-100" : "opacity-0"}
         aria-hidden={!contentReady}
       >
         {children}

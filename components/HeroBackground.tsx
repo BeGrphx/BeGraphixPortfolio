@@ -12,62 +12,56 @@ export interface HeroBackgroundProps {
 
 const PAGE_BG = "#080808";
 
-function buildSmoothFade(height: number) {
+function buildHeroMask(fadePercent: number) {
+  const start = 100 - fadePercent;
   return `linear-gradient(
     180deg,
-    rgba(8, 8, 8, 0) 0%,
-    rgba(8, 8, 8, 0) 18%,
-    rgba(8, 8, 8, 0.018) 30%,
-    rgba(8, 8, 8, 0.045) 40%,
-    rgba(8, 8, 8, 0.085) 48%,
-    rgba(8, 8, 8, 0.14) 55%,
-    rgba(8, 8, 8, 0.21) 61%,
-    rgba(8, 8, 8, 0.3) 67%,
-    rgba(8, 8, 8, 0.41) 72%,
-    rgba(8, 8, 8, 0.53) 77%,
-    rgba(8, 8, 8, 0.65) 82%,
-    rgba(8, 8, 8, 0.76) 87%,
-    rgba(8, 8, 8, 0.86) 92%,
-    rgba(8, 8, 8, 0.94) 96%,
-    ${PAGE_BG} 100%
+    #000 0%,
+    #000 ${start}%,
+    rgba(0, 0, 0, 0.985) ${start + fadePercent * 0.12}%,
+    rgba(0, 0, 0, 0.96) ${start + fadePercent * 0.22}%,
+    rgba(0, 0, 0, 0.92) ${start + fadePercent * 0.32}%,
+    rgba(0, 0, 0, 0.86) ${start + fadePercent * 0.42}%,
+    rgba(0, 0, 0, 0.78) ${start + fadePercent * 0.52}%,
+    rgba(0, 0, 0, 0.68) ${start + fadePercent * 0.62}%,
+    rgba(0, 0, 0, 0.55) ${start + fadePercent * 0.72}%,
+    rgba(0, 0, 0, 0.38) ${start + fadePercent * 0.82}%,
+    rgba(0, 0, 0, 0.18) ${start + fadePercent * 0.92}%,
+    transparent 100%
   )`;
 }
 
-function HeroBottomFade({ height }: { height: number }) {
-  return (
-    <>
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5]"
-        style={{
-          height,
-          background: buildSmoothFade(height),
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[4] opacity-70"
-        style={{
-          height: height * 0.65,
-          background: `linear-gradient(180deg, transparent 0%, ${PAGE_BG} 100%)`,
-          filter: "blur(18px)",
-          transform: "translateY(12px)",
-        }}
-      />
-    </>
-  );
+function buildOverlayFade(fadePercent: number) {
+  const start = 100 - fadePercent;
+  return `linear-gradient(
+    180deg,
+    rgba(8, 8, 8, 0) 0%,
+    rgba(8, 8, 8, 0) ${start}%,
+    rgba(8, 8, 8, 0.12) ${start + fadePercent * 0.2}%,
+    rgba(8, 8, 8, 0.32) ${start + fadePercent * 0.4}%,
+    rgba(8, 8, 8, 0.55) ${start + fadePercent * 0.6}%,
+    rgba(8, 8, 8, 0.78) ${start + fadePercent * 0.8}%,
+    ${PAGE_BG} 100%
+  )`;
 }
 
 export function HeroBackground({
   type,
   videoUrl,
   videoBlur = 10,
-  bottomFade = 280,
+  bottomFade = 320,
 }: HeroBackgroundProps) {
   const [videoFailed, setVideoFailed] = useState(false);
 
   useEffect(() => setVideoFailed(false), [videoUrl, type]);
 
   const showVideo = type === "video" && Boolean(videoUrl) && !videoFailed;
-  const showFade = type !== "none" && bottomFade > 0;
+  const fadePercent = Math.min(55, Math.max(28, bottomFade / 12));
+
+  const maskStyle = {
+    WebkitMaskImage: buildHeroMask(fadePercent),
+    maskImage: buildHeroMask(fadePercent),
+  };
 
   let content: ReactNode;
 
@@ -96,9 +90,14 @@ export function HeroBackground({
   }
 
   return (
-    <div className="absolute inset-0">
-      {content}
-      {showFade && <HeroBottomFade height={bottomFade} />}
+    <div className="absolute inset-0 bg-[#080808]">
+      <div className="absolute inset-0" style={maskStyle}>
+        {content}
+      </div>
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: buildOverlayFade(fadePercent) }}
+      />
     </div>
   );
 }

@@ -56,7 +56,7 @@ export const siteSettings = defineType({
       type: "number",
       description: "Hauteur de la transition douce vers la grille (px). Recommandé : 120–240.",
       validation: (Rule) => Rule.min(40).max(400),
-      initialValue: 280,
+      initialValue: 320,
       hidden: ({ parent }) => parent?.heroBackgroundType === "none",
     }),
   ],
