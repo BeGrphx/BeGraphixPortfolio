@@ -9,8 +9,8 @@ import { Footer } from "@/components/Footer";
 import { GrainOverlay } from "@/components/GrainOverlay";
 import { Header } from "@/components/Header";
 import { PageTransition } from "@/components/PageTransition";
-import { SiteLoader } from "@/components/SiteLoader";
 import { LenisProvider } from "@/components/providers/LenisProvider";
+import { SiteLoaderProvider } from "@/components/providers/SiteLoaderProvider";
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -27,18 +27,19 @@ export function AppProviders({
 }: AppProvidersProps) {
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <LenisProvider>
-        <SiteLoader logoUrl={logoUrl} />
-        <GrainOverlay />
-        <Header />
-        <PageTransition>
-          <main>{children}</main>
-        </PageTransition>
-        <Footer />
-        <Analytics />
-        <AnalyticsPageView />
-        <SpeedInsights />
-      </LenisProvider>
+      <SiteLoaderProvider logoUrl={logoUrl}>
+        <LenisProvider>
+          <GrainOverlay />
+          <Header />
+          <PageTransition>
+            <main>{children}</main>
+          </PageTransition>
+          <Footer />
+          <Analytics />
+          <AnalyticsPageView />
+          <SpeedInsights />
+        </LenisProvider>
+      </SiteLoaderProvider>
     </NextIntlClientProvider>
   );
 }
