@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { formatProjectDateShort } from "@/lib/media";
 import { urlFor } from "@/lib/sanity/image";
 import type { SanityProject } from "@/lib/sanity/queries";
 
@@ -20,11 +21,13 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
+      layout
+      initial={{ opacity: 0, y: 40, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.96 }}
       transition={{
-        duration: 0.6,
-        delay: index * 0.08,
+        duration: 0.5,
+        delay: index * 0.06,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
@@ -41,7 +44,9 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           <div className="absolute inset-x-0 bottom-0 translate-y-4 p-6 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
             <p className="text-xs uppercase tracking-[0.2em] text-white/70">
               {project.client}
-              {project.year ? ` · ${project.year}` : ""}
+              {project.completedAt
+                ? ` · ${formatProjectDateShort(project.completedAt)}`
+                : ""}
             </p>
           </div>
         </div>

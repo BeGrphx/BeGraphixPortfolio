@@ -19,7 +19,7 @@ export default defineConfig({
               .title("Projets")
               .child(
                 S.documentTypeList("project").title("Projets").defaultOrdering([
-                  { field: "order", direction: "asc" },
+                  { field: "completedAt", direction: "desc" },
                 ]),
               ),
             S.listItem()

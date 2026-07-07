@@ -1,11 +1,24 @@
+"use client";
+
+import { useState } from "react";
 import type { SanityProject } from "@/lib/sanity/queries";
-import { ProjectCard } from "./ProjectCard";
+import { FilteredProjectGrid } from "./FilteredProjectGrid";
+import { ProjectFilter, type FilterValue } from "./ProjectFilter";
 
 interface ProjectGridProps {
   projects: SanityProject[];
 }
 
 export function ProjectGrid({ projects }: ProjectGridProps) {
+  const [filter, setFilter] = useState<FilterValue>("professional");
+
+  const counts = {
+    professional: projects.filter(
+      (p) => (p.projectType ?? "professional") === "professional",
+    ).length,
+    personal: projects.filter((p) => p.projectType === "personal").length,
+  };
+
   if (projects.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-neutral-800 px-8 py-16 text-center">
@@ -22,10 +35,9 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
-      {projects.map((project, index) => (
-        <ProjectCard key={project._id} project={project} index={index} />
-      ))}
-    </div>
+    <>
+      <ProjectFilter value={filter} onChange={setFilter} counts={counts} />
+      <FilteredProjectGrid projects={projects} filter={filter} />
+    </>
   );
 }

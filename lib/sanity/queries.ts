@@ -1,22 +1,34 @@
-export interface SanityVideo {
-  title?: string;
-  vimeoUrl: string;
+import type { MediaType } from "@/lib/media";
+
+export interface SanityGalleryImage {
+  asset: { _ref: string };
+  alt?: string;
+  caption?: string;
 }
+
+export interface SanityMediaItem {
+  _key: string;
+  mediaType: MediaType;
+  url: string;
+  title?: string;
+  label?: string;
+}
+
+export type ProjectType = "professional" | "personal";
 
 export interface SanityProject {
   _id: string;
   title: string;
   slug: { current: string };
+  projectType?: ProjectType;
   client?: string;
-  year?: number;
+  completedAt?: string;
   description?: string;
+  credits?: string;
   tags?: string[];
-  thumbnail: {
-    asset: { _ref: string };
-    alt?: string;
-  };
-  videos?: SanityVideo[];
-  order?: number;
+  thumbnail: SanityGalleryImage;
+  gallery?: SanityGalleryImage[];
+  media?: SanityMediaItem[];
 }
 
 export interface SanityAbout {
@@ -26,29 +38,31 @@ export interface SanityAbout {
   socialLinks?: { label: string; url: string }[];
 }
 
-export const projectsQuery = `*[_type == "project"] | order(order asc, year desc) {
+export const projectsQuery = `*[_type == "project"] | order(completedAt desc) {
   _id,
   title,
   slug,
+  projectType,
   client,
-  year,
+  completedAt,
   description,
   tags,
-  thumbnail,
-  order
+  thumbnail
 }`;
 
 export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug][0] {
   _id,
   title,
   slug,
+  projectType,
   client,
-  year,
+  completedAt,
   description,
+  credits,
   tags,
   thumbnail,
-  videos,
-  order
+  gallery,
+  media
 }`;
 
 export const aboutQuery = `*[_type == "about"][0] {
