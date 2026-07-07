@@ -15,6 +15,9 @@ const LOGO_HOLD_MS = 400;
 const LOGO_EXIT_MS = 250;
 const SCREEN_FADE_MS = 350;
 const LOGO_ENTER_S = 0.35;
+const SAFETY_MS = 2000;
+
+type LoaderPhase = "idle" | "enter" | "logo-exit" | "screen-fade";
 
 interface SiteLoaderContextValue {
   contentReady: boolean;
@@ -38,6 +41,12 @@ function markLoading() {
   document.documentElement.classList.remove("begraphix-ready");
 }
 
+function finishLoader(setPhase: (p: LoaderPhase) => void) {
+  sessionStorage.setItem(STORAGE_KEY, "1");
+  markReady();
+  setPhase("idle");
+}
+
 interface SiteLoaderProviderProps {
   children: ReactNode;
   logoUrl?: string;
@@ -47,57 +56,56 @@ export function SiteLoaderProvider({
   children,
   logoUrl,
 }: SiteLoaderProviderProps) {
-  const [showLoader, setShowLoader] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return !sessionStorage.getItem(STORAGE_KEY);
-  });
-  const [contentReady, setContentReady] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return !!sessionStorage.getItem(STORAGE_KEY);
-  });
-  const [phase, setPhase] = useState<"enter" | "logo-exit" | "screen-fade">(
-    "enter",
-  );
+  const [phase, setPhase] = useState<LoaderPhase>("idle");
 
   useEffect(() => {
+    let logoExit: ReturnType<typeof setTimeout>;
+    let screenFade: ReturnType<typeof setTimeout>;
+    let finish: ReturnType<typeof setTimeout>;
+    let safety: ReturnType<typeof setTimeout>;
+
     if (sessionStorage.getItem(STORAGE_KEY)) {
       markReady();
-      setShowLoader(false);
-      setContentReady(true);
+      setPhase("idle");
       return;
     }
 
     markLoading();
-    setShowLoader(true);
-    setContentReady(false);
+    setPhase("enter");
 
-    const logoExit = setTimeout(() => setPhase("logo-exit"), LOGO_HOLD_MS);
-    const screenFade = setTimeout(() => {
-      setContentReady(true);
-      setPhase("screen-fade");
-    }, LOGO_HOLD_MS + LOGO_EXIT_MS);
-    const finish = setTimeout(() => {
-      sessionStorage.setItem(STORAGE_KEY, "1");
-      markReady();
-      setShowLoader(false);
-    }, LOGO_HOLD_MS + LOGO_EXIT_MS + SCREEN_FADE_MS);
+    logoExit = setTimeout(() => setPhase("logo-exit"), LOGO_HOLD_MS);
+    screenFade = setTimeout(
+      () => setPhase("screen-fade"),
+      LOGO_HOLD_MS + LOGO_EXIT_MS,
+    );
+    finish = setTimeout(
+      () => finishLoader(setPhase),
+      LOGO_HOLD_MS + LOGO_EXIT_MS + SCREEN_FADE_MS,
+    );
+    safety = setTimeout(() => finishLoader(setPhase), SAFETY_MS);
 
     return () => {
       clearTimeout(logoExit);
       clearTimeout(screenFade);
       clearTimeout(finish);
+      clearTimeout(safety);
     };
   }, []);
 
+  const isLoading = phase !== "idle";
+
   return (
-    <SiteLoaderContext.Provider value={{ contentReady }}>
-      {showLoader && (
+    <SiteLoaderContext.Provider value={{ contentReady: !isLoading }}>
+      {isLoading && (
         <div className="fixed inset-0 z-[200]">
           <motion.div
             className="absolute inset-0 bg-background"
             initial={{ opacity: 1 }}
             animate={{ opacity: phase === "screen-fade" ? 0 : 1 }}
-            transition={{ duration: SCREEN_FADE_MS / 1000, ease: [0.4, 0, 0.2, 1] }}
+            transition={{
+              duration: SCREEN_FADE_MS / 1000,
+              ease: [0.4, 0, 0.2, 1],
+            }}
           />
 
           <AnimatePresence>
@@ -155,12 +163,7 @@ export function SiteLoaderProvider({
         </div>
       )}
 
-      <div
-        className={contentReady ? "opacity-100" : "opacity-0"}
-        aria-hidden={!contentReady}
-      >
-        {children}
-      </div>
+      {children}
     </SiteLoaderContext.Provider>
   );
 }
