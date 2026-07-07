@@ -10,20 +10,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "image.mux.com" },
     ],
   },
-  async redirects() {
-    return [
-      {
-        source: "/fr",
-        destination: "/",
-        permanent: true,
-      },
-      {
-        source: "/fr/:path*",
-        destination: "/:path*",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default withNextIntl(nextConfig);

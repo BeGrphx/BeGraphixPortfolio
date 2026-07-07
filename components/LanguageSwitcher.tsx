@@ -15,7 +15,9 @@ export function LanguageSwitcher() {
         <button
           key={loc}
           type="button"
-          onClick={() => router.replace(pathname, { locale: loc })}
+          onClick={() => {
+            router.replace(pathname || "/", { locale: loc });
+          }}
           className={`relative z-10 px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] transition-colors ${
             locale === loc
               ? "rounded-full bg-foreground text-background"

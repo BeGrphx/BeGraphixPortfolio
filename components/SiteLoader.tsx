@@ -12,15 +12,7 @@ export function SiteLoader({ logoUrl }: SiteLoaderProps) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const seen = sessionStorage.getItem("begraphix-loaded");
-    if (seen) {
-      setVisible(false);
-      return;
-    }
-    const timer = setTimeout(() => {
-      sessionStorage.setItem("begraphix-loaded", "1");
-      setVisible(false);
-    }, 1400);
+    const timer = setTimeout(() => setVisible(false), 1400);
     return () => clearTimeout(timer);
   }, []);
 
@@ -38,12 +30,13 @@ export function SiteLoader({ logoUrl }: SiteLoaderProps) {
               initial={{ opacity: 0, scale: 0.82 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="relative h-16 w-48 md:h-20 md:w-56"
+              className="relative h-20 w-56 md:h-24 md:w-64"
             >
               <Image
                 src={logoUrl}
                 alt="BeGraphix"
                 fill
+                unoptimized
                 className="object-contain"
                 priority
               />
@@ -52,7 +45,6 @@ export function SiteLoader({ logoUrl }: SiteLoaderProps) {
             <motion.p
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="font-display text-2xl font-medium tracking-tight"
             >
               BeGraphix

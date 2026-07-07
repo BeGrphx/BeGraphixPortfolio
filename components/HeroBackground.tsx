@@ -16,30 +16,27 @@ export interface HeroBackgroundProps {
 
 export function HeroBackground({ type, videoUrl }: HeroBackgroundProps) {
   const { resolvedTheme } = useTheme();
-  const [webglEnabled, setWebglEnabled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    setWebglEnabled(!prefersReduced);
   }, []);
 
   useEffect(() => {
     setVideoFailed(false);
   }, [videoUrl]);
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return <div className="absolute inset-0 bg-background" />;
+  }
 
   const isDark = resolvedTheme === "dark";
-  const showVideo = type === "video" && videoUrl && !videoFailed;
+  const showVideo = type === "video" && Boolean(videoUrl) && !videoFailed;
 
-  if (showVideo) {
+  if (showVideo && videoUrl) {
     return (
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
         <video
           key={videoUrl}
           autoPlay
@@ -47,39 +44,30 @@ export function HeroBackground({ type, videoUrl }: HeroBackgroundProps) {
           loop
           playsInline
           preload="auto"
-          crossOrigin="anonymous"
           onError={() => setVideoFailed(true)}
-          className="absolute inset-0 h-full w-full scale-105 object-cover blur-xl"
+          className="absolute inset-0 h-full w-full scale-105 object-cover blur-2xl"
           src={videoUrl}
         />
-        <div
-          className={`absolute inset-0 ${isDark ? "bg-black/65" : "bg-white/70"}`}
-        />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-background" />
+        <div className={`absolute inset-0 ${isDark ? "bg-black/60" : "bg-white/65"}`} />
       </div>
     );
   }
 
-  if ((type === "webgl" || (type === "video" && videoFailed)) && webglEnabled) {
+  if (type === "webgl" && !showVideo) {
     return (
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 h-full w-full">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 h-full w-full scale-110">
           <WebGLCanvas />
         </div>
-        <div
-          className={`absolute inset-0 ${isDark ? "bg-black/30" : "bg-white/40"}`}
-        />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-background" />
+        <div className={`absolute inset-0 ${isDark ? "bg-black/25" : "bg-white/35"}`} />
       </div>
     );
   }
 
   return (
     <div
-      className={`pointer-events-none absolute inset-0 ${
-        isDark
-          ? "bg-gradient-to-b from-neutral-900/40 to-transparent"
-          : "bg-gradient-to-b from-neutral-200/50 to-transparent"
+      className={`absolute inset-0 ${
+        isDark ? "bg-neutral-950" : "bg-neutral-100"
       }`}
     />
   );

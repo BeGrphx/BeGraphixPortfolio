@@ -38,11 +38,12 @@ export default async function HomePage({
   const projects = await localizeProjects(projectsRaw, locale);
 
   const videoUrl = resolveShowreelUrl(settings);
-  const heroType = settings?.heroBackgroundType ?? "webgl";
+  const heroType =
+    settings?.heroBackgroundType ?? (videoUrl ? "video" : "none");
 
   return (
     <div className="relative">
-      <section className="relative min-h-[88vh] overflow-hidden">
+      <section className="relative min-h-[85vh] overflow-hidden">
         <HeroBackground type={heroType} videoUrl={videoUrl} />
         <div className="relative z-10 mx-auto max-w-7xl px-6 pt-32 md:px-10 md:pt-40">
           <FadeIn>

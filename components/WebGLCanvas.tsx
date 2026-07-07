@@ -5,12 +5,11 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
 function WavePlane() {
-  const mesh = useRef<THREE.Mesh>(null);
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
-        uColor: { value: new THREE.Color("#aaaaaa") },
+        uColor: { value: new THREE.Color("#999999") },
       },
       vertexShader: `
         uniform float uTime;
@@ -18,8 +17,8 @@ function WavePlane() {
         void main() {
           vUv = uv;
           vec3 pos = position;
-          pos.z += sin(pos.x * 1.2 + uTime) * 0.18;
-          pos.z += cos(pos.y * 1.8 + uTime * 0.6) * 0.12;
+          pos.z += sin(pos.x * 0.8 + uTime) * 0.12;
+          pos.z += cos(pos.y * 1.1 + uTime * 0.7) * 0.08;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         }
       `,
@@ -27,8 +26,9 @@ function WavePlane() {
         uniform vec3 uColor;
         varying vec2 vUv;
         void main() {
-          float fade = smoothstep(0.0, 0.15, vUv.y) * (1.0 - smoothstep(0.75, 1.0, vUv.y));
-          float alpha = 0.35 * fade;
+          float edge = smoothstep(0.0, 0.2, vUv.y) * smoothstep(1.0, 0.6, vUv.y);
+          float alpha = 0.28 * edge;
+          if (alpha < 0.01) discard;
           gl_FragColor = vec4(uColor, alpha);
         }
       `,
@@ -39,12 +39,12 @@ function WavePlane() {
   }, []);
 
   useFrame((state) => {
-    material.uniforms.uTime.value = state.clock.elapsedTime * 0.35;
+    material.uniforms.uTime.value = state.clock.elapsedTime * 0.3;
   });
 
   return (
-    <mesh ref={mesh} rotation={[-0.25, 0, 0]} position={[0, 0.2, 0]} material={material}>
-      <planeGeometry args={[30, 18, 64, 64]} />
+    <mesh rotation={[-0.3, 0, 0]} position={[0, 0, 0]} material={material}>
+      <planeGeometry args={[14, 8, 48, 48]} />
     </mesh>
   );
 }
@@ -53,8 +53,7 @@ export function WebGLCanvas() {
   return (
     <Canvas
       className="h-full w-full"
-      style={{ width: "100%", height: "100%" }}
-      camera={{ position: [0, 0, 8], fov: 50 }}
+      camera={{ position: [0, 0, 5], fov: 60 }}
       dpr={[1, 1.25]}
       gl={{ antialias: true, alpha: true }}
     >
