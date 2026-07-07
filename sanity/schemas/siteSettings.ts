@@ -9,7 +9,7 @@ export const siteSettings = defineType({
       name: "logo",
       title: "Logo (écran de chargement)",
       type: "image",
-      description: "Affiché au chargement avec animation zoom + fade",
+      description: "Animation zoom + fade au chargement",
       options: { hotspot: true },
     }),
     defineField({
@@ -18,9 +18,9 @@ export const siteSettings = defineType({
       type: "string",
       options: {
         list: [
-          { title: "Showreel vidéo (recommandé)", value: "video" },
-          { title: "WebGL (grille animée)", value: "webgl" },
-          { title: "Aucun effet", value: "none" },
+          { title: "Showreel vidéo (MP4)", value: "video" },
+          { title: "Fond organique (CSS)", value: "organic" },
+          { title: "Aucun (noir/blanc)", value: "none" },
         ],
         layout: "radio",
       },
@@ -28,15 +28,15 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: "showreelVideoUrl",
-      title: "URL vidéo showreel (MP4 direct)",
+      title: "URL vidéo MP4 directe",
       type: "url",
       description:
-        "Lien direct vers un fichier .mp4 (ex: hébergé sur Sanity ou CDN). YouTube/Vimeo ne fonctionne pas ici.",
+        "Lien direct .mp4 uniquement. YouTube/Vimeo ne fonctionnent pas. Ex: https://cdn.sanity.io/files/.../video.mp4",
       hidden: ({ parent }) => parent?.heroBackgroundType !== "video",
     }),
     defineField({
       name: "showreelVideoFile",
-      title: "Ou uploader une vidéo MP4/WebM",
+      title: "Ou uploader un MP4 / WebM",
       type: "file",
       options: { accept: "video/mp4,video/webm" },
       hidden: ({ parent }) => parent?.heroBackgroundType !== "video",

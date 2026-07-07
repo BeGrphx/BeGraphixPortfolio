@@ -92,14 +92,17 @@ export const projectSlugsQuery = `*[_type == "project" && defined(slug.current)]
 
 export interface SiteSettings {
   logoUrl?: string;
-  heroBackgroundType?: "video" | "webgl" | "none";
+  heroBackgroundType?: "video" | "organic" | "none";
   showreelVideoUrl?: string;
 }
 
-export const siteSettingsQuery = `*[_id == "siteSettings"][0] {
+export const siteSettingsQuery = `*[_type == "siteSettings"] | order(_updatedAt desc)[0] {
   "logoUrl": logo.asset->url,
   heroBackgroundType,
-  "showreelVideoUrl": coalesce(showreelVideoUrl, showreelVideoFile.asset->url)
+  "showreelVideoUrl": coalesce(
+    showreelVideoUrl,
+    showreelVideoFile.asset->url
+  )
 }`;
 
 export type ProjectWithDisplay = SanityProject & { displayTitle: string };

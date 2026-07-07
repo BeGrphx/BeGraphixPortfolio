@@ -1,74 +1,41 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-
-const WebGLCanvas = dynamic(
-  () => import("./WebGLCanvas").then((m) => m.WebGLCanvas),
-  { ssr: false },
-);
+import { VideoBackground } from "./VideoBackground";
 
 export interface HeroBackgroundProps {
-  type: "video" | "webgl" | "none";
+  type: "video" | "organic" | "none";
   videoUrl?: string;
 }
 
 export function HeroBackground({ type, videoUrl }: HeroBackgroundProps) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setVideoFailed(false), [videoUrl, type]);
 
-  useEffect(() => {
-    setVideoFailed(false);
-  }, [videoUrl]);
-
-  if (!mounted) {
-    return <div className="absolute inset-0 bg-background" />;
-  }
-
-  const isDark = resolvedTheme === "dark";
   const showVideo = type === "video" && Boolean(videoUrl) && !videoFailed;
 
   if (showVideo && videoUrl) {
     return (
-      <div className="absolute inset-0 overflow-hidden">
-        <video
-          key={videoUrl}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          onError={() => setVideoFailed(true)}
-          className="absolute inset-0 h-full w-full scale-105 object-cover blur-2xl"
-          src={videoUrl}
-        />
-        <div className={`absolute inset-0 ${isDark ? "bg-black/60" : "bg-white/65"}`} />
-      </div>
+      <VideoBackground url={videoUrl} onError={() => setVideoFailed(true)} />
     );
   }
 
-  if (type === "webgl" && !showVideo) {
+  if (type === "organic") {
     return (
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 h-full w-full scale-110">
-          <WebGLCanvas />
-        </div>
-        <div className={`absolute inset-0 ${isDark ? "bg-black/25" : "bg-white/35"}`} />
+      <div className="absolute inset-0 overflow-hidden bg-neutral-100 dark:bg-neutral-950">
+        <div
+          className="animate-organic-spin absolute inset-[-45%] opacity-35 dark:opacity-25"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 30% 40%, var(--organic-a) 0%, transparent 45%), radial-gradient(circle at 70% 60%, var(--organic-b) 0%, transparent 42%)",
+          }}
+        />
       </div>
     );
   }
 
   return (
-    <div
-      className={`absolute inset-0 ${
-        isDark ? "bg-neutral-950" : "bg-neutral-100"
-      }`}
-    />
+    <div className="absolute inset-0 bg-neutral-100 dark:bg-neutral-950" />
   );
 }

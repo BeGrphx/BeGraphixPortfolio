@@ -38,8 +38,12 @@ export default async function HomePage({
   const projects = await localizeProjects(projectsRaw, locale);
 
   const videoUrl = resolveShowreelUrl(settings);
+  const rawType = settings?.heroBackgroundType as string | undefined;
   const heroType =
-    settings?.heroBackgroundType ?? (videoUrl ? "video" : "none");
+    rawType === "webgl"
+      ? "organic"
+      : (rawType as "video" | "organic" | "none" | undefined) ??
+        (videoUrl ? "video" : "none");
 
   return (
     <div className="relative">
