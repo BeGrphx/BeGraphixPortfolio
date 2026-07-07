@@ -18,6 +18,7 @@ export function HeroBackground({ type, videoUrl }: HeroBackgroundProps) {
   const { resolvedTheme } = useTheme();
   const [webglEnabled, setWebglEnabled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -27,41 +28,48 @@ export function HeroBackground({ type, videoUrl }: HeroBackgroundProps) {
     setWebglEnabled(!prefersReduced);
   }, []);
 
+  useEffect(() => {
+    setVideoFailed(false);
+  }, [videoUrl]);
+
   if (!mounted) return null;
 
   const isDark = resolvedTheme === "dark";
+  const showVideo = type === "video" && videoUrl && !videoFailed;
 
-  if (type === "video" && videoUrl) {
+  if (showVideo) {
     return (
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <video
+          key={videoUrl}
           autoPlay
           muted
           loop
           playsInline
-          className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
+          preload="auto"
+          crossOrigin="anonymous"
+          onError={() => setVideoFailed(true)}
+          className="absolute inset-0 h-full w-full scale-105 object-cover blur-xl"
           src={videoUrl}
         />
         <div
-          className={`absolute inset-0 ${
-            isDark ? "bg-black/70" : "bg-white/75"
-          }`}
+          className={`absolute inset-0 ${isDark ? "bg-black/65" : "bg-white/70"}`}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-background" />
       </div>
     );
   }
 
-  if (type === "webgl" && webglEnabled) {
+  if ((type === "webgl" || (type === "video" && videoFailed)) && webglEnabled) {
     return (
-      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-70 dark:opacity-50">
-        <WebGLCanvas />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 h-full w-full">
+          <WebGLCanvas />
+        </div>
         <div
-          className={`absolute inset-0 ${
-            isDark ? "bg-black/40" : "bg-white/50"
-          }`}
+          className={`absolute inset-0 ${isDark ? "bg-black/30" : "bg-white/40"}`}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-background" />
       </div>
     );
   }
@@ -70,8 +78,8 @@ export function HeroBackground({ type, videoUrl }: HeroBackgroundProps) {
     <div
       className={`pointer-events-none absolute inset-0 ${
         isDark
-          ? "bg-gradient-to-b from-neutral-900/50 to-transparent"
-          : "bg-gradient-to-b from-neutral-200/60 to-transparent"
+          ? "bg-gradient-to-b from-neutral-900/40 to-transparent"
+          : "bg-gradient-to-b from-neutral-200/50 to-transparent"
       }`}
     />
   );

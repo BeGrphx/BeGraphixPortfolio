@@ -91,15 +91,19 @@ export const projectSlugsQuery = `*[_type == "project" && defined(slug.current)]
 }`;
 
 export interface SiteSettings {
+  logo?: { asset?: { _ref: string } };
   heroBackgroundType?: "video" | "webgl" | "none";
   showreelVideoUrl?: string;
   showreelVideoFile?: { asset?: { url?: string } };
 }
 
 export const siteSettingsQuery = `*[_type == "siteSettings"][0] {
+  logo,
   heroBackgroundType,
   showreelVideoUrl,
-  showreelVideoFile { asset->{ url } }
+  "showreelVideoFile": showreelVideoFile {
+    "asset": asset->{ url }
+  }
 }`;
 
 export type ProjectWithDisplay = SanityProject & { displayTitle: string };

@@ -6,6 +6,13 @@ export const siteSettings = defineType({
   type: "document",
   fields: [
     defineField({
+      name: "logo",
+      title: "Logo (écran de chargement)",
+      type: "image",
+      description: "Affiché au chargement avec animation zoom + fade",
+      options: { hotspot: true },
+    }),
+    defineField({
       name: "heroBackgroundType",
       title: "Fond de la page d'accueil",
       type: "string",
@@ -21,14 +28,15 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: "showreelVideoUrl",
-      title: "URL vidéo showreel (MP4)",
+      title: "URL vidéo showreel (MP4 direct)",
       type: "url",
-      description: "Vidéo en boucle, muette, floutée en fond. Ex: lien direct .mp4",
+      description:
+        "Lien direct vers un fichier .mp4 (ex: hébergé sur Sanity ou CDN). YouTube/Vimeo ne fonctionne pas ici.",
       hidden: ({ parent }) => parent?.heroBackgroundType !== "video",
     }),
     defineField({
       name: "showreelVideoFile",
-      title: "Ou uploader une vidéo",
+      title: "Ou uploader une vidéo MP4/WebM",
       type: "file",
       options: { accept: "video/mp4,video/webm" },
       hidden: ({ parent }) => parent?.heroBackgroundType !== "video",

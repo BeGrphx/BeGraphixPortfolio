@@ -16,18 +16,20 @@ interface AppProvidersProps {
   children: ReactNode;
   locale: string;
   messages: Record<string, unknown>;
+  logoUrl?: string;
 }
 
 export function AppProviders({
   children,
   locale,
   messages,
+  logoUrl,
 }: AppProvidersProps) {
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ThemeProviderWrapper>
         <LenisProvider>
-          <SiteLoader />
+          <SiteLoader logoUrl={logoUrl} />
           <GrainOverlay />
           <Header />
           <PageTransition>

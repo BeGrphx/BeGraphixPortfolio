@@ -6,12 +6,11 @@ import { ProjectGrid } from "@/components/ProjectGrid";
 import type { Locale } from "@/i18n/routing";
 import { localizeProjects } from "@/lib/localize-project";
 import { client } from "@/lib/sanity/client";
+import { projectsQuery, type SanityProject } from "@/lib/sanity/queries";
 import {
-  projectsQuery,
-  siteSettingsQuery,
-  type SanityProject,
-  type SiteSettings,
-} from "@/lib/sanity/queries";
+  getSiteSettings,
+  resolveShowreelUrl,
+} from "@/lib/site-settings";
 
 export const revalidate = 60;
 
@@ -20,14 +19,6 @@ async function getProjects(): Promise<SanityProject[]> {
     return await client.fetch(projectsQuery);
   } catch {
     return [];
-  }
-}
-
-async function getSiteSettings(): Promise<SiteSettings | null> {
-  try {
-    return await client.fetch(siteSettingsQuery);
-  } catch {
-    return null;
   }
 }
 
@@ -46,11 +37,8 @@ export default async function HomePage({
   ]);
   const projects = await localizeProjects(projectsRaw, locale);
 
-  const videoUrl =
-    settings?.showreelVideoUrl ||
-    settings?.showreelVideoFile?.asset?.url ||
-    undefined;
-  const heroType = settings?.heroBackgroundType ?? (videoUrl ? "video" : "webgl");
+  const videoUrl = resolveShowreelUrl(settings);
+  const heroType = settings?.heroBackgroundType ?? "webgl";
 
   return (
     <div className="relative">

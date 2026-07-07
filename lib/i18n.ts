@@ -38,7 +38,14 @@ export async function getLocalizedAuto(
   if (locale === "fr") return value.fr || "";
   if (!value.fr?.trim()) return value.en || value.es || "";
 
-  return cachedTranslate(value.fr, locale);
+  const translated = await cachedTranslate(value.fr, locale);
+  if (
+    translated.toUpperCase().includes("QUERY LENGTH LIMIT") ||
+    translated.toUpperCase().includes("MAX ALLOWED QUERY")
+  ) {
+    return value.fr;
+  }
+  return translated;
 }
 
 export function hasLocalizedContent(value: LocalizedValue | undefined): boolean {

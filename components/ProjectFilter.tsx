@@ -18,7 +18,6 @@ export function ProjectFilter({
   counts,
 }: ProjectFilterProps) {
   const t = useTranslations("filter");
-  const tHome = useTranslations("home");
 
   const filters: { value: FilterValue; label: string }[] = [
     { value: "professional", label: t("professional") },
@@ -26,48 +25,43 @@ export function ProjectFilter({
   ];
 
   return (
-    <div className="mb-14 flex flex-col gap-6 md:mb-20 md:flex-row md:items-center md:justify-between">
-      <div className="relative inline-flex rounded-full border border-neutral-800 p-1">
-        {filters.map((filter) => {
-          const isActive = value === filter.value;
-          const count =
-            filter.value === "professional"
-              ? counts.professional
-              : counts.personal;
+    <div className="relative mb-14 inline-flex rounded-full border border-neutral-300 p-1 dark:border-neutral-800 md:mb-20">
+      {filters.map((filter) => {
+        const isActive = value === filter.value;
+        const count =
+          filter.value === "professional"
+            ? counts.professional
+            : counts.personal;
 
-          return (
-            <button
-              key={filter.value}
-              type="button"
-              onClick={() => onChange(filter.value)}
-              className={`relative z-10 px-5 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors duration-300 ${
-                isActive
-                  ? "text-background"
-                  : "text-neutral-400 hover:text-neutral-200"
-              }`}
-            >
-              {isActive && (
-                <motion.span
-                  layoutId="project-filter-pill"
-                  className="absolute inset-0 rounded-full bg-foreground"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-              <span className="relative flex items-center gap-2">
-                {filter.label}
-                <span
-                  className={`text-[10px] ${isActive ? "text-background/60" : "text-neutral-600"}`}
-                >
-                  {count}
-                </span>
+        return (
+          <button
+            key={filter.value}
+            type="button"
+            onClick={() => onChange(filter.value)}
+            className={`relative z-10 px-5 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors duration-300 ${
+              isActive
+                ? "text-background"
+                : "text-muted hover:text-foreground"
+            }`}
+          >
+            {isActive && (
+              <motion.span
+                layoutId="project-filter-pill"
+                className="absolute inset-0 rounded-full bg-foreground"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span className="relative flex items-center gap-2">
+              {filter.label}
+              <span
+                className={`text-[10px] ${isActive ? "text-background/60" : "text-muted"}`}
+              >
+                {count}
               </span>
-            </button>
-          );
-        })}
-      </div>
-      <p className="text-xs uppercase tracking-[0.2em] text-neutral-600">
-        {tHome("chronological")}
-      </p>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }

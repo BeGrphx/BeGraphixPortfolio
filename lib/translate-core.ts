@@ -1,5 +1,53 @@
 export type Target = "en" | "es";
 
+const MYMEMORY_MAX = 450;
+
+function chunkText(text: string, maxLen = MYMEMORY_MAX): string[] {
+  if (text.length <= maxLen) return [text];
+
+  const chunks: string[] = [];
+  let rest = text;
+
+  while (rest.length > 0) {
+    if (rest.length <= maxLen) {
+      chunks.push(rest);
+      break;
+    }
+    let splitAt = rest.lastIndexOf(" ", maxLen);
+    if (splitAt < maxLen * 0.5) splitAt = maxLen;
+    chunks.push(rest.slice(0, splitAt).trim());
+    rest = rest.slice(splitAt).trim();
+  }
+
+  return chunks.filter(Boolean);
+}
+
+function isBadTranslation(result: string, original: string): boolean {
+  const upper = result.toUpperCase();
+  return (
+    !result.trim() ||
+    upper.includes("QUERY LENGTH LIMIT") ||
+    upper.includes("MAX ALLOWED QUERY") ||
+    result === original
+  );
+}
+
+async function translateMyMemoryChunk(
+  text: string,
+  target: Target,
+): Promise<string> {
+  const res = await fetch(
+    `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=fr|${target}`,
+  );
+  if (!res.ok) return text;
+  const data = (await res.json()) as {
+    responseData?: { translatedText?: string };
+  };
+  const translated = data.responseData?.translatedText ?? text;
+  if (isBadTranslation(translated, text)) return text;
+  return translated;
+}
+
 export async function translateWithDeepL(
   text: string,
   target: Target,
@@ -32,23 +80,27 @@ export async function translateFallback(
   text: string,
   target: Target,
 ): Promise<string> {
-  const res = await fetch(
-    `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=fr|${target}`,
+  const chunks = chunkText(text);
+  const parts = await Promise.all(
+    chunks.map((chunk) => translateMyMemoryChunk(chunk, target)),
   );
-  if (!res.ok) return text;
-  const data = (await res.json()) as {
-    responseData?: { translatedText?: string };
-  };
-  return data.responseData?.translatedText ?? text;
+  return parts.join(chunks.length > 1 ? " " : "");
 }
 
 export async function translateTextCore(
   text: string,
   target: Target,
 ): Promise<string> {
+  if (!text.trim()) return text;
+
   try {
-    return await translateWithDeepL(text, target);
+    const deepL = await translateWithDeepL(text, target);
+    if (!isBadTranslation(deepL, text)) return deepL;
   } catch {
-    return translateFallback(text, target);
+    // fallback below
   }
+
+  const fallback = await translateFallback(text, target);
+  if (isBadTranslation(fallback, text)) return text;
+  return fallback;
 }
