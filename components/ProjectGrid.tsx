@@ -6,15 +6,24 @@ import type { Locale } from "@/i18n/routing";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
 import { FilteredProjectGrid } from "./FilteredProjectGrid";
 import { ProjectFilter, type FilterValue } from "./ProjectFilter";
+import { ShowreelPlayer } from "./ShowreelPlayer";
 
 interface ProjectGridProps {
   projects: ProjectWithDisplay[];
   locale: Locale;
+  showreelUrl?: string;
 }
 
-export function ProjectGrid({ projects, locale }: ProjectGridProps) {
+export function ProjectGrid({
+  projects,
+  locale,
+  showreelUrl,
+}: ProjectGridProps) {
   const t = useTranslations("home");
-  const [filter, setFilter] = useState<FilterValue>("professional");
+  const hasShowreel = Boolean(showreelUrl);
+  const [filter, setFilter] = useState<FilterValue>(
+    hasShowreel ? "showreel" : "professional",
+  );
 
   const counts = {
     professional: projects.filter(
@@ -23,7 +32,7 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
     personal: projects.filter((p) => p.projectType === "personal").length,
   };
 
-  if (projects.length === 0) {
+  if (projects.length === 0 && !hasShowreel) {
     return (
       <div className="rounded-lg border border-dashed border-white/20 px-8 py-16 text-center">
         <p className="text-white/70">{t("noProjects")}</p>
@@ -40,13 +49,22 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
   return (
     <>
       <div className="mb-14 flex w-full justify-center md:mb-20">
-        <ProjectFilter value={filter} onChange={setFilter} counts={counts} />
+        <ProjectFilter
+          value={filter}
+          onChange={setFilter}
+          counts={counts}
+          hasShowreel={hasShowreel}
+        />
       </div>
-      <FilteredProjectGrid
-        projects={projects}
-        filter={filter}
-        locale={locale}
-      />
+      {filter === "showreel" ? (
+        <ShowreelPlayer url={showreelUrl} />
+      ) : (
+        <FilteredProjectGrid
+          projects={projects}
+          filter={filter}
+          locale={locale}
+        />
+      )}
     </>
   );
 }

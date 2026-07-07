@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
@@ -29,12 +29,6 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
   const [hovering, setHovering] = useState(false);
   const title = project.displayTitle;
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
-
   const imageUrl = urlFor(project.thumbnail)
     .width(900)
     .height(600)
@@ -49,14 +43,12 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
   return (
     <motion.article
       ref={ref}
-      layout
-      style={{ y }}
-      initial={{ opacity: 0, y: 40, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.96 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{
-        duration: 0.5,
-        delay: index * 0.06,
+        duration: 0.45,
+        delay: index * 0.05,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
@@ -89,7 +81,7 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
           {hovering && hoverSrc && !isMp4 && (
             <iframe
               src={hoverSrc}
-              className="absolute inset-0 h-full w-full scale-110 object-cover pointer-events-none"
+              className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover"
               allow="autoplay; fullscreen"
             />
           )}

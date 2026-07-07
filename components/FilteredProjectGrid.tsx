@@ -9,7 +9,7 @@ import type { FilterValue } from "./ProjectFilter";
 
 interface FilteredProjectGridProps {
   projects: ProjectWithDisplay[];
-  filter: FilterValue;
+  filter: Exclude<FilterValue, "showreel">;
   locale: Locale;
 }
 
@@ -37,11 +37,8 @@ export function FilteredProjectGrid({
   }
 
   return (
-    <motion.div
-      layout
-      className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2"
-    >
-      <AnimatePresence mode="popLayout">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
+      <AnimatePresence mode="sync">
         {filtered.map((project, index) => (
           <ProjectCard
             key={project._id}
@@ -51,6 +48,6 @@ export function FilteredProjectGrid({
           />
         ))}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }

@@ -11,9 +11,11 @@
     "chronological": "Orden cronológico",
     "noProjects": "Aún no hay proyectos.",
     "addViaStudio": "Añade proyectos desde Sanity Studio.",
-    "noCategory": "No hay proyectos en esta categoría."
+    "noCategory": "No hay proyectos en esta categoría.",
+    "noShowreel": "Añade un vídeo showreel en Sanity Studio → Ajustes del sitio."
   },
   "filter": {
+    "showreel": "Showreel",
     "professional": "Profesional",
     "personal": "Personal"
   },

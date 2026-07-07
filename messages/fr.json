@@ -11,9 +11,11 @@
     "chronological": "Tri chronologique",
     "noProjects": "Aucun projet pour le moment.",
     "addViaStudio": "Ajoutez des projets via Sanity Studio.",
-    "noCategory": "Aucun projet dans cette catégorie."
+    "noCategory": "Aucun projet dans cette catégorie.",
+    "noShowreel": "Ajoutez une vidéo showreel dans Sanity Studio → Paramètres du site."
   },
   "filter": {
+    "showreel": "Showreel",
     "professional": "Professionnel",
     "personal": "Personnel"
   },

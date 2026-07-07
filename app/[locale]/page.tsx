@@ -78,7 +78,11 @@ export default async function HomePage({
 
       <section className="relative z-10 px-6 pb-24 md:px-10">
         <div className="mx-auto max-w-7xl pt-12 md:pt-20">
-          <ProjectGrid projects={projects} locale={locale} />
+          <ProjectGrid
+            projects={projects}
+            locale={locale}
+            showreelUrl={videoUrl}
+          />
         </div>
       </section>
     </div>
