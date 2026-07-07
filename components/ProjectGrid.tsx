@@ -3,36 +3,40 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
-import type { ProjectWithDisplay } from "@/lib/sanity/queries";
+import type {
+  ProjectWithDisplay,
+  ShowreelWithDisplay,
+} from "@/lib/sanity/queries";
 import { FilteredProjectGrid } from "./FilteredProjectGrid";
 import { ProjectFilter, type FilterValue } from "./ProjectFilter";
-import { ShowreelPlayer } from "./ShowreelPlayer";
+import { ShowreelList } from "./ShowreelList";
 
 interface ProjectGridProps {
   projects: ProjectWithDisplay[];
+  showreels: ShowreelWithDisplay[];
   locale: Locale;
-  showreelUrl?: string;
 }
 
 export function ProjectGrid({
   projects,
+  showreels,
   locale,
-  showreelUrl,
 }: ProjectGridProps) {
   const t = useTranslations("home");
-  const hasShowreel = Boolean(showreelUrl);
+  const hasShowreels = showreels.length > 0;
   const [filter, setFilter] = useState<FilterValue>(
-    hasShowreel ? "showreel" : "professional",
+    hasShowreels ? "showreel" : "professional",
   );
 
   const counts = {
+    showreel: showreels.length,
     professional: projects.filter(
       (p) => (p.projectType ?? "professional") === "professional",
     ).length,
     personal: projects.filter((p) => p.projectType === "personal").length,
   };
 
-  if (projects.length === 0 && !hasShowreel) {
+  if (projects.length === 0 && !hasShowreels) {
     return (
       <div className="rounded-lg border border-dashed border-white/20 px-8 py-16 text-center">
         <p className="text-white/70">{t("noProjects")}</p>
@@ -53,11 +57,11 @@ export function ProjectGrid({
           value={filter}
           onChange={setFilter}
           counts={counts}
-          hasShowreel={hasShowreel}
+          hasShowreel={hasShowreels}
         />
       </div>
       {filter === "showreel" ? (
-        <ShowreelPlayer url={showreelUrl} />
+        <ShowreelList showreels={showreels} />
       ) : (
         <FilteredProjectGrid
           projects={projects}

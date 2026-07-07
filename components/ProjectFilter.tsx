@@ -9,7 +9,7 @@ export type FilterValue = "showreel" | ProjectType;
 interface ProjectFilterProps {
   value: FilterValue;
   onChange: (value: FilterValue) => void;
-  counts: { professional: number; personal: number };
+  counts: { showreel: number; professional: number; personal: number };
   hasShowreel: boolean;
 }
 
@@ -26,13 +26,17 @@ export function ProjectFilter({
     label: string;
     count?: number;
   }[] = [
-    { value: "showreel", label: t("showreel") },
-    { value: "professional", label: t("professional"), count: counts.professional },
+    { value: "showreel", label: t("showreel"), count: counts.showreel },
+    {
+      value: "professional",
+      label: t("professional"),
+      count: counts.professional,
+    },
     { value: "personal", label: t("personal"), count: counts.personal },
   ];
 
   return (
-    <div className="relative mb-14 inline-flex flex-wrap justify-center rounded-full border border-white/20 p-1 md:mb-20">
+    <div className="relative inline-flex flex-wrap justify-center rounded-full border border-white/20 p-1">
       {filters.map((filter) => {
         const isActive = value === filter.value;
         const disabled = filter.value === "showreel" && !hasShowreel;

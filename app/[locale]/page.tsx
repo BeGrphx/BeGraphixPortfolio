@@ -4,8 +4,14 @@ import { HeroBackground } from "@/components/HeroBackground";
 import { ProjectGrid } from "@/components/ProjectGrid";
 import type { Locale } from "@/i18n/routing";
 import { localizeProjects } from "@/lib/localize-project";
+import { localizeShowreels } from "@/lib/localize-showreel";
 import { client } from "@/lib/sanity/client";
-import { projectsQuery, type SanityProject } from "@/lib/sanity/queries";
+import {
+  projectsQuery,
+  showreelsQuery,
+  type SanityProject,
+  type SanityShowreel,
+} from "@/lib/sanity/queries";
 import {
   getSiteSettings,
   resolveShowreelUrl,
@@ -21,6 +27,14 @@ async function getProjects(): Promise<SanityProject[]> {
   }
 }
 
+async function getShowreels(): Promise<SanityShowreel[]> {
+  try {
+    return await client.fetch(showreelsQuery);
+  } catch {
+    return [];
+  }
+}
+
 export default async function HomePage({
   params,
 }: {
@@ -30,11 +44,15 @@ export default async function HomePage({
   setRequestLocale(locale);
   const t = await getTranslations("home");
 
-  const [projectsRaw, settings] = await Promise.all([
+  const [projectsRaw, showreelsRaw, settings] = await Promise.all([
     getProjects(),
+    getShowreels(),
     getSiteSettings(),
   ]);
-  const projects = await localizeProjects(projectsRaw, locale);
+  const [projects, showreels] = await Promise.all([
+    localizeProjects(projectsRaw, locale),
+    localizeShowreels(showreelsRaw, locale),
+  ]);
 
   const videoUrl = resolveShowreelUrl(settings);
   const rawType = settings?.heroBackgroundType as string | undefined;
@@ -80,8 +98,8 @@ export default async function HomePage({
         <div className="mx-auto max-w-7xl pt-12 md:pt-20">
           <ProjectGrid
             projects={projects}
+            showreels={showreels}
             locale={locale}
-            showreelUrl={videoUrl}
           />
         </div>
       </section>

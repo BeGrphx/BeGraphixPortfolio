@@ -110,3 +110,21 @@ export const siteSettingsQuery = `*[_type == "siteSettings"] | order(_updatedAt 
 }`;
 
 export type ProjectWithDisplay = SanityProject & { displayTitle: string };
+
+export interface SanityShowreel {
+  _id: string;
+  title: LocalizedValue | string;
+  theme: string;
+  completedAt: string;
+  videoUrl?: string;
+}
+
+export const showreelsQuery = `*[_type == "showreel"] | order(completedAt desc) {
+  _id,
+  title,
+  theme,
+  completedAt,
+  "videoUrl": coalesce(videoUrl, videoFile.asset->url)
+}`;
+
+export type ShowreelWithDisplay = SanityShowreel & { displayTitle: string };
