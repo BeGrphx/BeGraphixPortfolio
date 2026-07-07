@@ -51,7 +51,9 @@ export async function generateMetadata({
 
   const title = await getLocalizedAuto(project.title, locale);
   const description = await getLocalizedAuto(project.description, locale);
-  const ogImage = urlFor(project.thumbnail).width(1200).height(630).url();
+  const ogImage = project.thumbnail
+    ? urlFor(project.thumbnail).width(1200).height(630).url()
+    : undefined;
 
   return {
     title,
@@ -60,13 +62,15 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      ...(ogImage
+        ? { images: [{ url: ogImage, width: 1200, height: 630, alt: title }] }
+        : {}),
     },
     twitter: {
-      card: "summary_large_image",
+      card: ogImage ? "summary_large_image" : "summary",
       title,
       description,
-      images: [ogImage],
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   };
 }
