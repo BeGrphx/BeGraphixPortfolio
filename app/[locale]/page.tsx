@@ -45,6 +45,7 @@ export default async function HomePage({
         (videoUrl ? "video" : "none");
 
   const bottomFade = settings?.heroBottomFade ?? 320;
+  const projectsTopSpacing = `calc(6vh + ${Math.round(bottomFade * 0.6)}px + 6rem)`;
 
   return (
     <div className="relative bg-[#080808] text-white">
@@ -77,7 +78,10 @@ export default async function HomePage({
       </section>
 
       <section className="relative z-10 px-6 pb-24 md:px-10">
-        <div className="mx-auto max-w-7xl pt-12 md:pt-20">
+        <div
+          className="mx-auto max-w-7xl"
+          style={{ paddingTop: projectsTopSpacing }}
+        >
           <ProjectGrid projects={projects} locale={locale} />
         </div>
       </section>
