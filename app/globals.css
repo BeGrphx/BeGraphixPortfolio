@@ -78,6 +78,33 @@ video.begraphix-video::-webkit-media-controls-overlay-play-button {
   pointer-events: none;
 }
 
+/* Force SDR compositing in fullscreen on HDR displays (Windows/Chrome oversaturation fix) */
+.begraphix-video-player:fullscreen,
+.begraphix-video-player:-webkit-full-screen {
+  color-scheme: dark;
+  dynamic-range: standard;
+  color-gamut: srgb;
+  background: #000;
+  isolation: isolate;
+}
+
+.begraphix-video-player:fullscreen .begraphix-video,
+.begraphix-video-player:-webkit-full-screen .begraphix-video {
+  dynamic-range: standard;
+  color-gamut: srgb;
+  filter: none;
+}
+
+@media (dynamic-range: high) {
+  .begraphix-video-player:fullscreen,
+  .begraphix-video-player:-webkit-full-screen,
+  .begraphix-video-player:fullscreen .begraphix-video,
+  .begraphix-video-player:-webkit-full-screen .begraphix-video {
+    dynamic-range: standard;
+    color-gamut: srgb;
+  }
+}
+
 @keyframes organic-spin {
   from {
     transform: rotate(0deg);

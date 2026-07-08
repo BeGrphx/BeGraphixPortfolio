@@ -226,7 +226,7 @@ export function VideoPlayer({
   }
 
   const containerClassName = [
-    "group/player relative overflow-hidden bg-black",
+    "begraphix-video-player group/player relative overflow-hidden bg-black",
     isFullscreen && isAdaptive
       ? "flex h-screen w-screen items-center justify-center"
       : "",
@@ -250,7 +250,10 @@ export function VideoPlayer({
     <div
       ref={containerRef}
       className={containerClassName}
-      style={containerStyle}
+      style={{
+        ...containerStyle,
+        ...(isFullscreen ? { colorScheme: "dark" as const } : {}),
+      }}
       onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
       aria-labelledby={title ? labelId : undefined}
@@ -278,11 +281,13 @@ export function VideoPlayer({
         onLoadedMetadata={(e) => handleLoadedMetadata(e.currentTarget)}
       />
 
-      <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 transition-opacity duration-300 ${
-          showControls || !playing ? "opacity-100" : "opacity-0"
-        }`}
-      />
+      {!isFullscreen && (
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 transition-opacity duration-300 ${
+            showControls || !playing ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      )}
 
       {!playing && (
         <button
@@ -291,8 +296,14 @@ export function VideoPlayer({
           className="absolute left-1/2 top-1/2 z-20 h-[4.5rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-105 active:scale-95"
           aria-label="Lire la vidéo"
         >
-          <span className="relative flex h-full w-full items-center justify-center rounded-full border border-white/35 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-            <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/35 via-white/10 to-transparent" />
+          <span
+            className={`relative flex h-full w-full items-center justify-center rounded-full border border-white/35 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_12px_40px_rgba(0,0,0,0.45)] ${
+              isFullscreen ? "bg-black/60" : "backdrop-blur-2xl"
+            }`}
+          >
+            {!isFullscreen && (
+              <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/35 via-white/10 to-transparent" />
+            )}
             <PlayTriangleIcon />
           </span>
         </button>
@@ -300,6 +311,8 @@ export function VideoPlayer({
 
       <div
         className={`absolute inset-x-0 bottom-0 z-20 px-4 pb-4 pt-12 transition-opacity duration-300 ${
+          isFullscreen ? "bg-gradient-to-t from-black via-black/95 to-transparent" : ""
+        } ${
           showControls || !playing
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0"
@@ -338,7 +351,9 @@ export function VideoPlayer({
             <button
               type="button"
               onClick={togglePlay}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 backdrop-blur-md transition-colors hover:bg-white/20"
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 ${
+                isFullscreen ? "" : "backdrop-blur-md"
+              }`}
               aria-label={playing ? "Pause" : "Lecture"}
             >
               {playing ? (
