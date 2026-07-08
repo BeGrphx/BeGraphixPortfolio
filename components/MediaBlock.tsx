@@ -52,7 +52,6 @@ function FileMediaBlock({
         poster={item.posterUrl}
         title={item.title}
         preload="auto"
-        fit="contain"
         className="w-full rounded-sm"
       />
     </FadeIn>

@@ -54,7 +54,6 @@ export function ShowreelList({ projects }: ShowreelListProps) {
                 src={videoUrl}
                 title={project.displayTitle}
                 preload="auto"
-                fit="cover"
                 className="w-full"
               />
             ) : (

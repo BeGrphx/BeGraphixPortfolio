@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type CSSProperties,
   type MouseEvent,
 } from "react";
 
@@ -22,7 +23,7 @@ interface VideoPlayerProps {
   poster?: string;
   title?: string;
   preload?: "none" | "metadata" | "auto";
-  fit?: "cover" | "contain";
+  fit?: "auto" | "cover" | "contain";
   className?: string;
 }
 
@@ -43,7 +44,7 @@ export function VideoPlayer({
   poster,
   title,
   preload = "auto",
-  fit = "cover",
+  fit = "auto",
   className = "",
 }: VideoPlayerProps) {
   const labelId = useId();
@@ -59,6 +60,15 @@ export function VideoPlayer({
   const [buffered, setBuffered] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [intrinsicSize, setIntrinsicSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const isAdaptive = fit === "auto" || fit === "contain";
+  const isPortrait = intrinsicSize
+    ? intrinsicSize.width < intrinsicSize.height
+    : false;
 
   const revealControls = useCallback(() => {
     setShowControls(true);
@@ -84,6 +94,10 @@ export function VideoPlayer({
   useEffect(() => {
     applyVolume(0.85);
   }, [applyVolume, src]);
+
+  useEffect(() => {
+    setIntrinsicSize(null);
+  }, [src]);
 
   useEffect(() => {
     return () => {
@@ -176,22 +190,67 @@ export function VideoPlayer({
     [duration, revealControls],
   );
 
+  const handleLoadedMetadata = useCallback(
+    (video: HTMLVideoElement) => {
+      setDuration(video.duration);
+
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        setIntrinsicSize({
+          width: video.videoWidth,
+          height: video.videoHeight,
+        });
+      }
+    },
+    [],
+  );
+
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const bufferProgress = duration > 0 ? (buffered / duration) * 100 : 0;
   const isMuted = volume === 0;
 
-  const useCover = isFullscreen || fit === "cover";
+  let containerStyle: CSSProperties | undefined;
+  if (!isFullscreen && isAdaptive && intrinsicSize) {
+    const ratio = intrinsicSize.width / intrinsicSize.height;
+    containerStyle = isPortrait
+      ? {
+          aspectRatio: `${intrinsicSize.width} / ${intrinsicSize.height}`,
+          width: `min(100%, calc(min(85vh, 920px) * ${ratio}))`,
+          maxHeight: "min(85vh, 920px)",
+          marginInline: "auto",
+        }
+      : {
+          aspectRatio: `${intrinsicSize.width} / ${intrinsicSize.height}`,
+          width: "100%",
+          maxHeight: "80vh",
+        };
+  }
+
+  const containerClassName = [
+    "group/player relative overflow-hidden bg-black",
+    isFullscreen && isAdaptive
+      ? "flex h-screen w-screen items-center justify-center"
+      : "",
+    !isFullscreen && fit === "cover" ? "aspect-video w-full" : "",
+    !isFullscreen && isAdaptive && !intrinsicSize ? "aspect-video w-full" : "",
+    !isFullscreen && isAdaptive && isPortrait ? "mx-auto" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const videoClassName = isFullscreen && isAdaptive
+    ? "begraphix-video max-h-[100vh] max-w-[100vw] h-auto w-auto object-contain"
+    : fit === "cover"
+      ? "begraphix-video absolute inset-0 h-full w-full object-cover"
+      : isAdaptive && intrinsicSize
+        ? "begraphix-video absolute inset-0 h-full w-full object-cover"
+        : "begraphix-video block h-auto max-h-[80vh] w-full object-contain";
 
   return (
     <div
       ref={containerRef}
-      className={`group/player relative w-full overflow-hidden bg-black ${
-        isFullscreen
-          ? "h-screen w-screen"
-          : useCover
-            ? "aspect-video w-full"
-            : ""
-      } ${className}`}
+      className={containerClassName}
+      style={containerStyle}
       onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
       aria-labelledby={title ? labelId : undefined}
@@ -204,11 +263,7 @@ export function VideoPlayer({
         playsInline
         controls={false}
         disablePictureInPicture
-        className={`begraphix-video ${
-          useCover
-            ? "absolute inset-0 h-full w-full object-cover"
-            : "block h-auto max-h-[80vh] w-full object-contain"
-        }`}
+        className={videoClassName}
         onClick={togglePlay}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
@@ -220,7 +275,7 @@ export function VideoPlayer({
             setBuffered(video.buffered.end(video.buffered.length - 1));
           }
         }}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onLoadedMetadata={(e) => handleLoadedMetadata(e.currentTarget)}
       />
 
       <div
