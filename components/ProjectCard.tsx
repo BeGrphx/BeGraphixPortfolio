@@ -15,7 +15,6 @@ import {
 
 interface ProjectCardProps {
   project: ProjectWithDisplay;
-  index: number;
   locale: Locale;
 }
 
@@ -28,7 +27,7 @@ function getHoverVideoSrc(url: string): string | null {
   return null;
 }
 
-export function ProjectCard({ project, index, locale }: ProjectCardProps) {
+export function ProjectCard({ project, locale }: ProjectCardProps) {
   const ref = useRef<HTMLElement>(null);
   const [hovering, setHovering] = useState(false);
   const title = project.displayTitle;
@@ -46,17 +45,7 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
   const isMp4 = hoverSrc?.includes(".mp4");
 
   return (
-    <motion.article
-      ref={ref}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{
-        duration: 0.45,
-        delay: index * 0.05,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-    >
+    <article ref={ref}>
       <Link
         href={`/project/${project.slug.current}`}
         className="group block"
@@ -125,6 +114,6 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
           </motion.span>
         </div>
       </Link>
-    </motion.article>
+    </article>
   );
 }

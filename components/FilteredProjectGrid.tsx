@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
@@ -37,17 +37,20 @@ export function FilteredProjectGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2">
-      <AnimatePresence mode="sync">
-        {filtered.map((project, index) => (
-          <ProjectCard
-            key={project._id}
-            project={project}
-            index={index}
-            locale={locale}
-          />
-        ))}
-      </AnimatePresence>
-    </div>
+    <motion.div
+      key={filter}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
+      className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2"
+    >
+      {filtered.map((project) => (
+        <ProjectCard
+          key={project._id}
+          project={project}
+          locale={locale}
+        />
+      ))}
+    </motion.div>
   );
 }

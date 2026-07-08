@@ -72,9 +72,10 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
         />
       </div>
       {filter === "showreel" ? (
-        <ShowreelList projects={showreelProjects} />
+        <ShowreelList key="showreel" projects={showreelProjects} />
       ) : (
         <FilteredProjectGrid
+          key={filter}
           projects={gridProjects}
           filter={filter}
           locale={locale}
