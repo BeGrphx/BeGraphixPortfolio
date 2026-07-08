@@ -1,10 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { parseMediaUrl } from "@/lib/media";
+import { preloadVideo } from "@/lib/preload-video";
 import type { SanityMediaItem } from "@/lib/sanity/queries";
 import { FadeIn } from "./FadeIn";
+import { VideoPlayer } from "./VideoPlayer";
 
 const MuxPlayer = dynamic(
   () => import("@mux/mux-player-react").then((m) => m.default),
@@ -22,8 +24,46 @@ const defaultLabels: Record<string, string> = {
   link: "En savoir plus",
 };
 
+function FileMediaBlock({
+  item,
+  index,
+}: {
+  item: SanityMediaItem;
+  index: number;
+}) {
+  useEffect(() => {
+    if (item.videoUrl) preloadVideo(item.videoUrl, "auto");
+  }, [item.videoUrl]);
+
+  if (!item.videoUrl) {
+    return (
+      <FadeIn delay={index * 0.08}>
+        <div className="flex aspect-video items-center justify-center bg-neutral-900 text-sm text-neutral-500">
+          Vidéo manquante
+        </div>
+      </FadeIn>
+    );
+  }
+
+  return (
+    <FadeIn delay={index * 0.08}>
+      <VideoPlayer
+        src={item.videoUrl}
+        poster={item.posterUrl}
+        title={item.title}
+        preload="auto"
+        className="w-full rounded-sm"
+      />
+    </FadeIn>
+  );
+}
+
 export function MediaBlock({ item, index }: MediaBlockProps) {
   const [muted, setMuted] = useState(true);
+
+  if (item.mediaType === "file") {
+    return <FileMediaBlock item={item} index={index} />;
+  }
 
   if (item.mediaType === "mux" && item.muxPlaybackId) {
     return (

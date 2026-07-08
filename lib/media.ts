@@ -1,4 +1,5 @@
 export type MediaType =
+  | "file"
   | "youtube"
   | "vimeo"
   | "instagram"

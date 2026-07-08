@@ -16,9 +16,18 @@ export interface SanityMediaItem {
   _key: string;
   mediaType: MediaType;
   url?: string;
+  videoUrl?: string;
+  posterUrl?: string;
   muxPlaybackId?: string;
   title?: string;
   label?: string;
+}
+
+export interface SanityVideoItem {
+  _key: string;
+  title?: string;
+  videoUrl?: string;
+  posterUrl?: string;
 }
 
 export type ProjectType = "showreel" | "professional" | "personal";
@@ -39,6 +48,7 @@ export interface SanityProject {
   hoverPreviewUrl?: string;
   showreelVideoUrl?: string;
   gallery?: SanityGalleryImage[];
+  videoGallery?: SanityVideoItem[];
   pdfFile?: { asset: { _ref: string; url?: string } };
   media?: SanityMediaItem[];
 }
@@ -90,9 +100,24 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
     ...,
     ${imageDimensions}
   },
+  "videoGallery": videoGallery[] {
+    _key,
+    title,
+    "videoUrl": coalesce(videoUrl, videoFile.asset->url),
+    "posterUrl": poster.asset->url
+  },
   pdfFile { asset->{ url } },
-  media
-}`;
+  "media": media[] {
+    _key,
+    mediaType,
+    title,
+    label,
+    url,
+    muxPlaybackId,
+    "videoUrl": coalesce(url, videoFile.asset->url),
+    "posterUrl": poster.asset->url
+  }
+`;
 
 export const aboutQuery = `*[_type == "about"][0] {
   title,

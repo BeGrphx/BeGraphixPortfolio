@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { FadeIn } from "@/components/FadeIn";
 import { MediaBlock } from "@/components/MediaBlock";
 import { PhotoGallery } from "@/components/PhotoGallery";
+import { VideoGallery } from "@/components/VideoGallery";
 import type { Locale } from "@/i18n/routing";
 import { getLocalizedAuto } from "@/lib/i18n";
 import { localizeProjectDetail } from "@/lib/localize-project";
@@ -141,6 +142,10 @@ export default async function ProjectPage({
 
         {project.gallery && project.gallery.length > 0 && (
           <PhotoGallery images={project.gallery} />
+        )}
+
+        {project.videoGallery && project.videoGallery.length > 0 && (
+          <VideoGallery videos={project.videoGallery} />
         )}
 
         {description && (

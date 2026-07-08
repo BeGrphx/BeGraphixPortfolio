@@ -140,6 +140,53 @@ export const project = defineType({
       ],
     }),
     defineField({
+      name: "videoGallery",
+      title: "Galerie vidéos",
+      type: "array",
+      description: "Uploadez vos fichiers sources MP4/WebM — lecteur custom sur la page projet.",
+      of: [
+        {
+          type: "object",
+          name: "videoItem",
+          title: "Vidéo",
+          fields: [
+            defineField({
+              name: "title",
+              title: "Titre (optionnel)",
+              type: "string",
+            }),
+            defineField({
+              name: "videoFile",
+              title: "Fichier vidéo",
+              type: "file",
+              options: { accept: "video/mp4,video/webm" },
+            }),
+            defineField({
+              name: "videoUrl",
+              title: "Ou URL MP4 directe",
+              type: "url",
+              description: "Alternative si la vidéo est hébergée ailleurs.",
+            }),
+            defineField({
+              name: "poster",
+              title: "Image de couverture",
+              type: "image",
+              options: { hotspot: true },
+            }),
+          ],
+          preview: {
+            select: { title: "title", videoUrl: "videoUrl" },
+            prepare({ title, videoUrl }) {
+              return {
+                title: title || "Vidéo",
+                subtitle: videoUrl ? "URL externe" : "Fichier uploadé",
+              };
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
       name: "pdfFile",
       title: "Fichier PDF",
       type: "file",
@@ -161,6 +208,7 @@ export const project = defineType({
               type: "string",
               options: {
                 list: [
+                  { title: "Fichier vidéo (upload)", value: "file" },
                   { title: "Mux (player custom)", value: "mux" },
                   { title: "YouTube", value: "youtube" },
                   { title: "Vimeo", value: "vimeo" },
@@ -173,6 +221,20 @@ export const project = defineType({
               validation: (rule) => rule.required(),
             }),
             defineField({
+              name: "videoFile",
+              title: "Fichier vidéo",
+              type: "file",
+              options: { accept: "video/mp4,video/webm" },
+              hidden: ({ parent }) => parent?.mediaType !== "file",
+            }),
+            defineField({
+              name: "poster",
+              title: "Image de couverture",
+              type: "image",
+              options: { hotspot: true },
+              hidden: ({ parent }) => parent?.mediaType !== "file",
+            }),
+            defineField({
               name: "muxPlaybackId",
               title: "Mux Playback ID",
               type: "string",
@@ -182,7 +244,8 @@ export const project = defineType({
               name: "url",
               title: "URL",
               type: "url",
-              hidden: ({ parent }) => parent?.mediaType === "mux",
+              hidden: ({ parent }) =>
+                parent?.mediaType === "mux" || parent?.mediaType === "file",
             }),
             defineField({
               name: "title",
