@@ -82,8 +82,33 @@ function InstagramMediaBlock({
 }) {
   const t = useTranslations("project");
   const [engaged, setEngaged] = useState(false);
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [thumbnailReady, setThumbnailReady] = useState(false);
   const isReel = parsed.href.includes("/reel/");
   const embedSrc = `${parsed.embedUrl}${parsed.embedUrl?.includes("?") ? "&" : "?"}hidecaption=1`;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch(`/api/instagram-thumbnail?url=${encodeURIComponent(parsed.href)}`)
+      .then((response) => response.json())
+      .then((data: { thumbnail?: string | null }) => {
+        if (!cancelled) {
+          setThumbnail(data.thumbnail ?? null);
+          setThumbnailReady(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setThumbnailReady(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [parsed.href]);
+
+  const showPoster = !engaged && Boolean(thumbnail);
+  const showIframe = engaged || (thumbnailReady && !thumbnail);
 
   return (
     <FadeIn delay={index * 0.08}>
@@ -101,19 +126,32 @@ function InstagramMediaBlock({
               : "aspect-video max-w-[720px]"
           }`}
         >
-          <iframe
-            src={embedSrc}
-            title={item.title ?? "Instagram"}
-            className="absolute left-1/2 top-0 w-[118%] -translate-x-1/2 border-0"
-            style={{
-              height: "calc(100% + 104px)",
-              marginTop: isReel ? "-56px" : "-40px",
-            }}
-            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-            allowFullScreen
-          />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[76px] bg-neutral-950" />
-          <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-[54px] -translate-y-1/2 bg-neutral-950" />
+          {showIframe && (
+            <>
+              <iframe
+                src={embedSrc}
+                title={item.title ?? "Instagram"}
+                className="absolute left-1/2 border-0"
+                style={{
+                  top: isReel ? "-35%" : "-18%",
+                  width: isReel ? "118%" : "112%",
+                  height: isReel ? "280%" : "190%",
+                  transform: "translateX(-50%)",
+                }}
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                allowFullScreen
+              />
+              <div className="pointer-events-none absolute inset-x-0 top-[42%] z-10 h-[14%] bg-neutral-950" />
+            </>
+          )}
+
+          {showPoster && (
+            <img
+              src={thumbnail!}
+              alt=""
+              className="absolute inset-0 z-[1] h-full w-full object-cover"
+            />
+          )}
 
           {!engaged && (
             <button
