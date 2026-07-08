@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { parseMediaUrl, type ParsedMedia } from "@/lib/media";
 import { preloadVideo } from "@/lib/preload-video";
 import type { SanityMediaItem } from "@/lib/sanity/queries";
@@ -58,6 +59,18 @@ function FileMediaBlock({
   );
 }
 
+function PlayTriangleIcon({ className = "h-7 w-7" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`ml-0.5 fill-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)] ${className}`}
+      aria-hidden
+    >
+      <path d="M8 5.14v13.72L19 12 8 5.14z" />
+    </svg>
+  );
+}
+
 function InstagramMediaBlock({
   item,
   index,
@@ -67,34 +80,65 @@ function InstagramMediaBlock({
   index: number;
   parsed: ParsedMedia;
 }) {
+  const t = useTranslations("project");
+  const [engaged, setEngaged] = useState(false);
   const isReel = parsed.href.includes("/reel/");
-  const embedSrc = `${parsed.embedUrl}${parsed.embedUrl?.includes("?") ? "&" : "?"}hidecaption=1&muted=1`;
+  const embedSrc = `${parsed.embedUrl}${parsed.embedUrl?.includes("?") ? "&" : "?"}hidecaption=1`;
 
   return (
     <FadeIn delay={index * 0.08}>
-      <div className="bg-neutral-950">
+      <div>
         {item.title && (
-          <p className="mb-3 text-center text-xs uppercase tracking-[0.2em] text-neutral-500">
+          <p className="mb-6 text-center text-xs uppercase tracking-[0.2em] text-neutral-500">
             {item.title}
           </p>
         )}
 
         <div
-          className={`relative mx-auto w-full overflow-hidden bg-black ${
+          className={`relative mx-auto w-full overflow-hidden bg-neutral-950 ${
             isReel
-              ? "aspect-[9/16] max-w-[400px]"
+              ? "aspect-[9/16] max-w-[min(100%,400px)]"
               : "aspect-video max-w-[720px]"
           }`}
         >
           <iframe
             src={embedSrc}
             title={item.title ?? "Instagram"}
-            className="pointer-events-none absolute left-0 top-0 w-full border-0"
-            style={{ height: "calc(100% + 72px)" }}
+            className="absolute left-1/2 top-0 w-[118%] -translate-x-1/2 border-0"
+            style={{
+              height: "calc(100% + 104px)",
+              marginTop: isReel ? "-56px" : "-40px",
+            }}
             allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
             allowFullScreen
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[76px] bg-neutral-950" />
+          <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-[54px] -translate-y-1/2 bg-neutral-950" />
+
+          {!engaged && (
+            <button
+              type="button"
+              onClick={() => setEngaged(true)}
+              className="absolute left-1/2 top-1/2 z-20 h-[4.5rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-105 active:scale-95"
+              aria-label="Lire la vidéo"
+            >
+              <span className="relative flex h-full w-full items-center justify-center rounded-full border border-white/35 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+                <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/35 via-white/10 to-transparent" />
+                <PlayTriangleIcon />
+              </span>
+            </button>
+          )}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <a
+            href={parsed.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-foreground px-10 py-3 text-xs uppercase tracking-[0.25em] text-background transition-opacity hover:opacity-80"
+          >
+            {item.label ?? t("viewMoreInstagram")} →
+          </a>
         </div>
       </div>
     </FadeIn>
@@ -192,9 +236,7 @@ export function MediaBlock({ item, index }: MediaBlockProps) {
             {item.title}
           </p>
         )}
-        <div
-          className="relative w-full overflow-hidden aspect-video"
-        >
+        <div className="relative aspect-video w-full overflow-hidden">
           <iframe
             src={`${parsed.embedUrl}${parsed.embedUrl.includes("?") ? "&" : "?"}muted=1`}
             title={item.title ?? "Média embarqué"}

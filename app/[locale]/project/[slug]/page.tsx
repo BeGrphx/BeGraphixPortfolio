@@ -9,7 +9,7 @@ import { VideoGallery } from "@/components/VideoGallery";
 import type { Locale } from "@/i18n/routing";
 import { getLocalizedAuto } from "@/lib/i18n";
 import { localizeProjectDetail } from "@/lib/localize-project";
-import { formatProjectDate, parseMediaUrl } from "@/lib/media";
+import { formatProjectDate } from "@/lib/media";
 import {
   getHomeProjectsHref,
   projectTypeToHomeFilter,
@@ -97,9 +97,9 @@ export default async function ProjectPage({
   const homeHref = getHomeProjectsHref(
     projectTypeToHomeFilter(projectRaw.projectType),
   );
-  const instagramMedia =
-    project.media?.filter((item) => item.mediaType === "instagram" && item.url) ??
-    [];
+  const hasInstagramMedia = project.media?.some(
+    (item) => item.mediaType === "instagram",
+  );
 
   return (
     <div
@@ -191,25 +191,11 @@ export default async function ProjectPage({
         )}
 
         <FadeIn delay={0.2}>
-          <div className="mt-20 flex flex-col items-center gap-6 border-t border-neutral-200 px-4 pt-12 dark:border-neutral-900">
-            {instagramMedia.map((item) => {
-              const parsed = parseMediaUrl(item.url!, "instagram");
-              if (!parsed) return null;
-
-              return (
-                <a
-                  key={item._key}
-                  href={parsed.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-foreground px-10 py-3 text-xs uppercase tracking-[0.25em] text-background transition-opacity hover:opacity-80"
-                >
-                  {item.label ??
-                    t("watchOn", { platform: t("platforms.instagram") })}{" "}
-                  →
-                </a>
-              );
-            })}
+          <div
+            className={`flex justify-center border-t border-neutral-200 px-4 pt-12 dark:border-neutral-900 ${
+              hasInstagramMedia ? "mt-10" : "mt-20"
+            }`}
+          >
             <Link
               href={homeHref}
               scroll={false}
