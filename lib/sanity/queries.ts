@@ -117,7 +117,7 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
     "videoUrl": coalesce(url, videoFile.asset->url),
     "posterUrl": poster.asset->url
   }
-`;
+}`;
 
 export const aboutQuery = `*[_type == "about"][0] {
   title,
