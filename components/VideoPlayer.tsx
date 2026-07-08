@@ -6,6 +6,7 @@ import {
   useId,
   useRef,
   useState,
+  type ChangeEvent,
   type MouseEvent,
 } from "react";
 
@@ -32,10 +33,13 @@ export function VideoPlayer({
   className = "",
 }: VideoPlayerProps) {
   const labelId = useId();
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastVolume = useRef(0.85);
+
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [volume, setVolume] = useState(0.85);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
@@ -51,6 +55,21 @@ export function VideoPlayer({
       }
     }, 2800);
   }, []);
+
+  const applyVolume = useCallback((value: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const clamped = Math.min(1, Math.max(0, value));
+    video.volume = clamped;
+    video.muted = clamped === 0;
+    setVolume(clamped);
+    if (clamped > 0) lastVolume.current = clamped;
+  }, []);
+
+  useEffect(() => {
+    applyVolume(0.85);
+  }, [applyVolume, src]);
 
   useEffect(() => {
     return () => {
@@ -83,15 +102,24 @@ export function VideoPlayer({
   }, [revealControls]);
 
   const toggleMute = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setMuted(video.muted);
+    if (volume > 0) {
+      applyVolume(0);
+      return;
+    }
+    applyVolume(lastVolume.current || 0.85);
     revealControls();
-  }, [revealControls]);
+  }, [applyVolume, revealControls, volume]);
+
+  const onVolumeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      applyVolume(Number(event.target.value) / 100);
+      revealControls();
+    },
+    [applyVolume, revealControls],
+  );
 
   const toggleFullscreen = useCallback(() => {
-    const container = videoRef.current?.parentElement;
+    const container = containerRef.current;
     if (!container) return;
 
     if (document.fullscreenElement) {
@@ -121,10 +149,12 @@ export function VideoPlayer({
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const bufferProgress = duration > 0 ? (buffered / duration) * 100 : 0;
+  const isMuted = volume === 0;
 
   return (
     <div
-      className={`group/player relative overflow-hidden bg-neutral-950 ${className}`}
+      ref={containerRef}
+      className={`group/player relative w-full overflow-hidden bg-black ${className}`}
       onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
       aria-labelledby={title ? labelId : undefined}
@@ -135,7 +165,7 @@ export function VideoPlayer({
         poster={poster}
         preload={preload}
         playsInline
-        className="aspect-video h-full w-full bg-black object-contain"
+        className="block h-auto max-h-[80vh] w-full object-contain"
         onClick={togglePlay}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
@@ -151,7 +181,7 @@ export function VideoPlayer({
       />
 
       <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/30 transition-opacity duration-300 ${
+        className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 transition-opacity duration-300 ${
           showControls || !playing ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -168,7 +198,7 @@ export function VideoPlayer({
       )}
 
       <div
-        className={`absolute inset-x-0 bottom-0 z-20 px-4 pb-4 pt-10 transition-opacity duration-300 ${
+        className={`absolute inset-x-0 bottom-0 z-20 px-4 pb-4 pt-12 transition-opacity duration-300 ${
           showControls || !playing
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0"
@@ -202,34 +232,46 @@ export function VideoPlayer({
           />
         </div>
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={togglePlay}
-              className="text-xs uppercase tracking-[0.15em] text-white/80 transition-colors hover:text-white"
+              className="shrink-0 text-xs uppercase tracking-[0.15em] text-white/80 transition-colors hover:text-white"
               aria-label={playing ? "Pause" : "Lecture"}
             >
               {playing ? "Pause" : "Lecture"}
             </button>
-            <button
-              type="button"
-              onClick={toggleMute}
-              className="text-xs uppercase tracking-[0.15em] text-white/60 transition-colors hover:text-white"
-              aria-label={muted ? "Activer le son" : "Couper le son"}
-            >
-              {muted ? "Muet" : "Son"}
-            </button>
+
+            <div className="flex min-w-0 flex-1 items-center gap-2 sm:max-w-[180px]">
+              <button
+                type="button"
+                onClick={toggleMute}
+                className="shrink-0 text-xs uppercase tracking-[0.15em] text-white/60 transition-colors hover:text-white"
+                aria-label={isMuted ? "Activer le son" : "Couper le son"}
+              >
+                {isMuted ? "Muet" : "Son"}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={Math.round(volume * 100)}
+                onChange={onVolumeChange}
+                aria-label="Volume"
+                className="h-1 min-w-[72px] flex-1 cursor-pointer appearance-none rounded-full bg-white/20 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+              />
+            </div>
           </div>
 
-          <p className="font-mono text-[11px] text-white/50">
+          <p className="font-mono shrink-0 text-[11px] text-white/50">
             {formatTime(currentTime)} / {formatTime(duration)}
           </p>
 
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="text-xs uppercase tracking-[0.15em] text-white/60 transition-colors hover:text-white"
+            className="shrink-0 text-xs uppercase tracking-[0.15em] text-white/60 transition-colors hover:text-white"
             aria-label={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
           >
             {isFullscreen ? "Réduire" : "Plein écran"}
