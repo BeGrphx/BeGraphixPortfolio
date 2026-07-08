@@ -22,8 +22,20 @@ export function buildImageSrc(
   return urlFor(image).width(maxWidth).fit("max").auto("format").url();
 }
 
+export const LIGHTBOX_MAX_WIDTH = 2560;
+
+export function buildLightboxSrc(image: SanityGalleryImage): string {
+  return urlFor(image)
+    .width(LIGHTBOX_MAX_WIDTH)
+    .fit("max")
+    .auto("format")
+    .quality(85)
+    .url();
+}
+
+/** @deprecated Use buildLightboxSrc */
 export function buildFullImageSrc(image: SanityGalleryImage): string {
-  return urlFor(image).width(3840).fit("max").auto("format").quality(90).url();
+  return buildLightboxSrc(image);
 }
 
 export function aspectRatioStyle(

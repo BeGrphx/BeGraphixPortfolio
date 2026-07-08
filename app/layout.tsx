@@ -24,6 +24,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html className="dark" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
+      </head>
       <body
         className={`${syne.variable} ${dmSans.variable} ${ibmMono.variable} antialiased`}
       >

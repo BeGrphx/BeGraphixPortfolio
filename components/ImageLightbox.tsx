@@ -3,12 +3,17 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useLenis } from "lenis/react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   aspectRatioStyle,
   getImageDimensions,
   isPortrait,
 } from "@/lib/sanity/image-utils";
+import {
+  isImagePreloaded,
+  preloadImage,
+  preloadImagesIdle,
+} from "@/lib/preload-image";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
 
 export interface LightboxImage {
@@ -29,6 +34,43 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [hiResReady, setHiResReady] = useState<Record<string, boolean>>({});
+
+  const hiResSources = useMemo(
+    () => images.map((image) => image.fullSrc ?? image.src),
+    [images],
+  );
+
+  const markHiResReady = useCallback((src: string) => {
+    setHiResReady((prev) => (prev[src] ? prev : { ...prev, [src]: true }));
+  }, []);
+
+  useEffect(() => {
+    const initialReady = Object.fromEntries(
+      hiResSources
+        .filter((src) => isImagePreloaded(src))
+        .map((src) => [src, true]),
+    );
+    if (Object.keys(initialReady).length > 0) {
+      setHiResReady((prev) => ({ ...prev, ...initialReady }));
+    }
+
+    return preloadImagesIdle(hiResSources, markHiResReady);
+  }, [hiResSources, markHiResReady]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const neighbors = [
+      images[(index + 1) % images.length],
+      images[(index - 1 + images.length) % images.length],
+    ];
+
+    neighbors.forEach((image) => {
+      const src = image.fullSrc ?? image.src;
+      preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
+    });
+  }, [open, index, images, markHiResReady]);
 
   const close = useCallback(() => setOpen(false), []);
   const prev = useCallback(() => {
@@ -85,9 +127,14 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
   if (!images.length) return null;
 
   const active = images[index];
-  const activeSrc = active.fullSrc ?? active.src;
+  const hiResSrc = active.fullSrc ?? active.src;
+  const showHiRes = hiResReady[hiResSrc] ?? isImagePreloaded(hiResSrc);
   const { width: activeWidth, height: activeHeight } = getImageDimensions(active);
   const activePortrait = isPortrait(active);
+
+  const imageClassName = `pointer-events-none h-auto max-h-full w-auto max-w-full object-contain transition-opacity duration-300 ${
+    activePortrait ? "max-w-[min(96vw,900px)]" : "max-w-[min(96vw,1600px)]"
+  }`;
 
   return (
     <>
@@ -101,9 +148,19 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
               key={image.src}
               type="button"
               onClick={() => {
+                const src = image.fullSrc ?? image.src;
+                preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
                 setDirection(0);
                 setIndex(i);
                 setOpen(true);
+              }}
+              onMouseEnter={() => {
+                const src = image.fullSrc ?? image.src;
+                preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
+              }}
+              onFocus={() => {
+                const src = image.fullSrc ?? image.src;
+                preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
               }}
               className={`group relative overflow-hidden bg-neutral-900 text-left ${
                 portrait
@@ -187,7 +244,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             >
               <AnimatePresence initial={false} custom={direction}>
                 <motion.div
-                  key={activeSrc}
+                  key={hiResSrc}
                   custom={direction}
                   variants={slideVariants}
                   initial={direction === 0 ? false : "enter"}
@@ -197,18 +254,31 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                   className="absolute inset-0 flex items-center justify-center"
                 >
                   <Image
-                    src={activeSrc}
+                    src={active.src}
                     alt={active.alt}
                     width={activeWidth}
                     height={activeHeight}
-                    className={`pointer-events-none h-auto max-h-full w-auto max-w-full object-contain ${
-                      activePortrait ? "max-w-[min(96vw,900px)]" : "max-w-[min(96vw,1600px)]"
+                    className={`${imageClassName} ${
+                      showHiRes && hiResSrc !== active.src ? "opacity-0" : "opacity-100"
                     }`}
-                    priority
                     sizes="96vw"
                     draggable={false}
-                    unoptimized={Boolean(active.fullSrc)}
                   />
+                  {hiResSrc !== active.src && (
+                    <Image
+                      src={hiResSrc}
+                      alt={active.alt}
+                      width={activeWidth}
+                      height={activeHeight}
+                      className={`absolute ${imageClassName} ${
+                        showHiRes ? "opacity-100" : "opacity-0"
+                      }`}
+                      sizes="96vw"
+                      draggable={false}
+                      unoptimized
+                      onLoad={() => markHiResReady(hiResSrc)}
+                    />
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
