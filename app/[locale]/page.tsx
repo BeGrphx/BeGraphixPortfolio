@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 import { FadeIn } from "@/components/FadeIn";
 import { HeroBackground } from "@/components/HeroBackground";
+import { HomeScrollToProjects } from "@/components/HomeScrollToProjects";
 import { ProjectGrid } from "@/components/ProjectGrid";
 import type { Locale } from "@/i18n/routing";
 import { localizeProjects } from "@/lib/localize-project";
@@ -82,11 +84,18 @@ export default async function HomePage({
       </section>
 
       <section className="relative z-10 px-6 pb-24 md:px-10">
+        <Suspense fallback={null}>
+          <HomeScrollToProjects />
+        </Suspense>
         <div
           className="mx-auto max-w-7xl"
           style={{ paddingTop: projectsTopSpacing }}
         >
-          <ProjectGrid projects={projects} locale={locale} />
+          <div id="projects" className="scroll-mt-24">
+            <Suspense fallback={null}>
+              <ProjectGrid projects={projects} locale={locale} />
+            </Suspense>
+          </div>
         </div>
       </section>
     </div>

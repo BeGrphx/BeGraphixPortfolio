@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
@@ -15,14 +16,28 @@ interface ProjectGridProps {
 
 export function ProjectGrid({ projects, locale }: ProjectGridProps) {
   const t = useTranslations("home");
+  const searchParams = useSearchParams();
 
   const showreelProjects = projects.filter((p) => p.projectType === "showreel");
   const gridProjects = projects.filter((p) => p.projectType !== "showreel");
   const hasShowreels = showreelProjects.length > 0;
 
+  const paramFilter = useMemo((): FilterValue | null => {
+    const value = searchParams.get("filter");
+    if (value === "personal" || value === "professional") return value;
+    if (value === "showreel" && hasShowreels) return "showreel";
+    return null;
+  }, [searchParams, hasShowreels]);
+
+  const defaultFilter: FilterValue = hasShowreels ? "showreel" : "professional";
+
   const [filter, setFilter] = useState<FilterValue>(
-    hasShowreels ? "showreel" : "professional",
+    () => paramFilter ?? defaultFilter,
   );
+
+  useEffect(() => {
+    if (paramFilter) setFilter(paramFilter);
+  }, [paramFilter]);
 
   const counts = {
     showreel: showreelProjects.length,

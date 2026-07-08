@@ -9,6 +9,10 @@ import type { Locale } from "@/i18n/routing";
 import { getLocalizedAuto } from "@/lib/i18n";
 import { localizeProjectDetail } from "@/lib/localize-project";
 import { formatProjectDate } from "@/lib/media";
+import {
+  getHomeProjectsHref,
+  projectTypeToHomeFilter,
+} from "@/lib/home-navigation";
 import { client } from "@/lib/sanity/client";
 import { urlFor } from "@/lib/sanity/image";
 import {
@@ -89,6 +93,9 @@ export default async function ProjectPage({
   const project = await localizeProjectDetail(projectRaw, locale);
   const { title, description, credits } = project;
   const accent = project.dominantColor ?? "#1a1a1a";
+  const homeHref = getHomeProjectsHref(
+    projectTypeToHomeFilter(projectRaw.projectType),
+  );
 
   return (
     <div
@@ -178,7 +185,8 @@ export default async function ProjectPage({
         <FadeIn delay={0.2}>
           <div className="mt-20 flex justify-center border-t border-neutral-200 px-4 pt-12 dark:border-neutral-900">
             <Link
-              href="/"
+              href={homeHref}
+              scroll={false}
               className="inline-block border border-neutral-400 px-10 py-3 text-xs uppercase tracking-[0.25em] text-muted transition-colors hover:border-neutral-600 hover:text-foreground dark:border-neutral-700"
             >
               {t("home")}
