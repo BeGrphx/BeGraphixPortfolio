@@ -3,10 +3,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { aspectRatioStyle, getImageDimensions } from "@/lib/sanity/image-utils";
+import {
+  aspectRatioStyle,
+  getImageDimensions,
+  isPortrait,
+} from "@/lib/sanity/image-utils";
 
 export interface LightboxImage {
   src: string;
+  fullSrc?: string;
   alt: string;
   caption?: string;
   width?: number;
@@ -65,36 +70,51 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
   if (!images.length) return null;
 
   const active = images[index];
+  const activeSrc = active.fullSrc ?? active.src;
   const { width: activeWidth, height: activeHeight } = getImageDimensions(active);
+  const activePortrait = isPortrait(active);
 
   return (
     <>
-      <div className="mb-16 grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div className="mb-16 flex flex-wrap items-start justify-center gap-3">
         {images.map((image, i) => {
           const { width, height } = getImageDimensions(image);
+          const portrait = isPortrait(image);
 
           return (
-          <button
-            key={image.src}
-            type="button"
-            onClick={() => {
-              setDirection(0);
-              setIndex(i);
-              setOpen(true);
-            }}
-            className="group relative w-full overflow-hidden bg-neutral-900 text-left"
-            style={aspectRatioStyle(image)}
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              width={width}
-              height={height}
-              className="h-auto w-full transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
-          </button>
+            <button
+              key={image.src}
+              type="button"
+              onClick={() => {
+                setDirection(0);
+                setIndex(i);
+                setOpen(true);
+              }}
+              className={`group relative overflow-hidden bg-neutral-900 text-left ${
+                portrait
+                  ? "h-[min(58vh,780px)] shrink-0"
+                  : "w-full md:w-[calc(50%-0.375rem)]"
+              }`}
+              style={portrait ? undefined : aspectRatioStyle(image)}
+            >
+              <Image
+                src={image.src}
+                alt={image.alt}
+                width={width}
+                height={height}
+                className={
+                  portrait
+                    ? "h-full w-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                    : "h-auto w-full transition-transform duration-500 group-hover:scale-105"
+                }
+                sizes={
+                  portrait
+                    ? "(max-width: 768px) 45vw, 320px"
+                    : "(max-width: 768px) 100vw, 50vw"
+                }
+              />
+              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+            </button>
           );
         })}
       </div>
@@ -147,13 +167,12 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             )}
 
             <div
-              className="relative z-10 w-[90vw] max-w-6xl overflow-hidden"
-              style={aspectRatioStyle(active)}
+              className="relative z-10 flex max-h-[88vh] w-[96vw] max-w-[1600px] items-center justify-center px-4"
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence initial={false} custom={direction} mode="popLayout">
                 <motion.div
-                  key={images[index].src}
+                  key={activeSrc}
                   custom={direction}
                   variants={slideVariants}
                   initial={direction === 0 ? false : "enter"}
@@ -167,24 +186,27 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                     if (info.offset.x < -60) next();
                     else if (info.offset.x > 60) prev();
                   }}
-                  className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                  className="relative flex cursor-grab items-center justify-center active:cursor-grabbing"
                 >
                   <Image
-                    src={images[index].src}
-                    alt={images[index].alt}
+                    src={activeSrc}
+                    alt={active.alt}
                     width={activeWidth}
                     height={activeHeight}
-                    className="pointer-events-none h-auto w-full object-contain"
+                    className={`pointer-events-none h-auto max-h-[88vh] w-auto max-w-full object-contain ${
+                      activePortrait ? "max-w-[min(96vw,900px)]" : "max-w-[min(96vw,1600px)]"
+                    }`}
                     priority
-                    sizes="90vw"
+                    sizes="96vw"
                     draggable={false}
+                    unoptimized={Boolean(active.fullSrc)}
                   />
                 </motion.div>
               </AnimatePresence>
             </div>
 
             <AnimatePresence mode="wait">
-              {images[index].caption && (
+              {active.caption && (
                 <motion.p
                   key={`caption-${index}`}
                   initial={{ opacity: 0, y: 8 }}
@@ -193,7 +215,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                   transition={{ duration: 0.2 }}
                   className="pointer-events-none absolute bottom-8 left-1/2 z-10 max-w-xl -translate-x-1/2 text-center text-sm text-white/60"
                 >
-                  {images[index].caption}
+                  {active.caption}
                 </motion.p>
               )}
             </AnimatePresence>

@@ -8,11 +8,22 @@ export function getImageDimensions(image?: Pick<SanityGalleryImage, "width" | "h
   return { width, height };
 }
 
+export function isPortrait(
+  image?: Pick<SanityGalleryImage, "width" | "height">,
+): boolean {
+  const { width, height } = getImageDimensions(image);
+  return height > width;
+}
+
 export function buildImageSrc(
   image: SanityGalleryImage,
   maxWidth = 1920,
 ): string {
   return urlFor(image).width(maxWidth).fit("max").auto("format").url();
+}
+
+export function buildFullImageSrc(image: SanityGalleryImage): string {
+  return urlFor(image).width(3840).fit("max").auto("format").quality(90).url();
 }
 
 export function aspectRatioStyle(

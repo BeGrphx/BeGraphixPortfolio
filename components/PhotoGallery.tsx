@@ -1,5 +1,8 @@
 import { ImageLightbox, type LightboxImage } from "./ImageLightbox";
-import { buildImageSrc } from "@/lib/sanity/image-utils";
+import {
+  buildFullImageSrc,
+  buildImageSrc,
+} from "@/lib/sanity/image-utils";
 import type { SanityGalleryImage } from "@/lib/sanity/queries";
 
 interface PhotoGalleryProps {
@@ -10,7 +13,8 @@ export function PhotoGallery({ images }: PhotoGalleryProps) {
   if (!images.length) return null;
 
   const lightboxImages: LightboxImage[] = images.map((image) => ({
-    src: buildImageSrc(image, 2560),
+    src: buildImageSrc(image, 1600),
+    fullSrc: buildFullImageSrc(image),
     alt: image.alt ?? "",
     caption: image.caption,
     width: image.width,
