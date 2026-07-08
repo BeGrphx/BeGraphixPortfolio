@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { GrainOverlay } from "@/components/GrainOverlay";
 import { Header } from "@/components/Header";
 import { PageTransition } from "@/components/PageTransition";
+import { ScrollToTopOnNavigate } from "@/components/ScrollToTopOnNavigate";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 
 interface AppProvidersProps {
@@ -25,6 +26,7 @@ export function AppProviders({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LenisProvider>
+        <ScrollToTopOnNavigate />
         <GrainOverlay />
         <Header />
         <PageTransition>

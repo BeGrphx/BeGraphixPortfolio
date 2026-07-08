@@ -3,6 +3,7 @@
 import { useLenis } from "lenis/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { shouldSkipScrollToTop } from "@/lib/scroll";
 
 const HEADER_OFFSET = 88;
 
@@ -12,13 +13,7 @@ export function HomeScrollToProjects() {
   const filter = searchParams.get("filter");
 
   useEffect(() => {
-    const shouldScroll =
-      window.location.hash === "#projects" ||
-      filter === "personal" ||
-      filter === "professional" ||
-      filter === "showreel";
-
-    if (!shouldScroll) return;
+    if (!shouldSkipScrollToTop("/")) return;
 
     const scrollToProjects = () => {
       const target = document.getElementById("projects");

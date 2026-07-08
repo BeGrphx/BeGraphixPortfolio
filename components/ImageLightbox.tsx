@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useLenis } from "lenis/react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -8,6 +9,7 @@ import {
   getImageDimensions,
   isPortrait,
 } from "@/lib/sanity/image-utils";
+import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
 
 export interface LightboxImage {
   src: string;
@@ -23,6 +25,7 @@ interface ImageLightboxProps {
 }
 
 export function ImageLightbox({ images }: ImageLightboxProps) {
+  const lenis = useLenis();
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -39,7 +42,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
 
   const slideVariants = {
     enter: (dir: number) => ({
-      x: dir > 0 ? "18%" : "-18%",
+      x: dir >= 0 ? "12%" : "-12%",
       opacity: 0,
     }),
     center: {
@@ -47,25 +50,37 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
       opacity: 1,
     },
     exit: (dir: number) => ({
-      x: dir > 0 ? "-18%" : "18%",
+      x: dir >= 0 ? "-12%" : "12%",
       opacity: 0,
     }),
   };
 
   useEffect(() => {
     if (!open) return;
+
+    lockPageScroll(lenis);
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "ArrowLeft") prev();
       if (e.key === "ArrowRight") next();
     };
+
+    const blockScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
     window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    window.addEventListener("wheel", blockScroll, { passive: false });
+    window.addEventListener("touchmove", blockScroll, { passive: false });
+
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      window.removeEventListener("wheel", blockScroll);
+      window.removeEventListener("touchmove", blockScroll);
+      unlockPageScroll(lenis);
     };
-  }, [open, close, prev, next]);
+  }, [open, close, prev, next, lenis]);
 
   if (!images.length) return null;
 
@@ -122,7 +137,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[400] flex items-center justify-center bg-black/95"
+            className="fixed inset-0 z-[400] flex touch-none items-center justify-center overscroll-none bg-black/95"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -167,10 +182,10 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             )}
 
             <div
-              className="relative z-10 flex max-h-[88vh] w-[96vw] max-w-[1600px] items-center justify-center px-4"
+              className="relative z-10 h-[88vh] w-[96vw] max-w-[1600px] px-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <AnimatePresence initial={false} custom={direction} mode="popLayout">
+              <AnimatePresence initial={false} custom={direction}>
                 <motion.div
                   key={activeSrc}
                   custom={direction}
@@ -178,22 +193,15 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                   initial={direction === 0 ? false : "enter"}
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                  drag={images.length > 1 ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.12}
-                  onDragEnd={(_, info) => {
-                    if (info.offset.x < -60) next();
-                    else if (info.offset.x > 60) prev();
-                  }}
-                  className="relative flex cursor-grab items-center justify-center active:cursor-grabbing"
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 flex items-center justify-center"
                 >
                   <Image
                     src={activeSrc}
                     alt={active.alt}
                     width={activeWidth}
                     height={activeHeight}
-                    className={`pointer-events-none h-auto max-h-[88vh] w-auto max-w-full object-contain ${
+                    className={`pointer-events-none h-auto max-h-full w-auto max-w-full object-contain ${
                       activePortrait ? "max-w-[min(96vw,900px)]" : "max-w-[min(96vw,1600px)]"
                     }`}
                     priority
