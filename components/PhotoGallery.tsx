@@ -10,7 +10,7 @@ export function PhotoGallery({ images }: PhotoGalleryProps) {
   if (!images.length) return null;
 
   const lightboxImages: LightboxImage[] = images.map((image) => ({
-    src: urlFor(image).width(1920).fit("max").url(),
+    src: urlFor(image).width(1920).height(1080).fit("max").url(),
     alt: image.alt ?? "",
     caption: image.caption,
   }));

@@ -63,7 +63,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
 
   return (
     <>
-      <div className="mb-16 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-16 grid grid-cols-1 gap-3 md:grid-cols-2">
         {images.map((image, i) => (
           <button
             key={image.src}
@@ -73,14 +73,14 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
               setIndex(i);
               setOpen(true);
             }}
-            className="group relative aspect-[4/3] overflow-hidden bg-neutral-900 text-left"
+            className="group relative aspect-video overflow-hidden bg-neutral-900 text-left"
           >
             <Image
               src={image.src}
               alt={image.alt}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
           </button>
@@ -135,7 +135,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             )}
 
             <div
-              className="relative z-10 h-[70vh] w-[90vw] max-w-6xl overflow-hidden"
+              className="relative z-10 aspect-video w-[90vw] max-w-6xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence initial={false} custom={direction} mode="popLayout">

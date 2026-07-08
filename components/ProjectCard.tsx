@@ -30,7 +30,7 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
   const title = project.displayTitle;
 
   const imageUrl = project.thumbnail
-    ? urlFor(project.thumbnail).width(900).height(600).fit("crop").url()
+    ? urlFor(project.thumbnail).width(1280).height(720).fit("crop").url()
     : null;
 
   const hoverSrc = project.hoverPreviewUrl
@@ -56,7 +56,7 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
       >
-        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">
+        <div className="relative aspect-video overflow-hidden bg-neutral-900">
           {imageUrl ? (
             <Image
               src={imageUrl}
