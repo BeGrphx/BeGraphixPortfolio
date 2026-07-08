@@ -3,11 +3,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
+import { aspectRatioStyle, getImageDimensions } from "@/lib/sanity/image-utils";
 
 export interface LightboxImage {
   src: string;
   alt: string;
   caption?: string;
+  width?: number;
+  height?: number;
 }
 
 interface ImageLightboxProps {
@@ -61,10 +64,16 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
 
   if (!images.length) return null;
 
+  const active = images[index];
+  const { width: activeWidth, height: activeHeight } = getImageDimensions(active);
+
   return (
     <>
       <div className="mb-16 grid grid-cols-1 gap-3 md:grid-cols-2">
-        {images.map((image, i) => (
+        {images.map((image, i) => {
+          const { width, height } = getImageDimensions(image);
+
+          return (
           <button
             key={image.src}
             type="button"
@@ -73,18 +82,21 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
               setIndex(i);
               setOpen(true);
             }}
-            className="group relative aspect-video overflow-hidden bg-neutral-900 text-left"
+            className="group relative w-full overflow-hidden bg-neutral-900 text-left"
+            style={aspectRatioStyle(image)}
           >
             <Image
               src={image.src}
               alt={image.alt}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              width={width}
+              height={height}
+              className="h-auto w-full transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
           </button>
-        ))}
+          );
+        })}
       </div>
 
       <AnimatePresence>
@@ -135,7 +147,8 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             )}
 
             <div
-              className="relative z-10 aspect-video w-[90vw] max-w-6xl overflow-hidden"
+              className="relative z-10 w-[90vw] max-w-6xl overflow-hidden"
+              style={aspectRatioStyle(active)}
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence initial={false} custom={direction} mode="popLayout">
@@ -159,8 +172,9 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                   <Image
                     src={images[index].src}
                     alt={images[index].alt}
-                    fill
-                    className="pointer-events-none object-contain"
+                    width={activeWidth}
+                    height={activeHeight}
+                    className="pointer-events-none h-auto w-full object-contain"
                     priority
                     sizes="90vw"
                     draggable={false}

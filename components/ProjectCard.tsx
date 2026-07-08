@@ -7,7 +7,11 @@ import { Link } from "@/i18n/navigation";
 import { formatProjectDateShort } from "@/lib/media";
 import type { Locale } from "@/i18n/routing";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
-import { urlFor } from "@/lib/sanity/image";
+import {
+  aspectRatioStyle,
+  buildImageSrc,
+  getImageDimensions,
+} from "@/lib/sanity/image-utils";
 
 interface ProjectCardProps {
   project: ProjectWithDisplay;
@@ -30,8 +34,11 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
   const title = project.displayTitle;
 
   const imageUrl = project.thumbnail
-    ? urlFor(project.thumbnail).width(1280).height(720).fit("crop").url()
+    ? buildImageSrc(project.thumbnail, 1280)
     : null;
+  const { width: imageWidth, height: imageHeight } = getImageDimensions(
+    project.thumbnail,
+  );
 
   const hoverSrc = project.hoverPreviewUrl
     ? getHoverVideoSrc(project.hoverPreviewUrl)
@@ -56,13 +63,17 @@ export function ProjectCard({ project, index, locale }: ProjectCardProps) {
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
       >
-        <div className="relative aspect-video overflow-hidden bg-neutral-900">
+        <div
+          className="relative w-full overflow-hidden bg-neutral-900"
+          style={aspectRatioStyle(project.thumbnail)}
+        >
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt={project.thumbnail?.alt ?? title}
-              fill
-              className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+              width={imageWidth}
+              height={imageHeight}
+              className={`h-auto w-full transition-all duration-700 ease-out group-hover:scale-105 ${
                 hovering && hoverSrc ? "opacity-0" : "opacity-100"
               }`}
               sizes="(max-width: 768px) 100vw, 50vw"

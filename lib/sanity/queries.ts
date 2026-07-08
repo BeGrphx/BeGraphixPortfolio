@@ -6,7 +6,11 @@ export interface SanityGalleryImage {
   asset: { _ref: string };
   alt?: string;
   caption?: string;
+  width?: number;
+  height?: number;
 }
+
+const imageDimensions = `"width": asset->metadata.dimensions.width, "height": asset->metadata.dimensions.height`;
 
 export interface SanityMediaItem {
   _key: string;
@@ -57,7 +61,10 @@ export const projectsQuery = `*[_type == "project"] | order(completedAt desc) {
   description,
   tags,
   dominantColor,
-  thumbnail,
+  "thumbnail": thumbnail {
+    ...,
+    ${imageDimensions}
+  },
   hoverPreviewUrl,
   "showreelVideoUrl": coalesce(showreelVideoUrl, showreelVideoFile.asset->url)
 }`;
@@ -74,9 +81,15 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
   credits,
   tags,
   dominantColor,
-  thumbnail,
+  "thumbnail": thumbnail {
+    ...,
+    ${imageDimensions}
+  },
   hoverPreviewUrl,
-  gallery,
+  "gallery": gallery[] {
+    ...,
+    ${imageDimensions}
+  },
   pdfFile { asset->{ url } },
   media
 }`;
