@@ -11,11 +11,15 @@ import {
   resolveShowreelUrl,
 } from "@/lib/site-settings";
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 async function getProjects(): Promise<SanityProject[]> {
   try {
-    return await client.fetch(projectsQuery);
+    return await client.fetch(
+      projectsQuery,
+      {},
+      { next: { revalidate: 30 } },
+    );
   } catch {
     return [];
   }
