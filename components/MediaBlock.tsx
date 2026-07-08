@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { parseMediaUrl } from "@/lib/media";
+import { parseMediaUrl, type ParsedMedia } from "@/lib/media";
 import { preloadVideo } from "@/lib/preload-video";
 import type { SanityMediaItem } from "@/lib/sanity/queries";
 import { FadeIn } from "./FadeIn";
@@ -54,6 +54,49 @@ function FileMediaBlock({
         preload="auto"
         className="w-full rounded-sm"
       />
+    </FadeIn>
+  );
+}
+
+function InstagramMediaBlock({
+  item,
+  index,
+  parsed,
+}: {
+  item: SanityMediaItem;
+  index: number;
+  parsed: ParsedMedia;
+}) {
+  const isReel = parsed.href.includes("/reel/");
+  const embedSrc = `${parsed.embedUrl}${parsed.embedUrl?.includes("?") ? "&" : "?"}hidecaption=1&muted=1`;
+
+  return (
+    <FadeIn delay={index * 0.08}>
+      <div className="bg-neutral-950">
+        {item.title && (
+          <p className="mb-3 text-center text-xs uppercase tracking-[0.2em] text-neutral-500">
+            {item.title}
+          </p>
+        )}
+
+        <div
+          className={`relative mx-auto w-full overflow-hidden bg-black ${
+            isReel
+              ? "aspect-[9/16] max-w-[400px]"
+              : "aspect-video max-w-[720px]"
+          }`}
+        >
+          <iframe
+            src={embedSrc}
+            title={item.title ?? "Instagram"}
+            className="pointer-events-none absolute left-0 top-0 w-full border-0"
+            style={{ height: "calc(100% + 72px)" }}
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+            allowFullScreen
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent" />
+        </div>
+      </div>
     </FadeIn>
   );
 }
@@ -137,6 +180,10 @@ export function MediaBlock({ item, index }: MediaBlockProps) {
 
   const isInstagram = parsed.aspectRatio === "instagram";
 
+  if (isInstagram) {
+    return <InstagramMediaBlock item={item} index={index} parsed={parsed} />;
+  }
+
   return (
     <FadeIn delay={index * 0.08}>
       <div className="overflow-hidden bg-neutral-950">
@@ -146,9 +193,7 @@ export function MediaBlock({ item, index }: MediaBlockProps) {
           </p>
         )}
         <div
-          className={`relative w-full overflow-hidden ${
-            isInstagram ? "mx-auto max-w-[540px] aspect-[4/5]" : "aspect-video"
-          }`}
+          className="relative w-full overflow-hidden aspect-video"
         >
           <iframe
             src={`${parsed.embedUrl}${parsed.embedUrl.includes("?") ? "&" : "?"}muted=1`}
