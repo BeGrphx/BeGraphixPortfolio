@@ -79,7 +79,7 @@ export function VideoPlayer({
 
   useEffect(() => {
     const onFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
+      setIsFullscreen(document.fullscreenElement === containerRef.current);
     };
     document.addEventListener("fullscreenchange", onFullscreenChange);
     return () =>
@@ -100,6 +100,21 @@ export function VideoPlayer({
     }
     revealControls();
   }, [revealControls]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const container = containerRef.current;
+      if (!container || document.fullscreenElement !== container) return;
+
+      if (event.code === "Space" || event.key === " ") {
+        event.preventDefault();
+        togglePlay();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [togglePlay]);
 
   const toggleMute = useCallback(() => {
     if (volume > 0) {
@@ -154,7 +169,11 @@ export function VideoPlayer({
   return (
     <div
       ref={containerRef}
-      className={`group/player relative w-full overflow-hidden bg-black ${className}`}
+      className={`group/player relative w-full bg-black ${
+        isFullscreen
+          ? "flex h-full min-h-0 flex-col items-center justify-center"
+          : "overflow-hidden"
+      } ${className}`}
       onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
       aria-labelledby={title ? labelId : undefined}
@@ -165,7 +184,11 @@ export function VideoPlayer({
         poster={poster}
         preload={preload}
         playsInline
-        className="block h-auto max-h-[80vh] w-full object-contain"
+        className={
+          isFullscreen
+            ? "max-h-[100vh] max-w-[100vw] object-contain"
+            : "block h-auto max-h-[80vh] w-full object-contain"
+        }
         onClick={togglePlay}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
