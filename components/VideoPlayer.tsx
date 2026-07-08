@@ -22,7 +22,20 @@ interface VideoPlayerProps {
   poster?: string;
   title?: string;
   preload?: "none" | "metadata" | "auto";
+  fit?: "cover" | "contain";
   className?: string;
+}
+
+function PlayTriangleIcon({ className = "h-7 w-7" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`ml-0.5 fill-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)] ${className}`}
+      aria-hidden
+    >
+      <path d="M8 5.14v13.72L19 12 8 5.14z" />
+    </svg>
+  );
 }
 
 export function VideoPlayer({
@@ -30,6 +43,7 @@ export function VideoPlayer({
   poster,
   title,
   preload = "auto",
+  fit = "cover",
   className = "",
 }: VideoPlayerProps) {
   const labelId = useId();
@@ -166,13 +180,17 @@ export function VideoPlayer({
   const bufferProgress = duration > 0 ? (buffered / duration) * 100 : 0;
   const isMuted = volume === 0;
 
+  const useCover = isFullscreen || fit === "cover";
+
   return (
     <div
       ref={containerRef}
-      className={`group/player relative w-full bg-black ${
+      className={`group/player relative w-full overflow-hidden bg-black ${
         isFullscreen
-          ? "flex h-full min-h-0 flex-col items-center justify-center"
-          : "overflow-hidden"
+          ? "h-screen w-screen"
+          : useCover
+            ? "aspect-video w-full"
+            : ""
       } ${className}`}
       onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
@@ -184,11 +202,13 @@ export function VideoPlayer({
         poster={poster}
         preload={preload}
         playsInline
-        className={
-          isFullscreen
-            ? "max-h-[100vh] max-w-[100vw] object-contain"
+        controls={false}
+        disablePictureInPicture
+        className={`begraphix-video ${
+          useCover
+            ? "absolute inset-0 h-full w-full object-cover"
             : "block h-auto max-h-[80vh] w-full object-contain"
-        }
+        }`}
         onClick={togglePlay}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
@@ -213,10 +233,13 @@ export function VideoPlayer({
         <button
           type="button"
           onClick={togglePlay}
-          className="absolute left-1/2 top-1/2 z-20 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/50 text-white backdrop-blur-sm transition-transform hover:scale-105"
+          className="absolute left-1/2 top-1/2 z-20 h-[4.5rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-105 active:scale-95"
           aria-label="Lire la vidéo"
         >
-          <span className="ml-1 text-xl leading-none">▶</span>
+          <span className="relative flex h-full w-full items-center justify-center rounded-full border border-white/35 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+            <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/35 via-white/10 to-transparent" />
+            <PlayTriangleIcon />
+          </span>
         </button>
       )}
 
@@ -260,10 +283,14 @@ export function VideoPlayer({
             <button
               type="button"
               onClick={togglePlay}
-              className="shrink-0 text-xs uppercase tracking-[0.15em] text-white/80 transition-colors hover:text-white"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 backdrop-blur-md transition-colors hover:bg-white/20"
               aria-label={playing ? "Pause" : "Lecture"}
             >
-              {playing ? "Pause" : "Lecture"}
+              {playing ? (
+                <span className="text-[10px] font-bold tracking-tighter">II</span>
+              ) : (
+                <PlayTriangleIcon className="h-3.5 w-3.5" />
+              )}
             </button>
 
             <div className="flex min-w-0 flex-1 items-center gap-2 sm:max-w-[180px]">

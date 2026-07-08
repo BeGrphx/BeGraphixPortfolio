@@ -66,9 +66,16 @@ h3 {
   color: var(--color-foreground);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+video.begraphix-video::-webkit-media-controls {
+  display: none !important;
+}
+
+video.begraphix-video::-webkit-media-controls-start-playback-button,
+video.begraphix-video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes organic-spin {

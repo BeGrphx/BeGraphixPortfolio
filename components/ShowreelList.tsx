@@ -54,7 +54,8 @@ export function ShowreelList({ projects }: ShowreelListProps) {
                 src={videoUrl}
                 title={project.displayTitle}
                 preload="auto"
-                className="w-full rounded-sm"
+                fit="cover"
+                className="w-full"
               />
             ) : (
               <div className="flex aspect-video items-center justify-center bg-neutral-900 text-sm text-white/40">

@@ -35,6 +35,7 @@ export function VideoGallery({ videos }: VideoGalleryProps) {
             poster={video.posterUrl}
             title={video.title}
             preload="auto"
+            fit="contain"
             className="w-full rounded-sm"
           />
         );
