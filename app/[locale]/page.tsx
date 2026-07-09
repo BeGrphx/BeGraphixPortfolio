@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { FadeIn } from "@/components/FadeIn";
 import { HeroBackground } from "@/components/HeroBackground";
@@ -14,6 +15,26 @@ import {
 } from "@/lib/site-settings";
 
 export const revalidate = 30;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "home" });
+  const title = `${t("titleLine1")} ${t("titleLine2")}`;
+
+  return {
+    title: `BeGraphix — ${title}`,
+    description: t("subtitle"),
+    openGraph: {
+      title: `BeGraphix — ${title}`,
+      description: t("subtitle"),
+      type: "website",
+    },
+  };
+}
 
 async function getProjects(): Promise<SanityProject[]> {
   try {
