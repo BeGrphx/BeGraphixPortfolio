@@ -52,7 +52,9 @@ export function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastVolume = useRef(0.85);
+  const primedSrc = useRef<string | null>(null);
 
+  const [autoPoster, setAutoPoster] = useState<string | undefined>();
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.85);
   const [currentTime, setCurrentTime] = useState(0);
@@ -97,7 +99,56 @@ export function VideoPlayer({
 
   useEffect(() => {
     setIntrinsicSize(null);
+    setAutoPoster(undefined);
+    primedSrc.current = null;
   }, [src]);
+
+  const captureFirstFrame = useCallback((video: HTMLVideoElement) => {
+    if (video.videoWidth === 0 || video.videoHeight === 0) return;
+
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      setAutoPoster(canvas.toDataURL("image/jpeg", 0.84));
+    } catch {
+      // Canvas can fail on cross-origin video — the seeked frame still shows in <video>.
+    }
+  }, []);
+
+  const primeFirstFrame = useCallback(
+    (video: HTMLVideoElement) => {
+      if (poster || primedSrc.current === src) return;
+      primedSrc.current = src;
+
+      const seekAndCapture = () => {
+        if (video.paused) {
+          video.addEventListener("seeked", () => captureFirstFrame(video), {
+            once: true,
+          });
+          video.currentTime = 0.001;
+          return;
+        }
+
+        captureFirstFrame(video);
+      };
+
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        seekAndCapture();
+        return;
+      }
+
+      video.addEventListener("loadeddata", seekAndCapture, { once: true });
+    },
+    [captureFirstFrame, poster, src],
+  );
+
+  const effectivePoster = poster ?? autoPoster;
+  const effectivePreload = poster ? preload : "auto";
 
   useEffect(() => {
     return () => {
@@ -261,11 +312,12 @@ export function VideoPlayer({
       <video
         ref={videoRef}
         src={src}
-        poster={poster}
-        preload={preload}
+        poster={effectivePoster}
+        preload={effectivePreload}
         playsInline
         controls={false}
         disablePictureInPicture
+        crossOrigin={poster ? undefined : "anonymous"}
         className={videoClassName}
         onClick={togglePlay}
         onPlay={() => setPlaying(true)}
@@ -278,7 +330,10 @@ export function VideoPlayer({
             setBuffered(video.buffered.end(video.buffered.length - 1));
           }
         }}
-        onLoadedMetadata={(e) => handleLoadedMetadata(e.currentTarget)}
+        onLoadedData={(e) => {
+          handleLoadedMetadata(e.currentTarget);
+          primeFirstFrame(e.currentTarget);
+        }}
       />
 
       {!isFullscreen && (
