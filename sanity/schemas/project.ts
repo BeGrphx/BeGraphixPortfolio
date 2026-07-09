@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { BulkImageArrayInput } from "../components/BulkImageArrayInput";
+import { BulkVideoArrayInput } from "../components/BulkVideoArrayInput";
 
 export const project = defineType({
   name: "project",
@@ -125,7 +126,7 @@ export const project = defineType({
       name: "gallery",
       title: "Galerie photos",
       type: "array",
-      description: "Glissez-déposez plusieurs images d'un coup.",
+      description: "Images uniquement. Glissez-déposez plusieurs images d'un coup.",
       components: { input: BulkImageArrayInput },
       options: { layout: "grid" },
       of: [
@@ -143,7 +144,9 @@ export const project = defineType({
       name: "videoGallery",
       title: "Galerie vidéos",
       type: "array",
-      description: "Uploadez vos fichiers sources MP4/WebM — lecteur custom sur la page projet.",
+      description:
+        "Glissez-déposez vos MP4/WebM ici — pas dans « Galerie photos ».",
+      components: { input: BulkVideoArrayInput },
       of: [
         {
           type: "object",

@@ -10,11 +10,6 @@ import {
 } from "sanity";
 import { randomKey } from "@sanity/util/content";
 
-function getImageFiles(fileList: FileList | File[] | null | undefined): File[] {
-  if (!fileList) return [];
-  return Array.from(fileList).filter((file) => file.type.startsWith("image/"));
-}
-
 function getVideoFiles(fileList: FileList | File[] | null | undefined): File[] {
   if (!fileList) return [];
   return Array.from(fileList).filter(
@@ -24,49 +19,53 @@ function getVideoFiles(fileList: FileList | File[] | null | undefined): File[] {
   );
 }
 
-export function BulkImageArrayInput(props: ArrayOfObjectsInputProps) {
+export function BulkVideoArrayInput(props: ArrayOfObjectsInputProps) {
   const { onChange, value = [], readOnly, renderDefault } = props;
   const client = useClient({ apiVersion: "2024-01-01" });
-  const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
 
   const uploadFiles = useCallback(
     async (files: FileList | File[]) => {
-      const images = getImageFiles(files);
       const videos = getVideoFiles(files);
-
-      if (videos.length && !images.length) {
-        toast.push({
-          status: "warning",
-          title: "Fichier vidéo détecté",
-          description:
-            "Les MP4 vont dans « Galerie vidéos », pas dans « Galerie photos ».",
-        });
-        return;
-      }
-
-      if (!images.length || readOnly) return;
+      if (!videos.length || readOnly) return;
 
       setUploading(true);
       try {
         const uploaded = await Promise.all(
-          images.map((file) =>
-            client.assets.upload("image", file, { filename: file.name }),
+          videos.map((file) =>
+            client.assets.upload("file", file, {
+              filename: file.name,
+              contentType: file.type || "video/mp4",
+            }),
           ),
         );
 
-        const newItems = uploaded.map((asset) => ({
-          _type: "image" as const,
+        const newItems = uploaded.map((asset, index) => ({
+          _type: "videoItem" as const,
           _key: randomKey(),
-          asset: {
-            _type: "reference" as const,
-            _ref: asset._id,
+          title: videos[index]?.name.replace(/\.[^.]+$/, "") || "Vidéo",
+          videoFile: {
+            _type: "file" as const,
+            asset: {
+              _type: "reference" as const,
+              _ref: asset._id,
+            },
           },
         }));
 
         onChange(set([...(value ?? []), ...newItems]));
+      } catch (error) {
+        toast.push({
+          status: "error",
+          title: "Upload vidéo impossible",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Réessayez ou uploadez via le champ « Fichier vidéo ».",
+        });
       } finally {
         setUploading(false);
         setDragging(false);
@@ -125,7 +124,7 @@ export function BulkImageArrayInput(props: ArrayOfObjectsInputProps) {
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
             multiple
             hidden
             onChange={onFileChange}
@@ -143,10 +142,10 @@ export function BulkImageArrayInput(props: ArrayOfObjectsInputProps) {
                 </Text>
                 <Box>
                   <Text size={1} weight="semibold">
-                    Glissez-déposez plusieurs images ici
+                    Glissez-déposez vos vidéos MP4/WebM ici
                   </Text>
                   <Text size={1} muted>
-                    ou cliquez pour en sélectionner plusieurs d&apos;un coup
+                    ou cliquez pour en sélectionner une ou plusieurs
                   </Text>
                 </Box>
               </>
