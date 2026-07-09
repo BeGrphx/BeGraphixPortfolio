@@ -78,8 +78,8 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
             />
           )}
           <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
-          <div className="absolute inset-x-0 bottom-0 translate-y-4 p-6 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/70">
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-100 md:translate-y-4 md:from-transparent md:p-6 md:opacity-0 md:transition-all md:duration-500 md:group-hover:translate-y-0 md:group-hover:opacity-100">
+            <p className="text-[10px] uppercase tracking-[0.16em] text-white/80 sm:text-xs sm:tracking-[0.2em] md:text-white/70">
               {project.client}
               {project.completedAt
                 ? ` · ${formatProjectDateShort(project.completedAt)}`
@@ -87,13 +87,13 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
             </p>
           </div>
         </div>
-        <div className="mt-4 flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-medium tracking-tight text-white transition-opacity group-hover:opacity-60 md:text-xl">
+        <div className="mt-3 flex items-start justify-between gap-3 sm:mt-4 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-medium leading-snug tracking-tight text-white transition-opacity group-hover:opacity-60 sm:text-lg md:text-xl">
               {title}
             </h2>
             {project.tags && project.tags.length > 0 && (
-              <p className="mt-1 text-xs uppercase tracking-wider text-white/50">
+              <p className="mt-1 text-[10px] uppercase tracking-wider text-white/50 sm:text-xs">
                 {project.tags.slice(0, 3).join(" · ")}
               </p>
             )}

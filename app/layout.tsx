@@ -1,4 +1,12 @@
 import { Syne, DM_Sans, IBM_Plex_Mono } from "next/font/google";
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#080808",
+};
 
 const syne = Syne({
   subsets: ["latin"],

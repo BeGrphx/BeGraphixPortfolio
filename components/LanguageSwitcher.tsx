@@ -5,7 +5,11 @@ import { useTransition } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { localeLabels, locales, type Locale } from "@/i18n/routing";
 
-export function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  compact?: boolean;
+}
+
+export function LanguageSwitcher({ compact = false }: LanguageSwitcherProps) {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
@@ -13,7 +17,11 @@ export function LanguageSwitcher() {
 
   return (
     <div
-      className={`flex items-center gap-1 rounded-full border border-neutral-300 p-0.5 dark:border-neutral-800 ${pending ? "opacity-60" : ""}`}
+      className={`flex items-center gap-0.5 rounded-full border border-neutral-300 p-0.5 dark:border-neutral-800 ${
+        compact ? "scale-95" : ""
+      } ${pending ? "opacity-60" : ""}`}
+      role="group"
+      aria-label="Langue"
     >
       {locales.map((loc) => (
         <button
@@ -25,7 +33,7 @@ export function LanguageSwitcher() {
               router.replace(pathname || "/", { locale: loc, scroll: false });
             });
           }}
-          className={`relative z-10 px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] transition-colors ${
+          className={`relative z-10 min-h-9 min-w-9 px-2.5 py-1.5 text-[10px] uppercase tracking-[0.12em] transition-colors sm:min-h-0 sm:min-w-0 sm:px-2.5 sm:py-1 ${
             locale === loc
               ? "rounded-full bg-foreground text-background"
               : "text-muted hover:text-foreground"

@@ -27,6 +27,7 @@
 
 html {
   scroll-behavior: auto;
+  overflow-x: clip;
 }
 
 body {
@@ -34,6 +35,10 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   transition: background-color 0.4s ease, color 0.4s ease;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 ::selection {
@@ -125,4 +130,9 @@ video.begraphix-video::-webkit-media-controls-overlay-play-button {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+@utility touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
 }

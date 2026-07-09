@@ -42,7 +42,7 @@ export function ShowreelList({ projects }: ShowreelListProps) {
   }
 
   return (
-    <div className="flex flex-col gap-14 md:gap-20">
+    <div className="flex flex-col gap-10 sm:gap-14 md:gap-20">
       {projects.map((project) => {
         const videoUrl = getVideoUrl(project);
         const theme = getTheme(project);

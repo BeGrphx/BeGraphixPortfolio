@@ -108,7 +108,7 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
 
   return (
     <>
-      <div className="mb-14 flex w-full justify-center md:mb-20">
+      <div className="mb-10 flex w-full justify-center sm:mb-14 md:mb-20">
         <ProjectFilter
           value={filter}
           onChange={handleFilterChange}

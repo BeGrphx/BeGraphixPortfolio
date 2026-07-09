@@ -103,7 +103,7 @@ export default async function ProjectPage({
 
   return (
     <div
-      className="min-h-screen pb-24 pt-32 md:pt-40"
+      className="min-h-screen pb-[calc(5rem+env(safe-area-inset-bottom))] pt-[calc(6.5rem+env(safe-area-inset-top))] sm:pt-32 md:pt-40"
       style={
         {
           "--project-accent": accent,
@@ -117,23 +117,23 @@ export default async function ProjectPage({
         }}
       />
 
-      <div className="mx-auto max-w-[1400px] px-4 md:px-8">
+      <div className="mx-auto max-w-[1400px] px-3 sm:px-4 md:px-8">
         <FadeIn>
-          <header className="mb-12 px-2 text-center md:mb-16">
-            <h1 className="font-display text-3xl font-medium leading-tight tracking-tight md:text-5xl lg:text-6xl">
+          <header className="mb-8 px-1 text-center sm:mb-12 sm:px-2 md:mb-16">
+            <h1 className="font-display text-[clamp(1.75rem,6.5vw,3.75rem)] font-medium leading-tight tracking-tight">
               {title}
             </h1>
-            <p className="mt-4 text-xs uppercase tracking-[0.25em] text-muted">
+            <p className="mt-3 text-[10px] uppercase tracking-[0.18em] text-muted sm:mt-4 sm:text-xs sm:tracking-[0.25em]">
               {[project.client, project.completedAt && formatProjectDate(project.completedAt), project.duration]
                 .filter(Boolean)
                 .join(" · ")}
             </p>
             {project.tags && project.tags.length > 0 && (
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
+              <div className="mt-4 flex flex-wrap justify-center gap-1.5 sm:mt-6 sm:gap-2">
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-neutral-300 px-3 py-1 text-xs uppercase tracking-wider text-muted dark:border-neutral-800"
+                    className="rounded-full border border-neutral-300 px-2.5 py-1 text-[10px] uppercase tracking-wider text-muted dark:border-neutral-800 sm:px-3 sm:text-xs"
                   >
                     {tag}
                   </span>
@@ -149,7 +149,7 @@ export default async function ProjectPage({
 
         {description && (
           <FadeIn delay={0.1}>
-            <p className="mx-auto mb-10 max-w-2xl px-4 text-center text-base leading-relaxed md:text-lg">
+            <p className="mx-auto mb-8 max-w-2xl px-2 text-center text-[15px] leading-relaxed sm:mb-10 sm:px-4 sm:text-base md:text-lg">
               {description}
             </p>
           </FadeIn>
@@ -199,7 +199,7 @@ export default async function ProjectPage({
             <Link
               href={homeHref}
               scroll={false}
-              className="inline-block border border-neutral-400 px-10 py-3 text-xs uppercase tracking-[0.25em] text-muted transition-colors hover:border-neutral-600 hover:text-foreground dark:border-neutral-700"
+              className="inline-flex min-h-11 w-full max-w-xs items-center justify-center border border-neutral-400 px-8 py-3 text-xs uppercase tracking-[0.22em] text-muted transition-colors hover:border-neutral-600 hover:text-foreground dark:border-neutral-700 sm:w-auto sm:max-w-none sm:tracking-[0.25em]"
             >
               {t("home")}
             </Link>

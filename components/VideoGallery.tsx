@@ -24,7 +24,7 @@ export function VideoGallery({ videos }: VideoGalleryProps) {
   if (!videos.length) return null;
 
   return (
-    <div className="mb-16 space-y-10">
+    <div className="mb-12 space-y-8 sm:mb-16 sm:space-y-10">
       {videos.map((video) => {
         if (!video.videoUrl) return null;
 

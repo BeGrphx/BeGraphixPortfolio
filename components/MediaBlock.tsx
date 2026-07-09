@@ -168,12 +168,12 @@ function InstagramMediaBlock({
           )}
         </div>
 
-        <div className="mt-8 flex justify-center">
+        <div className="mt-6 flex justify-center px-4 sm:mt-8">
           <a
             href={parsed.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-foreground px-10 py-3 text-xs uppercase tracking-[0.25em] text-background transition-opacity hover:opacity-80"
+            className="inline-flex min-h-11 w-full max-w-sm items-center justify-center bg-foreground px-8 py-3 text-center text-xs uppercase tracking-[0.2em] text-background transition-opacity hover:opacity-80 sm:w-auto sm:max-w-none sm:px-10 sm:tracking-[0.25em]"
           >
             {item.label ?? t("viewMoreInstagram")} →
           </a>
@@ -251,7 +251,7 @@ export function MediaBlock({ item, index }: MediaBlockProps) {
             href={parsed.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-neutral-700 bg-foreground px-8 py-3 text-xs uppercase tracking-[0.2em] text-background transition-opacity hover:opacity-80"
+            className="inline-flex min-h-11 w-full max-w-sm items-center justify-center gap-2 rounded-full border border-neutral-700 bg-foreground px-8 py-3 text-xs uppercase tracking-[0.18em] text-background transition-opacity hover:opacity-80 sm:w-auto sm:max-w-none sm:tracking-[0.2em]"
           >
             {label} →
           </a>

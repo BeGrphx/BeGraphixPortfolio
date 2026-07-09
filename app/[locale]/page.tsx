@@ -89,23 +89,23 @@ export default async function HomePage({
         />
       </div>
 
-      <section className="relative z-10 flex min-h-[50vh] flex-col items-center justify-center px-6 pb-10 pt-28 text-center md:min-h-[54vh] md:px-10 md:pb-12 md:pt-32">
+      <section className="relative z-10 flex min-h-[44vh] flex-col items-center justify-center px-4 pb-8 pt-[calc(6.5rem+env(safe-area-inset-top))] text-center sm:px-6 sm:pb-10 sm:pt-28 md:min-h-[54vh] md:px-10 md:pb-12 md:pt-32">
         <FadeIn className="max-w-4xl">
-          <p className="mb-5 text-sm uppercase tracking-[0.35em] text-white/75 md:mb-6">
+          <p className="mb-4 text-[11px] uppercase tracking-[0.22em] text-white/75 sm:mb-5 sm:text-sm sm:tracking-[0.35em] md:mb-6">
             {t("eyebrow")}
           </p>
-          <h1 className="font-display text-5xl font-medium leading-[1.02] tracking-tight text-white md:text-7xl lg:text-[5.25rem]">
+          <h1 className="font-display text-[clamp(2.125rem,9vw,5.25rem)] font-medium leading-[1.04] tracking-tight text-white">
             {t("titleLine1")}
             <br />
             <span className="text-white">{t("titleLine2")}</span>
           </h1>
-          <p className="mx-auto mt-7 max-w-2xl text-base leading-relaxed text-white/90 md:mt-9 md:text-lg md:leading-relaxed">
+          <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-white/90 sm:mt-7 sm:text-base md:mt-9 md:text-lg md:leading-relaxed">
             {t("subtitle")}
           </p>
         </FadeIn>
       </section>
 
-      <section className="relative z-10 px-6 pb-24 md:px-10">
+      <section className="relative z-10 px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pb-24">
         <Suspense fallback={null}>
           <HomeScrollToProjects />
         </Suspense>
@@ -113,7 +113,7 @@ export default async function HomePage({
           className="mx-auto max-w-7xl"
           style={{ paddingTop: projectsTopSpacing }}
         >
-          <div id="projects" className="scroll-mt-24">
+          <div id="projects" className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))]">
             <Suspense fallback={null}>
               <ProjectGrid projects={projects} locale={locale} />
             </Suspense>

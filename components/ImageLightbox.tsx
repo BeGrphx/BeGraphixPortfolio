@@ -15,6 +15,7 @@ import {
   preloadImagesIdle,
 } from "@/lib/preload-image";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
+import { useLightboxSwipe } from "@/hooks/useLightboxSwipe";
 
 export interface LightboxImage {
   src: string;
@@ -124,6 +125,8 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
     };
   }, [open, close, prev, next, lenis]);
 
+  const swipeHandlers = useLightboxSwipe(prev, next, open && images.length > 1);
+
   if (!images.length) return null;
 
   const active = images[index];
@@ -199,6 +202,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={close}
+            {...swipeHandlers}
           >
             <button
               type="button"
@@ -206,7 +210,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                 e.stopPropagation();
                 close();
               }}
-              className="absolute right-6 top-6 z-20 rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+              className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 text-xs uppercase tracking-[0.18em] text-white/70 transition-colors active:bg-white/10 sm:right-6 sm:top-6 sm:px-4 sm:text-white/60 sm:hover:bg-white/10 sm:hover:text-white"
             >
               Fermer ✕
             </button>
@@ -219,7 +223,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                     e.stopPropagation();
                     prev();
                   }}
-                  className="absolute left-0 top-0 z-20 flex h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:w-28"
+                  className="absolute left-0 top-0 z-20 hidden h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:flex md:w-28"
                   aria-label="Image précédente"
                 >
                   <span className="text-4xl leading-none">←</span>
@@ -230,16 +234,40 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                     e.stopPropagation();
                     next();
                   }}
-                  className="absolute right-0 top-0 z-20 flex h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:w-28"
+                  className="absolute right-0 top-0 z-20 hidden h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:flex md:w-28"
                   aria-label="Image suivante"
                 >
                   <span className="text-4xl leading-none">→</span>
                 </button>
+                <div className="absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex justify-center gap-3 md:hidden">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      prev();
+                    }}
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80"
+                    aria-label="Image précédente"
+                  >
+                    ←
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      next();
+                    }}
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80"
+                    aria-label="Image suivante"
+                  >
+                    →
+                  </button>
+                </div>
               </>
             )}
 
             <div
-              className="relative z-10 h-[88vh] w-[96vw] max-w-[1600px] px-4"
+              className="relative z-10 h-[78vh] w-[100vw] max-w-[1600px] px-2 sm:h-[88vh] sm:w-[96vw] sm:px-4"
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence initial={false} custom={direction}>

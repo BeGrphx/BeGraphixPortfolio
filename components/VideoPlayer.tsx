@@ -9,6 +9,7 @@ import {
   type ChangeEvent,
   type CSSProperties,
   type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 
 const PREVIEW_START_SECONDS = 0.02;
@@ -131,11 +132,20 @@ export function VideoPlayer({
 
   useEffect(() => {
     const onFullscreenChange = () => {
-      setIsFullscreen(document.fullscreenElement === containerRef.current);
+      const container = containerRef.current;
+      const active =
+        document.fullscreenElement === container ||
+        (document as Document & { webkitFullscreenElement?: Element })
+          .webkitFullscreenElement === container;
+      setIsFullscreen(Boolean(active));
     };
+
     document.addEventListener("fullscreenchange", onFullscreenChange);
-    return () =>
+    document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+    return () => {
       document.removeEventListener("fullscreenchange", onFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", onFullscreenChange);
+    };
   }, []);
 
   const togglePlay = useCallback(() => {
@@ -189,29 +199,58 @@ export function VideoPlayer({
     const container = containerRef.current;
     if (!container) return;
 
-    if (document.fullscreenElement) {
-      void document.exitFullscreen();
+    const doc = document as Document & {
+      webkitFullscreenElement?: Element;
+      webkitExitFullscreen?: () => Promise<void>;
+    };
+
+    const isActive =
+      document.fullscreenElement === container ||
+      doc.webkitFullscreenElement === container;
+
+    if (isActive) {
+      if (document.exitFullscreen) {
+        void document.exitFullscreen();
+      } else if (doc.webkitExitFullscreen) {
+        void doc.webkitExitFullscreen();
+      }
     } else {
-      void container.requestFullscreen();
+      const request =
+        container.requestFullscreen?.bind(container) ??
+        (container as HTMLElement & { webkitRequestFullscreen?: () => void })
+          .webkitRequestFullscreen?.bind(container);
+      request?.();
     }
     revealControls();
   }, [revealControls]);
 
-  const seek = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
+  const seekToRatio = useCallback(
+    (ratio: number) => {
       const video = videoRef.current;
       if (!video || !duration) return;
 
-      const rect = event.currentTarget.getBoundingClientRect();
-      const ratio = Math.min(
-        1,
-        Math.max(0, (event.clientX - rect.left) / rect.width),
-      );
-      video.currentTime = ratio * duration;
+      const clamped = Math.min(1, Math.max(0, ratio));
+      video.currentTime = clamped * duration;
       setCurrentTime(video.currentTime);
       revealControls();
     },
     [duration, revealControls],
+  );
+
+  const seek = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      seekToRatio((event.clientX - rect.left) / rect.width);
+    },
+    [seekToRatio],
+  );
+
+  const seekFromPointer = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      seekToRatio((event.clientX - rect.left) / rect.width);
+    },
+    [seekToRatio],
   );
 
   const handleLoadedMetadata = useCallback(
@@ -280,6 +319,7 @@ export function VideoPlayer({
       }}
       onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
+      onTouchStart={revealControls}
       aria-labelledby={title ? labelId : undefined}
     >
       <video
@@ -323,7 +363,7 @@ export function VideoPlayer({
         <button
           type="button"
           onClick={togglePlay}
-          className="absolute left-1/2 top-1/2 z-20 h-[4.5rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-105 active:scale-95"
+          className="absolute left-1/2 top-1/2 z-20 h-16 w-16 -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-105 active:scale-95 sm:h-[4.5rem] sm:w-[4.5rem]"
           aria-label="Lire la vidéo"
         >
           <span
@@ -340,7 +380,7 @@ export function VideoPlayer({
       )}
 
       <div
-        className={`absolute inset-x-0 bottom-0 z-20 px-4 pb-4 pt-12 transition-opacity duration-300 ${
+        className={`absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-10 transition-opacity duration-300 sm:px-4 sm:pb-4 sm:pt-12 ${
           isFullscreen ? "bg-gradient-to-t from-black via-black/95 to-transparent" : ""
         } ${
           showControls || !playing
@@ -351,7 +391,7 @@ export function VideoPlayer({
         {title && (
           <p
             id={labelId}
-            className="mb-3 text-xs uppercase tracking-[0.2em] text-white/70"
+            className="mb-2 truncate text-[10px] uppercase tracking-[0.16em] text-white/70 sm:mb-3 sm:text-xs sm:tracking-[0.2em]"
           >
             {title}
           </p>
@@ -363,25 +403,35 @@ export function VideoPlayer({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress)}
-          className="relative mb-3 h-1 cursor-pointer rounded-full bg-white/15"
+          className="relative mb-3 h-2 cursor-pointer rounded-full bg-white/15 py-2 sm:h-1 sm:py-0"
           onClick={seek}
+          onPointerDown={(event) => {
+            seekFromPointer(event);
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerMove={(event) => {
+            if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+            seekFromPointer(event);
+          }}
         >
-          <div
-            className="absolute inset-y-0 left-0 rounded-full bg-white/25"
-            style={{ width: `${bufferProgress}%` }}
-          />
-          <div
-            className="absolute inset-y-0 left-0 rounded-full bg-white"
-            style={{ width: `${progress}%` }}
-          />
+          <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white/15 sm:top-0 sm:h-full sm:translate-y-0">
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-white/25"
+              style={{ width: `${bufferProgress}%` }}
+            />
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-white"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-4 sm:gap-y-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
             <button
               type="button"
               onClick={togglePlay}
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 ${
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 sm:h-8 sm:w-8 ${
                 isFullscreen ? "" : "backdrop-blur-md"
               }`}
               aria-label={playing ? "Pause" : "Lecture"}
@@ -393,7 +443,7 @@ export function VideoPlayer({
               )}
             </button>
 
-            <div className="flex min-w-0 flex-1 items-center gap-2 sm:max-w-[180px]">
+            <div className="hidden min-w-0 flex-1 items-center gap-2 sm:flex sm:max-w-[180px]">
               <button
                 type="button"
                 onClick={toggleMute}
@@ -412,16 +462,24 @@ export function VideoPlayer({
                 className="h-1 min-w-[72px] flex-1 cursor-pointer appearance-none rounded-full bg-white/20 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
               />
             </div>
+            <button
+              type="button"
+              onClick={toggleMute}
+              className="shrink-0 text-[10px] uppercase tracking-[0.12em] text-white/60 transition-colors hover:text-white sm:hidden"
+              aria-label={isMuted ? "Activer le son" : "Couper le son"}
+            >
+              {isMuted ? "Muet" : "Son"}
+            </button>
           </div>
 
-          <p className="font-mono shrink-0 text-[11px] text-white/50">
+          <p className="font-mono shrink-0 text-[10px] text-white/50 sm:text-[11px]">
             {formatTime(currentTime)} / {formatTime(duration)}
           </p>
 
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="shrink-0 text-xs uppercase tracking-[0.15em] text-white/60 transition-colors hover:text-white"
+            className="shrink-0 min-h-10 px-1 text-[10px] uppercase tracking-[0.12em] text-white/60 transition-colors hover:text-white sm:min-h-0 sm:text-xs sm:tracking-[0.15em]"
             aria-label={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
           >
             {isFullscreen ? "Réduire" : "Plein écran"}

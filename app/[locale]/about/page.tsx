@@ -41,18 +41,18 @@ export default async function AboutPage({
   const aboutBio = about ? await getLocalizedAuto(about.bio, locale) : "";
 
   return (
-    <div className="min-h-screen px-6 pb-24 pt-32 md:px-10 md:pt-40">
+    <div className="min-h-screen px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-[calc(6.5rem+env(safe-area-inset-top))] sm:px-6 md:px-10 md:pb-24 md:pt-40">
       <div className="mx-auto max-w-3xl">
         <FadeIn>
           <p className="mb-4 text-xs uppercase tracking-[0.3em] text-muted">
             {t("contact")}
           </p>
-          <h1 className="font-display text-4xl font-medium tracking-tight md:text-5xl">
+          <h1 className="font-display text-[clamp(2rem,7vw,3rem)] font-medium tracking-tight">
             {aboutTitle || t("defaultTitle")}
           </h1>
         </FadeIn>
         <FadeIn delay={0.1}>
-          <div className="mt-12 space-y-8 text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
+          <div className="mt-8 space-y-6 text-base leading-relaxed text-neutral-500 dark:text-neutral-400 sm:mt-12 sm:space-y-8 sm:text-lg">
             {aboutBio ? (
               <p className="whitespace-pre-line">{aboutBio}</p>
             ) : (
