@@ -1,19 +1,28 @@
 "use client";
 
 import { useLenis } from "lenis/react";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { usePathname } from "@/i18n/navigation";
 import { shouldSkipScrollToTop } from "@/lib/scroll";
 
 const HEADER_OFFSET = 88;
 
 export function HomeScrollToProjects() {
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const lenis = useLenis();
-  const filter = searchParams.get("filter");
+  const isInitialMount = useRef(true);
+  const prevPathnameRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!shouldSkipScrollToTop("/")) return;
+    if (!shouldSkipScrollToTop(pathname)) return;
+
+    const pathnameChanged =
+      prevPathnameRef.current !== null && prevPathnameRef.current !== pathname;
+    const isInitial = isInitialMount.current;
+    isInitialMount.current = false;
+    prevPathnameRef.current = pathname;
+
+    if (!isInitial && !pathnameChanged) return;
 
     const scrollToProjects = () => {
       const target = document.getElementById("projects");
@@ -31,7 +40,7 @@ export function HomeScrollToProjects() {
 
     const frame = requestAnimationFrame(scrollToProjects);
     return () => cancelAnimationFrame(frame);
-  }, [filter, lenis]);
+  }, [pathname, lenis]);
 
   return null;
 }

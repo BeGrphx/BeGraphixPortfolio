@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useLenis } from "lenis/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
@@ -17,6 +18,7 @@ interface ProjectGridProps {
 export function ProjectGrid({ projects, locale }: ProjectGridProps) {
   const t = useTranslations("home");
   const searchParams = useSearchParams();
+  const lenis = useLenis();
 
   const showreelProjects = projects.filter((p) => p.projectType === "showreel");
   const gridProjects = projects.filter((p) => p.projectType !== "showreel");
@@ -38,6 +40,24 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
   useEffect(() => {
     if (paramFilter) setFilter(paramFilter);
   }, [paramFilter]);
+
+  const handleFilterChange = useCallback(
+    (value: FilterValue) => {
+      const scrollY = lenis?.scroll ?? window.scrollY;
+      setFilter(value);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (lenis) {
+            lenis.scrollTo(scrollY, { immediate: true });
+          } else {
+            window.scrollTo({ top: scrollY, behavior: "instant" });
+          }
+        });
+      });
+    },
+    [lenis],
+  );
 
   const counts = {
     showreel: showreelProjects.length,
@@ -66,7 +86,7 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
       <div className="mb-14 flex w-full justify-center md:mb-20">
         <ProjectFilter
           value={filter}
-          onChange={setFilter}
+          onChange={handleFilterChange}
           counts={counts}
           hasShowreel={hasShowreels}
         />
@@ -75,7 +95,6 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
         <ShowreelList key="showreel" projects={showreelProjects} />
       ) : (
         <FilteredProjectGrid
-          key={filter}
           projects={gridProjects}
           filter={filter}
           locale={locale}

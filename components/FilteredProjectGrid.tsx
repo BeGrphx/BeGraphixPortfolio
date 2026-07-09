@@ -38,8 +38,7 @@ export function FilteredProjectGrid({
 
   return (
     <motion.div
-      key={filter}
-      initial={{ opacity: 0 }}
+      initial={false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2"
