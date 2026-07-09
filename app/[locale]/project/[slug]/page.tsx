@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { FadeIn } from "@/components/FadeIn";
+import { LoopVideoGallery } from "@/components/LoopVideoGallery";
 import { MediaBlock } from "@/components/MediaBlock";
 import { PhotoGallery } from "@/components/PhotoGallery";
 import { VideoGallery } from "@/components/VideoGallery";
@@ -143,12 +144,12 @@ export default async function ProjectPage({
           </header>
         </FadeIn>
 
-        {project.gallery && project.gallery.length > 0 && (
-          <PhotoGallery images={project.gallery} />
+        {project.loopGallery && project.loopGallery.length > 0 && (
+          <LoopVideoGallery videos={project.loopGallery} />
         )}
 
-        {project.videoGallery && project.videoGallery.length > 0 && (
-          <VideoGallery videos={project.videoGallery} />
+        {project.gallery && project.gallery.length > 0 && (
+          <PhotoGallery images={project.gallery} />
         )}
 
         {description && (
@@ -180,6 +181,10 @@ export default async function ProjectPage({
               </a>
             </div>
           </FadeIn>
+        )}
+
+        {project.videoGallery && project.videoGallery.length > 0 && (
+          <VideoGallery videos={project.videoGallery} />
         )}
 
         {project.media && project.media.length > 0 && (

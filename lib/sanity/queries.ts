@@ -23,6 +23,13 @@ export interface SanityMediaItem {
   label?: string;
 }
 
+export interface SanityLoopVideoItem {
+  _key: string;
+  title?: string;
+  videoUrl?: string;
+  posterUrl?: string;
+}
+
 export interface SanityVideoItem {
   _key: string;
   title?: string;
@@ -48,6 +55,7 @@ export interface SanityProject {
   hoverPreviewUrl?: string;
   showreelVideoUrl?: string;
   gallery?: SanityGalleryImage[];
+  loopGallery?: SanityLoopVideoItem[];
   videoGallery?: SanityVideoItem[];
   pdfFile?: { asset: { _ref: string; url?: string } };
   media?: SanityMediaItem[];
@@ -99,6 +107,12 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
   "gallery": gallery[] {
     ...,
     ${imageDimensions}
+  },
+  "loopGallery": loopGallery[] {
+    _key,
+    title,
+    "videoUrl": coalesce(videoUrl, videoFile.asset->url),
+    "posterUrl": poster.asset->url
   },
   "videoGallery": videoGallery[] {
     _key,

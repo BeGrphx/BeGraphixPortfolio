@@ -1,6 +1,9 @@
 import { defineField, defineType } from "sanity";
 import { BulkImageArrayInput } from "../components/BulkImageArrayInput";
-import { BulkVideoArrayInput } from "../components/BulkVideoArrayInput";
+import {
+  BulkLoopVideoArrayInput,
+  BulkVideoArrayInput,
+} from "../components/BulkVideoArrayInput";
 
 export const project = defineType({
   name: "project",
@@ -123,6 +126,54 @@ export const project = defineType({
       description: "URL MP4 ou Vimeo — jouée au survol sur la grille",
     }),
     defineField({
+      name: "loopGallery",
+      title: "Galerie loops (grille)",
+      type: "array",
+      description:
+        "Vidéos courtes en boucle, affichées en grille en haut — à la place ou en plus des images.",
+      components: { input: BulkLoopVideoArrayInput },
+      of: [
+        {
+          type: "object",
+          name: "loopVideoItem",
+          title: "Loop vidéo",
+          fields: [
+            defineField({
+              name: "title",
+              title: "Titre (optionnel, affiché en bas de la tuile)",
+              type: "string",
+            }),
+            defineField({
+              name: "videoFile",
+              title: "Fichier vidéo",
+              type: "file",
+              options: { accept: "video/mp4,video/webm" },
+            }),
+            defineField({
+              name: "videoUrl",
+              title: "Ou URL MP4 directe",
+              type: "url",
+            }),
+            defineField({
+              name: "poster",
+              title: "Image de couverture (optionnel)",
+              type: "image",
+              options: { hotspot: true },
+            }),
+          ],
+          preview: {
+            select: { title: "title", videoUrl: "videoUrl" },
+            prepare({ title, videoUrl }) {
+              return {
+                title: title || "Loop vidéo",
+                subtitle: videoUrl ? "URL externe" : "Fichier uploadé",
+              };
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
       name: "gallery",
       title: "Galerie photos",
       type: "array",
@@ -142,10 +193,10 @@ export const project = defineType({
     }),
     defineField({
       name: "videoGallery",
-      title: "Galerie vidéos",
+      title: "Galerie vidéos (lecteur complet)",
       type: "array",
       description:
-        "Glissez-déposez vos MP4/WebM ici — pas dans « Galerie photos ».",
+        "Vidéos avec lecteur custom en bas de page — son, plein écran, etc.",
       components: { input: BulkVideoArrayInput },
       of: [
         {
