@@ -36,12 +36,17 @@ function isGalleryLoop(
   return item._type === "galleryLoopItem" || Boolean(item.videoUrl);
 }
 
+const centeredLastOddItemClassName =
+  "md:col-span-2 md:w-[calc(50%-0.375rem)] md:justify-self-center";
+
 function LoopVideoTile({
   videoUrl,
   posterUrl,
+  className,
 }: {
   videoUrl: string;
   posterUrl?: string;
+  className?: string;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -65,7 +70,7 @@ function LoopVideoTile({
   }, [videoUrl]);
 
   return (
-    <article className={galleryTileClassName}>
+    <article className={`${galleryTileClassName} ${className ?? ""}`}>
       <video
         ref={ref}
         src={videoUrl}
@@ -91,6 +96,18 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
   const [hiResReady, setHiResReady] = useState<Record<string, boolean>>({});
 
   const imageItems = useMemo(() => items.filter(isGalleryImage), [items]);
+
+  const renderableItems = useMemo(
+    () =>
+      items.filter(
+        (item) =>
+          (isGalleryLoop(item) && Boolean(item.videoUrl)) || isGalleryImage(item),
+      ),
+    [items],
+  );
+
+  const lastRenderableKey = renderableItems.at(-1)?._key;
+  const centerLastOddItem = renderableItems.length % 2 === 1;
 
   const lightboxImages: LightboxImage[] = useMemo(
     () =>
@@ -226,12 +243,16 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
     <>
       <div className="mb-16 grid grid-cols-1 gap-3 md:grid-cols-2">
         {items.map((item) => {
+          const isCenteredLast =
+            centerLastOddItem && item._key === lastRenderableKey;
+
           if (isGalleryLoop(item) && item.videoUrl) {
             return (
               <LoopVideoTile
                 key={item._key}
                 videoUrl={item.videoUrl}
                 posterUrl={item.posterUrl}
+                className={isCenteredLast ? centeredLastOddItemClassName : undefined}
               />
             );
           }
@@ -251,7 +272,9 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
                 const src = buildLightboxSrc(item);
                 preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
               }}
-              className={`group ${galleryTileClassName} w-full text-left`}
+              className={`group ${galleryTileClassName} w-full text-left ${
+                isCenteredLast ? centeredLastOddItemClassName : ""
+              }`}
             >
               <Image
                 src={buildImageSrc(item, 1600)}
