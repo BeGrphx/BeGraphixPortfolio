@@ -54,7 +54,6 @@ export function BulkGalleryArrayInput(props: ArrayOfObjectsInputProps) {
             return {
               _type: "galleryLoopItem" as const,
               _key: randomKey(),
-              title: file.name.replace(/\.[^.]+$/, ""),
               videoFile: {
                 _type: "file" as const,
                 asset: {
