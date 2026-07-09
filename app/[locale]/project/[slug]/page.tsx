@@ -3,9 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { FadeIn } from "@/components/FadeIn";
-import { LoopVideoGallery } from "@/components/LoopVideoGallery";
+import { ProjectGallery } from "@/components/ProjectGallery";
 import { MediaBlock } from "@/components/MediaBlock";
-import { PhotoGallery } from "@/components/PhotoGallery";
 import { VideoGallery } from "@/components/VideoGallery";
 import type { Locale } from "@/i18n/routing";
 import { getLocalizedAuto } from "@/lib/i18n";
@@ -144,12 +143,8 @@ export default async function ProjectPage({
           </header>
         </FadeIn>
 
-        {project.loopGallery && project.loopGallery.length > 0 && (
-          <LoopVideoGallery videos={project.loopGallery} />
-        )}
-
         {project.gallery && project.gallery.length > 0 && (
-          <PhotoGallery images={project.gallery} />
+          <ProjectGallery items={project.gallery} />
         )}
 
         {description && (

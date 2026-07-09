@@ -10,6 +10,19 @@ export interface SanityGalleryImage {
   height?: number;
 }
 
+export interface SanityGalleryItem {
+  _key: string;
+  _type: "image" | "galleryLoopItem";
+  asset?: { _ref: string };
+  alt?: string;
+  caption?: string;
+  width?: number;
+  height?: number;
+  title?: string;
+  videoUrl?: string;
+  posterUrl?: string;
+}
+
 const imageDimensions = `"width": asset->metadata.dimensions.width, "height": asset->metadata.dimensions.height`;
 
 export interface SanityMediaItem {
@@ -21,13 +34,6 @@ export interface SanityMediaItem {
   muxPlaybackId?: string;
   title?: string;
   label?: string;
-}
-
-export interface SanityLoopVideoItem {
-  _key: string;
-  title?: string;
-  videoUrl?: string;
-  posterUrl?: string;
 }
 
 export interface SanityVideoItem {
@@ -54,8 +60,7 @@ export interface SanityProject {
   thumbnail?: SanityGalleryImage;
   hoverPreviewUrl?: string;
   showreelVideoUrl?: string;
-  gallery?: SanityGalleryImage[];
-  loopGallery?: SanityLoopVideoItem[];
+  gallery?: SanityGalleryItem[];
   videoGallery?: SanityVideoItem[];
   pdfFile?: { asset: { _ref: string; url?: string } };
   media?: SanityMediaItem[];
@@ -105,11 +110,10 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
   },
   hoverPreviewUrl,
   "gallery": gallery[] {
-    ...,
-    ${imageDimensions}
-  },
-  "loopGallery": loopGallery[] {
     _key,
+    _type,
+    ...,
+    ${imageDimensions},
     title,
     "videoUrl": coalesce(videoUrl, videoFile.asset->url),
     "posterUrl": poster.asset->url

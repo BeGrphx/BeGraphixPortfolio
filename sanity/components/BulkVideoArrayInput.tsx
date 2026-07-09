@@ -176,9 +176,3 @@ export const BulkVideoArrayInput = createBulkVideoArrayInput({
   dropTitle: "Glissez-déposez vos vidéos MP4/WebM ici",
   dropSubtitle: "Lecteur complet en bas de la page projet",
 });
-
-export const BulkLoopVideoArrayInput = createBulkVideoArrayInput({
-  itemType: "loopVideoItem",
-  dropTitle: "Glissez-déposez vos loops MP4/WebM ici",
-  dropSubtitle: "Grille en boucle en haut — comme les images",
-});

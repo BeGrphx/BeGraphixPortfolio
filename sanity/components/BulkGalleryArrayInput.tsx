@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadIcon } from "@sanity/icons";
-import { Box, Card, Flex, Spinner, Stack, Text, useToast } from "@sanity/ui";
+import { Box, Card, Flex, Spinner, Stack, Text } from "@sanity/ui";
 import { useCallback, useRef, useState } from "react";
 import {
   type ArrayOfObjectsInputProps,
@@ -10,61 +10,61 @@ import {
 } from "sanity";
 import { randomKey } from "@sanity/util/content";
 
-function getImageFiles(fileList: FileList | File[] | null | undefined): File[] {
-  if (!fileList) return [];
-  return Array.from(fileList).filter((file) => file.type.startsWith("image/"));
-}
-
-function getVideoFiles(fileList: FileList | File[] | null | undefined): File[] {
-  if (!fileList) return [];
-  return Array.from(fileList).filter(
-    (file) =>
-      file.type.startsWith("video/") ||
-      /\.(mp4|webm|mov)$/i.test(file.name),
-  );
-}
-
-export function BulkImageArrayInput(props: ArrayOfObjectsInputProps) {
+export function BulkGalleryArrayInput(props: ArrayOfObjectsInputProps) {
   const { onChange, value = [], readOnly, renderDefault } = props;
   const client = useClient({ apiVersion: "2024-01-01" });
-  const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
 
   const uploadFiles = useCallback(
     async (files: FileList | File[]) => {
-      const images = getImageFiles(files);
-      const videos = getVideoFiles(files);
-
-      if (videos.length && !images.length) {
-        toast.push({
-          status: "warning",
-          title: "Fichier vidéo détecté",
-          description:
-            "Les MP4 vont dans « Galerie vidéos », pas dans « Galerie photos ».",
-        });
-        return;
-      }
-
-      if (!images.length || readOnly) return;
+      const batch = Array.from(files).filter(
+        (file) =>
+          file.type.startsWith("image/") ||
+          file.type.startsWith("video/") ||
+          /\.(mp4|webm|mov)$/i.test(file.name),
+      );
+      if (!batch.length || readOnly) return;
 
       setUploading(true);
       try {
-        const uploaded = await Promise.all(
-          images.map((file) =>
-            client.assets.upload("image", file, { filename: file.name }),
-          ),
-        );
+        const newItems = await Promise.all(
+          batch.map(async (file) => {
+            if (file.type.startsWith("image/")) {
+              const asset = await client.assets.upload("image", file, {
+                filename: file.name,
+              });
 
-        const newItems = uploaded.map((asset) => ({
-          _type: "image" as const,
-          _key: randomKey(),
-          asset: {
-            _type: "reference" as const,
-            _ref: asset._id,
-          },
-        }));
+              return {
+                _type: "image" as const,
+                _key: randomKey(),
+                asset: {
+                  _type: "reference" as const,
+                  _ref: asset._id,
+                },
+              };
+            }
+
+            const asset = await client.assets.upload("file", file, {
+              filename: file.name,
+              contentType: file.type || "video/mp4",
+            });
+
+            return {
+              _type: "galleryLoopItem" as const,
+              _key: randomKey(),
+              title: file.name.replace(/\.[^.]+$/, ""),
+              videoFile: {
+                _type: "file" as const,
+                asset: {
+                  _type: "reference" as const,
+                  _ref: asset._id,
+                },
+              },
+            };
+          }),
+        );
 
         onChange(set([...(value ?? []), ...newItems]));
       } finally {
@@ -72,7 +72,7 @@ export function BulkImageArrayInput(props: ArrayOfObjectsInputProps) {
         setDragging(false);
       }
     },
-    [client, onChange, readOnly, toast, value],
+    [client, onChange, readOnly, value],
   );
 
   const onDrop = useCallback(
@@ -125,7 +125,7 @@ export function BulkImageArrayInput(props: ArrayOfObjectsInputProps) {
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
             multiple
             hidden
             onChange={onFileChange}
@@ -143,10 +143,10 @@ export function BulkImageArrayInput(props: ArrayOfObjectsInputProps) {
                 </Text>
                 <Box>
                   <Text size={1} weight="semibold">
-                    Glissez-déposez plusieurs images ici
+                    Glissez-déposez images et loops MP4 ici
                   </Text>
                   <Text size={1} muted>
-                    ou cliquez pour en sélectionner plusieurs d&apos;un coup
+                    Réordonnez ensuite la grille ci-dessous pour choisir l&apos;ordre
                   </Text>
                 </Box>
               </>

@@ -1,9 +1,6 @@
 import { defineField, defineType } from "sanity";
-import { BulkImageArrayInput } from "../components/BulkImageArrayInput";
-import {
-  BulkLoopVideoArrayInput,
-  BulkVideoArrayInput,
-} from "../components/BulkVideoArrayInput";
+import { BulkGalleryArrayInput } from "../components/BulkGalleryArrayInput";
+import { BulkVideoArrayInput } from "../components/BulkVideoArrayInput";
 
 export const project = defineType({
   name: "project",
@@ -126,16 +123,25 @@ export const project = defineType({
       description: "URL MP4 ou Vimeo — jouée au survol sur la grille",
     }),
     defineField({
-      name: "loopGallery",
-      title: "Galerie loops (grille)",
+      name: "gallery",
+      title: "Galerie (images & loops)",
       type: "array",
       description:
-        "Vidéos courtes en boucle, affichées en grille en haut — à la place ou en plus des images.",
-      components: { input: BulkLoopVideoArrayInput },
+        "Images et vidéos en boucle — glissez-déposez, puis réordonnez la grille pour choisir l'ordre.",
+      components: { input: BulkGalleryArrayInput },
+      options: { layout: "grid" },
       of: [
         {
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({ name: "alt", title: "Alt", type: "string" }),
+            defineField({ name: "caption", title: "Légende", type: "string" }),
+          ],
+        },
+        {
           type: "object",
-          name: "loopVideoItem",
+          name: "galleryLoopItem",
           title: "Loop vidéo",
           fields: [
             defineField({
@@ -162,32 +168,19 @@ export const project = defineType({
             }),
           ],
           preview: {
-            select: { title: "title", videoUrl: "videoUrl" },
-            prepare({ title, videoUrl }) {
+            select: {
+              title: "title",
+              poster: "poster",
+              fileName: "videoFile.asset.originalFilename",
+            },
+            prepare({ title, poster, fileName }) {
               return {
-                title: title || "Loop vidéo",
-                subtitle: videoUrl ? "URL externe" : "Fichier uploadé",
+                title: title || fileName || "Loop vidéo",
+                subtitle: "Vidéo en boucle",
+                media: poster,
               };
             },
           },
-        },
-      ],
-    }),
-    defineField({
-      name: "gallery",
-      title: "Galerie photos",
-      type: "array",
-      description: "Images uniquement. Glissez-déposez plusieurs images d'un coup.",
-      components: { input: BulkImageArrayInput },
-      options: { layout: "grid" },
-      of: [
-        {
-          type: "image",
-          options: { hotspot: true },
-          fields: [
-            defineField({ name: "alt", title: "Alt", type: "string" }),
-            defineField({ name: "caption", title: "Légende", type: "string" }),
-          ],
         },
       ],
     }),
