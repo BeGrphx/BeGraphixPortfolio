@@ -5,7 +5,6 @@ import { useLenis } from "lenis/react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  aspectRatioStyle,
   buildImageSrc,
   buildLightboxSrc,
   getImageDimensions,
@@ -40,11 +39,9 @@ function isGalleryLoop(
 function LoopVideoTile({
   videoUrl,
   posterUrl,
-  title,
 }: {
   videoUrl: string;
   posterUrl?: string;
-  title?: string;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -68,29 +65,23 @@ function LoopVideoTile({
   }, [videoUrl]);
 
   return (
-    <article className="relative w-full overflow-hidden bg-neutral-900 md:w-[calc(50%-0.375rem)]">
-      <div className="relative aspect-[16/10] w-full">
-        <video
-          ref={ref}
-          src={videoUrl}
-          poster={posterUrl}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {title && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent px-5 pb-5 pt-16 text-center md:px-8 md:pb-6">
-            <p className="font-display text-lg uppercase tracking-[0.14em] text-white md:text-2xl">
-              {title}
-            </p>
-          </div>
-        )}
-      </div>
+    <article className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-900">
+      <video
+        ref={ref}
+        src={videoUrl}
+        poster={posterUrl}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="absolute left-1/2 top-1/2 h-[118%] w-[118%] -translate-x-1/2 -translate-y-[46%] object-cover"
+      />
     </article>
   );
 }
+
+const galleryTileClassName =
+  "relative aspect-[16/10] w-full overflow-hidden bg-neutral-900";
 
 export function ProjectGallery({ items }: ProjectGalleryProps) {
   const lenis = useLenis();
@@ -233,7 +224,7 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
 
   return (
     <>
-      <div className="mb-16 flex flex-wrap items-start justify-center gap-3">
+      <div className="mb-16 grid grid-cols-1 gap-3 md:grid-cols-2">
         {items.map((item) => {
           if (isGalleryLoop(item) && item.videoUrl) {
             return (
@@ -241,15 +232,11 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
                 key={item._key}
                 videoUrl={item.videoUrl}
                 posterUrl={item.posterUrl}
-                title={item.title}
               />
             );
           }
 
           if (!isGalleryImage(item)) return null;
-
-          const { width, height } = getImageDimensions(item);
-          const portrait = isPortrait(item);
 
           return (
             <button
@@ -264,28 +251,14 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
                 const src = buildLightboxSrc(item);
                 preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
               }}
-              className={`group relative overflow-hidden bg-neutral-900 text-left ${
-                portrait
-                  ? "h-[min(58vh,780px)] shrink-0"
-                  : "w-full md:w-[calc(50%-0.375rem)]"
-              }`}
-              style={portrait ? undefined : aspectRatioStyle(item)}
+              className={`group ${galleryTileClassName} text-left`}
             >
               <Image
                 src={buildImageSrc(item, 1600)}
                 alt={item.alt ?? ""}
-                width={width}
-                height={height}
-                className={
-                  portrait
-                    ? "h-full w-auto transition-transform duration-500 group-hover:scale-[1.02]"
-                    : "h-auto w-full transition-transform duration-500 group-hover:scale-105"
-                }
-                sizes={
-                  portrait
-                    ? "(max-width: 768px) 45vw, 320px"
-                    : "(max-width: 768px) 100vw, 50vw"
-                }
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
               <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
             </button>

@@ -145,11 +145,6 @@ export const project = defineType({
           title: "Loop vidéo",
           fields: [
             defineField({
-              name: "title",
-              title: "Titre (optionnel, affiché en bas de la tuile)",
-              type: "string",
-            }),
-            defineField({
               name: "videoFile",
               title: "Fichier vidéo",
               type: "file",
@@ -169,13 +164,12 @@ export const project = defineType({
           ],
           preview: {
             select: {
-              title: "title",
               poster: "poster",
               fileName: "videoFile.asset.originalFilename",
             },
-            prepare({ title, poster, fileName }) {
+            prepare({ poster, fileName }) {
               return {
-                title: title || fileName || "Loop vidéo",
+                title: fileName || "Loop vidéo",
                 subtitle: "Vidéo en boucle",
                 media: poster,
               };
