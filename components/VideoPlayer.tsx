@@ -11,6 +11,8 @@ import {
   type MouseEvent,
 } from "react";
 
+const PREVIEW_START_SECONDS = 0.02;
+
 function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds)) return "0:00";
   const mins = Math.floor(seconds / 60);
@@ -100,14 +102,24 @@ export function VideoPlayer({
   }, [src]);
 
   const primeFirstFrame = useCallback((video: HTMLVideoElement) => {
-    if (video.paused && video.currentTime < 0.0005) {
+    if (poster || !video.paused) return;
+
+    const seekToPreview = () => {
+      if (video.currentTime >= PREVIEW_START_SECONDS * 0.5) return;
       try {
-        video.currentTime = 0.001;
+        video.currentTime = PREVIEW_START_SECONDS;
       } catch {
         // Seek can fail before the browser has buffered enough data.
       }
+    };
+
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      seekToPreview();
+      return;
     }
-  }, []);
+
+    video.addEventListener("loadeddata", seekToPreview, { once: true });
+  }, [poster]);
 
   const effectivePreload = poster ? preload : "auto";
 
@@ -290,7 +302,10 @@ export function VideoPlayer({
             setBuffered(video.buffered.end(video.buffered.length - 1));
           }
         }}
-        onLoadedMetadata={(e) => handleLoadedMetadata(e.currentTarget)}
+        onLoadedMetadata={(e) => {
+          handleLoadedMetadata(e.currentTarget);
+          if (!poster) primeFirstFrame(e.currentTarget);
+        }}
         onLoadedData={(e) => {
           if (!poster) primeFirstFrame(e.currentTarget);
         }}

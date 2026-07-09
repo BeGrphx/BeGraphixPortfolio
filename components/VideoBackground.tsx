@@ -48,11 +48,11 @@ export function VideoBackground({ url, blur, onError }: VideoBackgroundProps) {
     };
   }, [url]);
 
-  const scale = blur > 0 ? 1.12 + blur / 60 : 1.05;
+  const scale = blur > 0 ? 1.04 + blur / 90 : 1;
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-neutral-950">
-      <div className="absolute -inset-[12%]">
+      <div className="absolute -inset-[6%]">
         <video
           ref={ref}
           key={url}
