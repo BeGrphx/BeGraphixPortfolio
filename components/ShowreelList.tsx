@@ -53,7 +53,7 @@ export function ShowreelList({ projects }: ShowreelListProps) {
               <VideoPlayer
                 src={videoUrl}
                 title={project.displayTitle}
-                preload="auto"
+                preload="metadata"
                 className="w-full"
               />
             ) : (

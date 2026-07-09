@@ -72,6 +72,7 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
           {hovering && hoverSrc && !isMp4 && (
             <iframe
               src={hoverSrc}
+              title={`${title} preview`}
               className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover"
               allow="autoplay; fullscreen"
             />

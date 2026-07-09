@@ -1,5 +1,32 @@
 import type Lenis from "lenis";
 
+export function getScrollY(lenis: Lenis | null | undefined): number {
+  return lenis?.scroll ?? window.scrollY;
+}
+
+export function getMaxScrollY(): number {
+  return Math.max(
+    0,
+    document.documentElement.scrollHeight - window.innerHeight,
+  );
+}
+
+export function restoreScrollPosition(
+  lenis: Lenis | null | undefined,
+  targetY: number,
+) {
+  const y = Math.min(Math.max(0, targetY), getMaxScrollY());
+
+  lenis?.resize?.();
+
+  if (lenis) {
+    lenis.scrollTo(y, { immediate: true, force: true });
+    return;
+  }
+
+  window.scrollTo({ top: y, behavior: "instant" });
+}
+
 export function scrollToTop(lenis: Lenis | null | undefined) {
   if (lenis) {
     lenis.scrollTo(0, { immediate: true });

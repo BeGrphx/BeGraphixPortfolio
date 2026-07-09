@@ -1,11 +1,19 @@
 "use client";
 
 import { useLenis } from "lenis/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
+import { getScrollY, restoreScrollPosition } from "@/lib/scroll";
 import { FilteredProjectGrid } from "./FilteredProjectGrid";
 import { ProjectFilter, type FilterValue } from "./ProjectFilter";
 import { ShowreelList } from "./ShowreelList";
@@ -37,27 +45,44 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
     () => paramFilter ?? defaultFilter,
   );
 
+  const contentRef = useRef<HTMLDivElement>(null);
+  const pendingScrollRef = useRef<number | null>(null);
+  const [contentMinHeight, setContentMinHeight] = useState<number | undefined>();
+
   useEffect(() => {
     if (paramFilter) setFilter(paramFilter);
   }, [paramFilter]);
 
   const handleFilterChange = useCallback(
     (value: FilterValue) => {
-      const scrollY = lenis?.scroll ?? window.scrollY;
-      setFilter(value);
+      if (value === filter) return;
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (lenis) {
-            lenis.scrollTo(scrollY, { immediate: true });
-          } else {
-            window.scrollTo({ top: scrollY, behavior: "instant" });
-          }
-        });
-      });
+      const container = contentRef.current;
+      if (container) {
+        setContentMinHeight(container.offsetHeight);
+      }
+
+      pendingScrollRef.current = getScrollY(lenis);
+      setFilter(value);
     },
-    [lenis],
+    [filter, lenis],
   );
+
+  useLayoutEffect(() => {
+    if (pendingScrollRef.current === null) return;
+
+    const targetY = pendingScrollRef.current;
+    pendingScrollRef.current = null;
+
+    restoreScrollPosition(lenis, targetY);
+
+    const frame = requestAnimationFrame(() => {
+      setContentMinHeight(undefined);
+      restoreScrollPosition(lenis, targetY);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [filter, lenis]);
 
   const counts = {
     showreel: showreelProjects.length,
@@ -91,15 +116,21 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
           hasShowreel={hasShowreels}
         />
       </div>
-      {filter === "showreel" ? (
-        <ShowreelList key="showreel" projects={showreelProjects} />
-      ) : (
-        <FilteredProjectGrid
-          projects={gridProjects}
-          filter={filter}
-          locale={locale}
-        />
-      )}
+      <div
+        ref={contentRef}
+        className="[overflow-anchor:none]"
+        style={contentMinHeight ? { minHeight: contentMinHeight } : undefined}
+      >
+        {filter === "showreel" ? (
+          <ShowreelList projects={showreelProjects} />
+        ) : (
+          <FilteredProjectGrid
+            projects={gridProjects}
+            filter={filter}
+            locale={locale}
+          />
+        )}
+      </div>
     </>
   );
 }

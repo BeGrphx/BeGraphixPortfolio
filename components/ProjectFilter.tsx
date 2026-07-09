@@ -46,6 +46,7 @@ export function ProjectFilter({
             key={filter.value}
             type="button"
             disabled={disabled}
+            aria-pressed={isActive}
             onClick={() => onChange(filter.value)}
             className={`relative z-10 px-5 py-2.5 text-xs uppercase tracking-[0.2em] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-30 ${
               isActive ? "text-white" : "text-white/50 hover:text-white/80"
