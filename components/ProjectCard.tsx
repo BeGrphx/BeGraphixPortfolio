@@ -9,6 +9,7 @@ import type { Locale } from "@/i18n/routing";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
 import {
   buildImageSrc,
+  isUltrawide,
 } from "@/lib/sanity/image-utils";
 
 interface ProjectCardProps {
@@ -28,11 +29,16 @@ function getHoverVideoSrc(url: string): string | null {
 export function ProjectCard({ project, locale }: ProjectCardProps) {
   const ref = useRef<HTMLElement>(null);
   const [hovering, setHovering] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const title = project.displayTitle;
 
   const imageUrl = project.thumbnail
     ? buildImageSrc(project.thumbnail, 1280)
     : null;
+
+  const wideThumbnail = project.thumbnail
+    ? isUltrawide(project.thumbnail)
+    : false;
 
   const hoverSrc = project.hoverPreviewUrl
     ? getHoverVideoSrc(project.hoverPreviewUrl)
@@ -53,8 +59,11 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
               src={imageUrl}
               alt={project.thumbnail?.alt ?? title}
               fill
-              className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
-                hovering && hoverSrc ? "opacity-0" : "opacity-100"
+              onLoad={() => setImageLoaded(true)}
+              className={`transition-all duration-700 ease-out ${
+                wideThumbnail ? "object-contain" : "object-cover group-hover:scale-105"
+              } ${imageLoaded ? "opacity-100" : "opacity-0"} ${
+                hovering && hoverSrc ? "opacity-0" : ""
               }`}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
@@ -66,14 +75,18 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
               muted
               loop
               playsInline
-              className="absolute inset-0 h-full w-full object-cover"
+              className={`absolute inset-0 h-full w-full ${
+                wideThumbnail ? "object-contain" : "object-cover"
+              }`}
             />
           )}
           {hovering && hoverSrc && !isMp4 && (
             <iframe
               src={hoverSrc}
               title={`${title} preview`}
-              className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover"
+              className={`pointer-events-none absolute inset-0 h-full w-full scale-110 ${
+                wideThumbnail ? "object-contain" : "object-cover"
+              }`}
               allow="autoplay; fullscreen"
             />
           )}

@@ -5,10 +5,12 @@ import { useLenis } from "lenis/react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  aspectRatioStyle,
   buildImageSrc,
   buildLightboxSrc,
   getImageDimensions,
   isPortrait,
+  isUltrawide,
 } from "@/lib/sanity/image-utils";
 import {
   isImagePreloaded,
@@ -19,6 +21,7 @@ import type { SanityGalleryImage, SanityGalleryItem } from "@/lib/sanity/queries
 import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
 import { useLightboxSwipe } from "@/hooks/useLightboxSwipe";
 import type { LightboxImage } from "./ImageLightbox";
+import { LightboxChrome } from "./LightboxChrome";
 
 interface ProjectGalleryProps {
   items: SanityGalleryItem[];
@@ -88,6 +91,46 @@ function LoopVideoTile({
 
 const galleryTileClassName =
   "relative aspect-[16/10] overflow-hidden bg-neutral-900";
+
+function GalleryImageTile({
+  item,
+  className,
+  onOpen,
+  onPreload,
+}: {
+  item: SanityGalleryImage & { _key: string; _type: "image" };
+  className?: string;
+  onOpen: () => void;
+  onPreload: () => void;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const wide = isUltrawide(item);
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      onMouseEnter={onPreload}
+      onFocus={onPreload}
+      className={`group relative w-full overflow-hidden bg-neutral-900 text-left ${
+        wide ? "" : galleryTileClassName
+      } ${className ?? ""}`}
+      style={wide ? aspectRatioStyle(item) : undefined}
+    >
+      <Image
+        src={buildImageSrc(item, 1600)}
+        alt={item.alt ?? ""}
+        fill
+        onLoad={() => setLoaded(true)}
+        className={`transition-all duration-500 ${
+          wide ? "object-contain" : "object-cover group-hover:scale-[1.03]"
+        } ${loaded ? "opacity-100" : "opacity-0"}`}
+        sizes="(max-width: 768px) 100vw, 50vw"
+      />
+      <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+    </button>
+  );
+}
 
 export function ProjectGallery({ items }: ProjectGalleryProps) {
   const lenis = useLenis();
@@ -263,31 +306,16 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
           if (!isGalleryImage(item)) return null;
 
           return (
-            <button
+            <GalleryImageTile
               key={item._key}
-              type="button"
-              onClick={() => openImage(item._key)}
-              onMouseEnter={() => {
+              item={item}
+              className={isCenteredLast ? centeredLastOddItemClassName : undefined}
+              onOpen={() => openImage(item._key)}
+              onPreload={() => {
                 const src = buildLightboxSrc(item);
                 preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
               }}
-              onFocus={() => {
-                const src = buildLightboxSrc(item);
-                preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
-              }}
-              className={`group ${galleryTileClassName} w-full text-left ${
-                isCenteredLast ? centeredLastOddItemClassName : ""
-              }`}
-            >
-              <Image
-                src={buildImageSrc(item, 1600)}
-                alt={item.alt ?? ""}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
-            </button>
+            />
           );
         })}
       </div>
@@ -302,70 +330,15 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
             onClick={close}
             {...swipeHandlers}
           >
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                close();
-              }}
-              className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 text-xs uppercase tracking-[0.18em] text-white/70 transition-colors active:bg-white/10 sm:right-6 sm:top-6 sm:px-4 sm:text-white/60 sm:hover:bg-white/10 sm:hover:text-white"
-            >
-              Fermer ✕
-            </button>
-
-            {lightboxImages.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prev();
-                  }}
-                  className="absolute left-0 top-0 z-20 hidden h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:flex md:w-28"
-                  aria-label="Image précédente"
-                >
-                  <span className="text-4xl leading-none">←</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    next();
-                  }}
-                  className="absolute right-0 top-0 z-20 hidden h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:flex md:w-28"
-                  aria-label="Image suivante"
-                >
-                  <span className="text-4xl leading-none">→</span>
-                </button>
-                <div className="absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex justify-center gap-3 md:hidden">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      prev();
-                    }}
-                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80"
-                    aria-label="Image précédente"
-                  >
-                    ←
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      next();
-                    }}
-                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80"
-                    aria-label="Image suivante"
-                  >
-                    →
-                  </button>
-                </div>
-              </>
-            )}
+            <LightboxChrome
+              onClose={close}
+              onPrev={prev}
+              onNext={next}
+              hasMultiple={lightboxImages.length > 1}
+            />
 
             <div
-              className="relative z-10 h-[78vh] w-[100vw] max-w-[1600px] px-2 sm:h-[88vh] sm:w-[96vw] sm:px-4"
+              className="relative z-10 h-[72vh] w-full max-w-[1600px] px-2 pt-14 sm:h-[88vh] sm:w-[96vw] sm:px-4 sm:pt-0 md:pt-0"
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence initial={false} custom={direction}>

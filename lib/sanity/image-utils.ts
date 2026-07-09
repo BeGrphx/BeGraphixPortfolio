@@ -15,6 +15,14 @@ export function isPortrait(
   return height > width;
 }
 
+export function isUltrawide(
+  image?: Pick<SanityGalleryImage, "width" | "height">,
+  threshold = 1.85,
+): boolean {
+  const { width, height } = getImageDimensions(image);
+  return width / height >= threshold;
+}
+
 export function buildImageSrc(
   image: SanityGalleryImage,
   maxWidth = 1920,

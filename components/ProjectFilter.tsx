@@ -36,11 +36,11 @@ export function ProjectFilter({
   ];
 
   return (
-    <div className="-mx-1 w-[calc(100%+0.5rem)] overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:w-auto sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
+    <div className="w-full max-w-full">
       <div
         role="tablist"
         aria-label="Filtrer les projets"
-        className="relative inline-flex min-w-max flex-nowrap justify-center rounded-full border border-white/20 p-1"
+        className="relative grid w-full grid-cols-3 rounded-full border border-white/20 p-0.5 sm:inline-flex sm:w-auto sm:grid-cols-none sm:justify-center sm:p-1"
       >
         {filters.map((filter) => {
           const isActive = value === filter.value;
@@ -55,7 +55,7 @@ export function ProjectFilter({
               aria-selected={isActive}
               aria-pressed={isActive}
               onClick={() => onChange(filter.value)}
-              className={`relative z-10 min-h-11 shrink-0 px-4 py-2.5 text-[11px] uppercase tracking-[0.14em] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-30 sm:px-5 sm:text-xs sm:tracking-[0.2em] ${
+              className={`relative z-10 min-h-10 px-1 py-2 text-[9px] uppercase leading-tight tracking-[0.08em] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-30 sm:min-h-11 sm:px-5 sm:py-2.5 sm:text-xs sm:tracking-[0.2em] ${
                 isActive ? "text-white" : "text-white/50 hover:text-white/80"
               }`}
             >
@@ -66,11 +66,11 @@ export function ProjectFilter({
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <span className="relative flex items-center gap-1.5 sm:gap-2">
-                {filter.label}
+              <span className="relative flex flex-col items-center gap-0.5 sm:flex-row sm:gap-2">
+                <span className="text-center">{filter.label}</span>
                 {filter.count !== undefined && (
                   <span
-                    className={`text-[10px] ${isActive ? "text-white/70" : "text-white/40"}`}
+                    className={`text-[9px] sm:text-[10px] ${isActive ? "text-white/70" : "text-white/40"}`}
                   >
                     {filter.count}
                   </span>

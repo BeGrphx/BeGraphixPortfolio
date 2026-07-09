@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
@@ -26,6 +27,8 @@ interface ProjectGridProps {
 export function ProjectGrid({ projects, locale }: ProjectGridProps) {
   const t = useTranslations("home");
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const lenis = useLenis();
 
   const showreelProjects = projects.filter((p) => p.projectType === "showreel");
@@ -64,8 +67,12 @@ export function ProjectGrid({ projects, locale }: ProjectGridProps) {
 
       pendingScrollRef.current = getScrollY(lenis);
       setFilter(value);
+
+      const params = new URLSearchParams();
+      params.set("filter", value);
+      router.replace(`${pathname}?${params.toString()}#projects`, { scroll: false });
     },
-    [filter, lenis],
+    [filter, lenis, pathname, router],
   );
 
   useLayoutEffect(() => {

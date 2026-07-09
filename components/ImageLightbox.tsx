@@ -16,6 +16,7 @@ import {
 } from "@/lib/preload-image";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
 import { useLightboxSwipe } from "@/hooks/useLightboxSwipe";
+import { LightboxChrome } from "./LightboxChrome";
 
 export interface LightboxImage {
   src: string;
@@ -204,70 +205,15 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
             onClick={close}
             {...swipeHandlers}
           >
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                close();
-              }}
-              className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex min-h-11 min-w-11 items-center justify-center rounded-full px-3 text-xs uppercase tracking-[0.18em] text-white/70 transition-colors active:bg-white/10 sm:right-6 sm:top-6 sm:px-4 sm:text-white/60 sm:hover:bg-white/10 sm:hover:text-white"
-            >
-              Fermer ✕
-            </button>
-
-            {images.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prev();
-                  }}
-                  className="absolute left-0 top-0 z-20 hidden h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:flex md:w-28"
-                  aria-label="Image précédente"
-                >
-                  <span className="text-4xl leading-none">←</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    next();
-                  }}
-                  className="absolute right-0 top-0 z-20 hidden h-full w-20 items-center justify-center text-white/60 transition-colors hover:bg-white/5 hover:text-white md:flex md:w-28"
-                  aria-label="Image suivante"
-                >
-                  <span className="text-4xl leading-none">→</span>
-                </button>
-                <div className="absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex justify-center gap-3 md:hidden">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      prev();
-                    }}
-                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80"
-                    aria-label="Image précédente"
-                  >
-                    ←
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      next();
-                    }}
-                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80"
-                    aria-label="Image suivante"
-                  >
-                    →
-                  </button>
-                </div>
-              </>
-            )}
+            <LightboxChrome
+              onClose={close}
+              onPrev={prev}
+              onNext={next}
+              hasMultiple={images.length > 1}
+            />
 
             <div
-              className="relative z-10 h-[78vh] w-[100vw] max-w-[1600px] px-2 sm:h-[88vh] sm:w-[96vw] sm:px-4"
+              className="relative z-10 h-[72vh] w-full max-w-[1600px] px-2 pt-14 sm:h-[88vh] sm:w-[96vw] sm:px-4 sm:pt-0 md:pt-0"
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence initial={false} custom={direction}>

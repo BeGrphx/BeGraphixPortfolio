@@ -99,6 +99,21 @@ export function VideoPlayer({
   }, [applyVolume, src]);
 
   useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onWebkitBegin = () => setIsFullscreen(true);
+    const onWebkitEnd = () => setIsFullscreen(false);
+    video.addEventListener("webkitbeginfullscreen", onWebkitBegin);
+    video.addEventListener("webkitendfullscreen", onWebkitEnd);
+
+    return () => {
+      video.removeEventListener("webkitbeginfullscreen", onWebkitBegin);
+      video.removeEventListener("webkitendfullscreen", onWebkitEnd);
+    };
+  }, [src]);
+
+  useEffect(() => {
     setIntrinsicSize(null);
   }, [src]);
 
@@ -125,6 +140,30 @@ export function VideoPlayer({
   const effectivePreload = poster ? preload : "auto";
 
   useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const prime = () => {
+      if (!poster && video.paused) primeFirstFrame(video);
+    };
+
+    if (typeof IntersectionObserver === "undefined") {
+      prime();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) prime();
+      },
+      { threshold: 0.2 },
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [poster, primeFirstFrame, src]);
+
+  useEffect(() => {
     return () => {
       if (hideTimer.current) clearTimeout(hideTimer.current);
     };
@@ -148,20 +187,31 @@ export function VideoPlayer({
     };
   }, []);
 
-  const togglePlay = useCallback(() => {
+  const togglePlay = useCallback(async () => {
     const video = videoRef.current;
     if (!video) return;
 
     if (video.paused) {
-      void video.play();
-      setPlaying(true);
+      try {
+        video.muted = volume === 0;
+        await video.play();
+        setPlaying(true);
+      } catch {
+        video.muted = true;
+        try {
+          await video.play();
+          setPlaying(true);
+        } catch {
+          /* autoplay blocked */
+        }
+      }
     } else {
       video.pause();
       setPlaying(false);
       setShowControls(true);
     }
     revealControls();
-  }, [revealControls]);
+  }, [revealControls, volume]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -196,17 +246,24 @@ export function VideoPlayer({
   );
 
   const toggleFullscreen = useCallback(() => {
+    const video = videoRef.current;
     const container = containerRef.current;
-    if (!container) return;
+    if (!video || !container) return;
 
     const doc = document as Document & {
       webkitFullscreenElement?: Element;
       webkitExitFullscreen?: () => Promise<void>;
     };
 
+    const videoEl = video as HTMLVideoElement & {
+      webkitEnterFullscreen?: () => void;
+      webkitDisplayingFullscreen?: boolean;
+    };
+
     const isActive =
       document.fullscreenElement === container ||
-      doc.webkitFullscreenElement === container;
+      doc.webkitFullscreenElement === container ||
+      videoEl.webkitDisplayingFullscreen;
 
     if (isActive) {
       if (document.exitFullscreen) {
@@ -214,13 +271,20 @@ export function VideoPlayer({
       } else if (doc.webkitExitFullscreen) {
         void doc.webkitExitFullscreen();
       }
-    } else {
-      const request =
-        container.requestFullscreen?.bind(container) ??
-        (container as HTMLElement & { webkitRequestFullscreen?: () => void })
-          .webkitRequestFullscreen?.bind(container);
-      request?.();
+      return;
     }
+
+    if (videoEl.webkitEnterFullscreen) {
+      videoEl.webkitEnterFullscreen();
+      revealControls();
+      return;
+    }
+
+    const request =
+      container.requestFullscreen?.bind(container) ??
+      (container as HTMLElement & { webkitRequestFullscreen?: () => void })
+        .webkitRequestFullscreen?.bind(container);
+    request?.();
     revealControls();
   }, [revealControls]);
 
@@ -301,12 +365,16 @@ export function VideoPlayer({
     .filter(Boolean)
     .join(" ");
 
+  const isUltrawide = intrinsicSize
+    ? intrinsicSize.width / intrinsicSize.height >= 1.85
+    : false;
+
   const videoClassName = isFullscreen && isAdaptive
     ? "begraphix-video max-h-[100vh] max-w-[100vw] h-auto w-auto object-contain"
     : fit === "cover"
       ? "begraphix-video absolute inset-0 h-full w-full object-cover"
       : isAdaptive && intrinsicSize
-        ? "begraphix-video absolute inset-0 h-full w-full object-cover"
+        ? `begraphix-video absolute inset-0 h-full w-full ${isUltrawide ? "object-contain" : "object-cover"}`
         : "begraphix-video block h-auto max-h-[80vh] w-full object-contain";
 
   return (
@@ -327,11 +395,11 @@ export function VideoPlayer({
         src={src}
         poster={poster}
         preload={effectivePreload}
+        muted
         playsInline
         controls={false}
         disablePictureInPicture
         className={videoClassName}
-        onClick={togglePlay}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -362,8 +430,12 @@ export function VideoPlayer({
       {!playing && (
         <button
           type="button"
-          onClick={togglePlay}
-          className="absolute left-1/2 top-1/2 z-20 h-16 w-16 -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 hover:scale-105 active:scale-95 sm:h-[4.5rem] sm:w-[4.5rem]"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            void togglePlay();
+          }}
+          className="absolute left-1/2 top-1/2 z-30 h-11 w-11 -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 active:scale-95 sm:h-14 sm:w-14 md:h-[4.5rem] md:w-[4.5rem] md:hover:scale-105"
           aria-label="Lire la vidéo"
         >
           <span
@@ -374,18 +446,18 @@ export function VideoPlayer({
             {!isFullscreen && (
               <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/35 via-white/10 to-transparent" />
             )}
-            <PlayTriangleIcon />
+            <PlayTriangleIcon className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
           </span>
         </button>
       )}
 
       <div
-        className={`absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-10 transition-opacity duration-300 sm:px-4 sm:pb-4 sm:pt-12 ${
+        className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-6 transition-opacity duration-300 sm:px-4 sm:pb-4 sm:pt-12 ${
           isFullscreen ? "bg-gradient-to-t from-black via-black/95 to-transparent" : ""
         } ${
           showControls || !playing
-            ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0"
+            ? "opacity-100"
+            : "opacity-0"
         }`}
       >
         {title && (
@@ -403,7 +475,7 @@ export function VideoPlayer({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress)}
-          className="relative mb-3 h-2 cursor-pointer rounded-full bg-white/15 py-2 sm:h-1 sm:py-0"
+          className="pointer-events-auto relative mb-3 h-2 cursor-pointer rounded-full bg-white/15 py-2 sm:h-1 sm:py-0"
           onClick={seek}
           onPointerDown={(event) => {
             seekFromPointer(event);
@@ -426,12 +498,12 @@ export function VideoPlayer({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-4 sm:gap-y-3">
+        <div className="pointer-events-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-4 sm:gap-y-3">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
             <button
               type="button"
-              onClick={togglePlay}
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 sm:h-8 sm:w-8 ${
+              onClick={() => void togglePlay()}
+              className={`pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 sm:h-8 sm:w-8 ${
                 isFullscreen ? "" : "backdrop-blur-md"
               }`}
               aria-label={playing ? "Pause" : "Lecture"}
@@ -479,7 +551,7 @@ export function VideoPlayer({
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="shrink-0 min-h-10 px-1 text-[10px] uppercase tracking-[0.12em] text-white/60 transition-colors hover:text-white sm:min-h-0 sm:text-xs sm:tracking-[0.15em]"
+            className="pointer-events-auto shrink-0 min-h-10 px-1 text-[10px] uppercase tracking-[0.12em] text-white/60 transition-colors hover:text-white sm:min-h-0 sm:text-xs sm:tracking-[0.15em]"
             aria-label={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
           >
             {isFullscreen ? "Réduire" : "Plein écran"}
