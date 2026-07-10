@@ -89,7 +89,7 @@ export default async function HomePage({
         />
       </div>
 
-      <section className="relative z-10 flex min-h-[44vh] flex-col items-center justify-center px-4 pb-8 pt-[calc(6.5rem+env(safe-area-inset-top))] text-center sm:px-6 sm:pb-10 sm:pt-28 md:min-h-[54vh] md:px-10 md:pb-12 md:pt-32">
+      <section className="relative z-10 flex min-h-[70svh] flex-col items-center justify-center px-4 pb-8 pt-[calc(6.5rem+env(safe-area-inset-top))] text-center sm:px-6 sm:pb-10 sm:pt-28 md:min-h-[54vh] md:px-10 md:pb-12 md:pt-32">
         <FadeIn className="max-w-4xl">
           <p className="mb-4 text-[11px] uppercase tracking-[0.22em] text-white/75 sm:mb-5 sm:text-sm sm:tracking-[0.35em] md:mb-6">
             {t("eyebrow")}
@@ -110,7 +110,7 @@ export default async function HomePage({
           <HomeScrollToProjects />
         </Suspense>
         <div
-          className="mx-auto max-w-7xl pt-[calc(12vh+var(--projects-fade-offset)+1.5rem)] md:pt-[calc(2vh+var(--projects-fade-offset)+1.5rem)]"
+          className="mx-auto max-w-7xl pt-6 md:pt-[calc(2vh+var(--projects-fade-offset)+1.5rem)]"
           style={
             {
               "--projects-fade-offset": projectsFadeOffset,
