@@ -6,7 +6,7 @@ import { HomeIntro } from "@/components/HomeIntro";
 import type { Locale } from "@/i18n/routing";
 import { client } from "@/lib/sanity/client";
 import { aboutQuery, type SanityAbout } from "@/lib/sanity/queries";
-import { getSiteSettings, resolveLogoUrl } from "@/lib/site-settings";
+import { DEFAULT_LOGO_PATH } from "@/lib/site-settings";
 
 export const revalidate = 60;
 
@@ -47,11 +47,7 @@ export default async function AboutPage({
   setRequestLocale(locale);
   const t = await getTranslations("about");
 
-  const [aboutContact, settings] = await Promise.all([
-    getAboutContact(),
-    getSiteSettings(),
-  ]);
-  const logoUrl = resolveLogoUrl(settings);
+  const aboutContact = await getAboutContact();
   const backgroundItems = t.raw("backgroundItems") as string[];
   const expertiseCategories = t.raw("expertiseCategories") as ExpertiseCategory[];
   const agencyItems = t.raw("agencyItems") as string[];
@@ -59,21 +55,19 @@ export default async function AboutPage({
 
   return (
     <div className="min-h-screen px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-[calc(6.5rem+env(safe-area-inset-top))] sm:px-6 md:px-10 md:pb-24 md:pt-40">
-      <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-2 md:items-start md:gap-14 lg:gap-20">
-        <FadeIn className="w-full md:sticky md:top-32 md:self-start">
-          <div className="relative aspect-square w-full">
-            <Image
-              src={logoUrl}
-              alt="Be Graphi'x"
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          </div>
+      <div className="mx-auto flex max-w-[1400px] flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-16">
+        <FadeIn className="w-full shrink-0 lg:sticky lg:top-32 lg:w-1/2 lg:max-w-[620px]">
+          <Image
+            src={DEFAULT_LOGO_PATH}
+            alt="Be Graphi'x"
+            width={1024}
+            height={1024}
+            className="h-auto w-full"
+            priority
+          />
         </FadeIn>
 
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1 lg:pt-1">
           <FadeIn>
             <h1 className="font-display text-[clamp(2rem,7vw,3rem)] font-medium tracking-tight">
               {t("title")}
