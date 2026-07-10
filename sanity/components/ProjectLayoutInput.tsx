@@ -153,7 +153,7 @@ function PreviewWireframe({
 }
 
 export function ProjectLayoutInput(props: ArrayOfObjectsInputProps) {
-  const { value = [], onChange, readOnly } = props;
+  const { value = [], onChange, readOnly, renderDefault } = props;
   const [tab, setTab] = useState<"blocks" | "preview">("blocks");
   const doc = useFormValue([]) as Record<string, unknown> | null;
 
