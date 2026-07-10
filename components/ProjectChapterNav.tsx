@@ -21,6 +21,13 @@ export function ProjectChapterNav({
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
+    document.documentElement.classList.add("project-scrollbar-hidden");
+    return () => {
+      document.documentElement.classList.remove("project-scrollbar-hidden");
+    };
+  }, []);
+
+  useEffect(() => {
     if (chapters.length < 2) return;
 
     let frame = 0;
@@ -28,6 +35,14 @@ export function ProjectChapterNav({
     const updateActiveChapter = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
+        const pageBottom =
+          document.documentElement.scrollHeight - window.innerHeight;
+        if (window.scrollY >= pageBottom - 8) {
+          const lastId = chapters.at(-1)?.id ?? "";
+          setActiveId((current) => (current === lastId ? current : lastId));
+          return;
+        }
+
         const focusLine = window.innerHeight * 0.42;
         let closestId = chapters[0]?.id ?? "";
         let closestDistance = Number.POSITIVE_INFINITY;
@@ -69,6 +84,14 @@ export function ProjectChapterNav({
   if (chapters.length < 2) return null;
 
   const goToChapter = (id: string) => {
+    if (id === "project-home") {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "smooth",
+      });
+      return;
+    }
+
     const element = document.getElementById(id);
     if (!element) return;
 

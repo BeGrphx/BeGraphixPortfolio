@@ -23,6 +23,7 @@ interface ProjectPageBlocksProps {
   project: LocalizedProject;
   downloadPdfLabel: string;
   chapterNavLabel: string;
+  homeChapterLabel: string;
   chapterLabels: Record<ProjectLayoutBlockType, string>;
 }
 
@@ -30,15 +31,20 @@ export function ProjectPageBlocks({
   project,
   downloadPdfLabel,
   chapterNavLabel,
+  homeChapterLabel,
   chapterLabels,
 }: ProjectPageBlocksProps) {
   const layout = resolveProjectLayout(project.pageBlocks).filter((blockType) =>
     layoutBlockHasContent(blockType, project),
   );
-  const chapters: ProjectChapter[] = layout.map((blockType, index) => ({
+  const blockChapters: ProjectChapter[] = layout.map((blockType, index) => ({
     id: `project-chapter-${index + 1}`,
     label: chapterLabels[blockType],
   }));
+  const chapters: ProjectChapter[] = [
+    ...blockChapters,
+    { id: "project-home", label: homeChapterLabel },
+  ];
 
   return (
     <>
@@ -46,7 +52,7 @@ export function ProjectPageBlocks({
 
       {layout.map((blockType, index) => (
         <div
-          id={chapters[index].id}
+          id={blockChapters[index].id}
           key={`${blockType}-${index}`}
           data-project-chapter={blockType}
           className="scroll-mt-28"

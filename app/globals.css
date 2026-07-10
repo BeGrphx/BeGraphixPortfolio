@@ -30,6 +30,14 @@ html {
   overflow-x: clip;
 }
 
+html.project-scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+html.project-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   font-family: var(--font-body), system-ui, sans-serif;
   background-color: var(--color-background);

@@ -142,6 +142,7 @@ export default async function ProjectPage({
           project={project}
           downloadPdfLabel={t("downloadPdf")}
           chapterNavLabel={t("chapters.navigation")}
+          homeChapterLabel={t("home")}
           chapterLabels={{
             layoutVideoGallery: t("chapters.video"),
             layoutText: t("chapters.story"),
@@ -152,7 +153,10 @@ export default async function ProjectPage({
         />
 
         <FadeIn delay={0.2}>
-          <div className="mt-16 flex justify-center px-4 sm:mt-20">
+          <div
+            id="project-home"
+            className="mt-16 flex scroll-mt-28 justify-center px-4 sm:mt-20"
+          >
             <Link
               href={homeHref}
               scroll={false}
