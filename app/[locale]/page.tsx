@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { FadeIn } from "@/components/FadeIn";
 import { HeroBackground } from "@/components/HeroBackground";
-import { HomeIntro } from "@/components/HomeIntro";
 import { HomeScrollToProjects } from "@/components/HomeScrollToProjects";
 import { ProjectGrid } from "@/components/ProjectGrid";
 import type { Locale } from "@/i18n/routing";
@@ -104,12 +103,6 @@ export default async function HomePage({
             {t("subtitle")}
           </p>
         </FadeIn>
-      </section>
-
-      <section className="relative z-10 px-4 sm:px-6 md:px-10">
-        <div className="mx-auto max-w-7xl py-12 sm:py-16 md:py-20">
-          <HomeIntro />
-        </div>
       </section>
 
       <section className="relative z-10 px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pb-24">
