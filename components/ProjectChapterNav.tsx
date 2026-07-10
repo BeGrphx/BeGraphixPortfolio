@@ -21,13 +21,6 @@ export function ProjectChapterNav({
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.add("project-scrollbar-hidden");
-    return () => {
-      document.documentElement.classList.remove("project-scrollbar-hidden");
-    };
-  }, []);
-
-  useEffect(() => {
     if (chapters.length < 2) return;
 
     let frame = 0;

@@ -28,16 +28,11 @@
 html {
   scroll-behavior: auto;
   overflow-x: clip;
+  scrollbar-width: none;
 }
 
-@media (min-width: 1024px) {
-  html.project-scrollbar-hidden {
-    scrollbar-width: none;
-  }
-
-  html.project-scrollbar-hidden::-webkit-scrollbar {
-    display: none;
-  }
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
