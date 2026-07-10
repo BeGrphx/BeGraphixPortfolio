@@ -55,14 +55,14 @@ export default async function AboutPage({
 
   return (
     <div className="min-h-screen px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-[calc(6.5rem+env(safe-area-inset-top))] sm:px-6 md:px-10 md:pb-24 md:pt-40">
-      <div className="grid w-full gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(480px,700px)] lg:items-start lg:gap-12 xl:gap-16">
+      <div className="grid w-full gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start lg:gap-12 xl:gap-16">
         <FadeIn className="w-full lg:sticky lg:top-32">
           <Image
             src={DEFAULT_LOGO_PATH}
             alt="Be Graphi'x"
             width={1024}
             height={1024}
-            className="h-auto w-full"
+            className="h-auto w-full mix-blend-screen"
             priority
           />
         </FadeIn>
