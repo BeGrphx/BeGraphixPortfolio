@@ -1,5 +1,9 @@
 import { FadeIn } from "@/components/FadeIn";
 import { MediaBlock } from "@/components/MediaBlock";
+import {
+  ProjectChapterNav,
+  type ProjectChapter,
+} from "@/components/ProjectChapterNav";
 import { ProjectGallery } from "@/components/ProjectGallery";
 import { VideoGallery } from "@/components/VideoGallery";
 import {
@@ -18,24 +22,42 @@ interface LocalizedProject extends SanityProject {
 interface ProjectPageBlocksProps {
   project: LocalizedProject;
   downloadPdfLabel: string;
+  chapterNavLabel: string;
+  chapterLabels: Record<ProjectLayoutBlockType, string>;
 }
 
 export function ProjectPageBlocks({
   project,
   downloadPdfLabel,
+  chapterNavLabel,
+  chapterLabels,
 }: ProjectPageBlocksProps) {
-  const layout = resolveProjectLayout(project.pageBlocks);
+  const layout = resolveProjectLayout(project.pageBlocks).filter((blockType) =>
+    layoutBlockHasContent(blockType, project),
+  );
+  const chapters: ProjectChapter[] = layout.map((blockType, index) => ({
+    id: `project-chapter-${index + 1}`,
+    label: chapterLabels[blockType],
+  }));
 
   return (
     <>
+      <ProjectChapterNav chapters={chapters} ariaLabel={chapterNavLabel} />
+
       {layout.map((blockType, index) => (
-        <ProjectLayoutBlock
+        <div
+          id={chapters[index].id}
           key={`${blockType}-${index}`}
-          type={blockType}
-          project={project}
-          index={index}
-          downloadPdfLabel={downloadPdfLabel}
-        />
+          data-project-chapter={blockType}
+          className="scroll-mt-28"
+        >
+          <ProjectLayoutBlock
+            type={blockType}
+            project={project}
+            index={index}
+            downloadPdfLabel={downloadPdfLabel}
+          />
+        </div>
       ))}
     </>
   );

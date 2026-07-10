@@ -40,7 +40,15 @@
       "external": "le lien"
     },
     "duration": "Durée",
-    "downloadPdf": "Télécharger le PDF"
+    "downloadPdf": "Télécharger le PDF",
+    "chapters": {
+      "navigation": "Plan du projet",
+      "video": "Films",
+      "story": "Le projet",
+      "gallery": "Galerie",
+      "document": "Dossier",
+      "media": "Contenus"
+    }
   },
   "about": {
     "contact": "Contact",

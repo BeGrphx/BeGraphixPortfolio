@@ -141,6 +141,14 @@ export default async function ProjectPage({
         <ProjectPageBlocks
           project={project}
           downloadPdfLabel={t("downloadPdf")}
+          chapterNavLabel={t("chapters.navigation")}
+          chapterLabels={{
+            layoutVideoGallery: t("chapters.video"),
+            layoutText: t("chapters.story"),
+            layoutGallery: t("chapters.gallery"),
+            layoutPdf: t("chapters.document"),
+            layoutMedia: t("chapters.media"),
+          }}
         />
 
         <FadeIn delay={0.2}>
