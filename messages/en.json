@@ -8,6 +8,14 @@
     "titleLine1": "Visual creations",
     "titleLine2": "animated & augmented",
     "subtitle": "Motion designer & AI video creator — professional work and personal explorations.",
+    "intro": "After a journey through visual communication, game design, 3D, and artificial intelligence, I found my path: crafting images that speak, campaigns that resonate, and worlds that leave a lasting impression. Minimalist in form, maximalist in impact. With me, your projects won't go unnoticed.",
+    "quote": "Procrastination is the assassination of all destinations.",
+    "keywordColumns": [
+      ["Visual Campaign", "Creative AI", "Graphic Emotion"],
+      ["Memorable Videos", "High-Quality Rendering"],
+      ["Eye for Detail"],
+      ["Emotional Creation", "Stronger Presence", "3D Rendering"]
+    ],
     "chronological": "Chronological order",
     "noProjects": "No projects yet.",
     "addViaStudio": "Add projects via Sanity Studio.",
@@ -36,8 +44,81 @@
   },
   "about": {
     "contact": "Contact",
-    "defaultTitle": "About",
-    "placeholder": "Motion designer and AI video creator. Edit this text in Sanity Studio."
+    "title": "I'm Tom Rivier, founder of Be Graphi'x",
+    "intro": "Since 2023, I've been specializing in AI-powered video creation, combining traditional mastery with emerging technologies to reinvent visual content production.",
+    "backgroundHeading": "My background",
+    "backgroundItems": [
+      "Freelancer (Be Graphi'x, since 2023) – Creating content for Be Quiet, Ganstères, Human2AI: AI images and videos, social media content, events",
+      "Production Assistant (Short-term contract at Fab&Fab, 5 weeks) – Editing, visual design, participation in audiovisual productions",
+      "Nearly a year of intensive AI video creation experience",
+      "Education: Baccalauréat in Graphic Design (Visual Communication Crafts & Applied Arts) + AI Graphic Design Specialization (MJM Design School)"
+    ],
+    "expertiseHeading": "My expertise",
+    "expertiseCategories": [
+      {
+        "title": "Graphic Design",
+        "items": [
+          "Visual identity, publishing, print, social media",
+          "Complete Adobe Suite mastery (Photoshop, Illustrator, InDesign)"
+        ]
+      },
+      {
+        "title": "Motion & Video",
+        "items": [
+          "Animation, storytelling, dynamic editing",
+          "Premiere Pro, After Effects",
+          "Talking heads with voice cloning",
+          "Multi-language video production"
+        ]
+      },
+      {
+        "title": "3D & Rendering",
+        "items": [
+          "Architectural visualization, modeling, atmosphere creation",
+          "Cinema 4D, 3DS Max, Sketchup, Revit, Twinmotion, Lumion, D5 Render, Redshift"
+        ]
+      },
+      {
+        "title": "Creative AI",
+        "items": [
+          "Image generation: Midjourney, Nano Banana Pro and more",
+          "AI Video: Runway, Kling, Sora",
+          "Prompt design and optimization",
+          "ChatGPT, Claude"
+        ]
+      }
+    ],
+    "agencyHeading": "What I bring to your agency",
+    "agencyItems": [
+      "Product and brand showcase videos",
+      "Dynamic and attractive pack shots",
+      "Social media content (Reels, TikTok, Stories)",
+      "Quickly adaptable video ads",
+      "Animations and motion design",
+      "AI avatars and voiceovers",
+      "Video prototyping for concept validation"
+    ],
+    "addedValueHeading": "My added value",
+    "addedValueItems": [
+      {
+        "label": "Speed",
+        "description": "Accelerated content production through AI"
+      },
+      {
+        "label": "Creativity",
+        "description": "Exploring new aesthetics impossible with traditional methods"
+      },
+      {
+        "label": "Efficiency",
+        "description": "Optimized timelines and budgets"
+      },
+      {
+        "label": "Versatility",
+        "description": "From conception to final edit, a complete project vision"
+      }
+    ],
+    "closing": "At Be Graphi'x, I combine technical expertise with artistic vision to meet modern brands' video content needs. AI isn't just a tool — it's a new way to create.",
+    "tagline": "Your creative partner to boost your video production with artificial intelligence."
   },
   "footer": {
     "rights": "All rights reserved"

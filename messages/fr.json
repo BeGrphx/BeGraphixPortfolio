@@ -8,6 +8,14 @@
     "titleLine1": "Créations visuelles",
     "titleLine2": "animées & augmentées",
     "subtitle": "Motion designer & créateur vidéo IA — projets professionnels et explorations personnelles.",
+    "intro": "Après un parcours en communication visuelle, game design, 3D et intelligence artificielle, j'ai trouvé ma voie : créer des images qui parlent, des campagnes qui résonnent et des univers qui marquent les esprits. Minimaliste dans la forme, maximaliste dans l'impact. Avec moi, vos projets ne passeront pas inaperçus.",
+    "quote": "La procrastination est l'assassinat de toutes les destinations.",
+    "keywordColumns": [
+      ["Campagne visuelle", "IA créative", "Émotion graphique"],
+      ["Vidéos mémorables", "Rendu haute qualité"],
+      ["Œil pour le détail"],
+      ["Création émotionnelle", "Présence renforcée", "Rendu 3D"]
+    ],
     "chronological": "Tri chronologique",
     "noProjects": "Aucun projet pour le moment.",
     "addViaStudio": "Ajoutez des projets via Sanity Studio.",
@@ -36,8 +44,81 @@
   },
   "about": {
     "contact": "Contact",
-    "defaultTitle": "À propos",
-    "placeholder": "Motion designer et créateur vidéo IA. Ce texte est modifiable depuis Sanity Studio."
+    "title": "Je suis Tom Rivier, fondateur de Be Graphi'x",
+    "intro": "Depuis 2023, je me spécialise dans la création vidéo propulsée par l'IA, alliant maîtrise traditionnelle et technologies émergentes pour réinventer la production de contenus visuels.",
+    "backgroundHeading": "Mon parcours",
+    "backgroundItems": [
+      "Freelance (Be Graphi'x, depuis 2023) – Création de contenus pour Be Quiet, Ganstères, Human2AI : images et vidéos IA, contenus réseaux sociaux, événements",
+      "Assistant de production (Contrat court chez Fab&Fab, 5 semaines) – Montage, design visuel, participation à des productions audiovisuelles",
+      "Près d'un an d'expérience intensive en création vidéo IA",
+      "Formation : Baccalauréat en design graphique (Métiers d'Art de la communication visuelle) + Spécialisation design graphique IA (École MJM Design)"
+    ],
+    "expertiseHeading": "Mon expertise",
+    "expertiseCategories": [
+      {
+        "title": "Design graphique",
+        "items": [
+          "Identité visuelle, édition, print, réseaux sociaux",
+          "Maîtrise complète de la suite Adobe (Photoshop, Illustrator, InDesign)"
+        ]
+      },
+      {
+        "title": "Motion & vidéo",
+        "items": [
+          "Animation, storytelling, montage dynamique",
+          "Premiere Pro, After Effects",
+          "Talking heads avec clonage vocal",
+          "Production vidéo multilingue"
+        ]
+      },
+      {
+        "title": "3D & rendu",
+        "items": [
+          "Visualisation architecturale, modélisation, création d'atmosphères",
+          "Cinema 4D, 3DS Max, Sketchup, Revit, Twinmotion, Lumion, D5 Render, Redshift"
+        ]
+      },
+      {
+        "title": "IA créative",
+        "items": [
+          "Génération d'images : Midjourney, Nano Banana Pro et bien d'autres",
+          "Vidéo IA : Runway, Kling, Sora",
+          "Conception et optimisation de prompts",
+          "ChatGPT, Claude"
+        ]
+      }
+    ],
+    "agencyHeading": "Ce que j'apporte à votre agence",
+    "agencyItems": [
+      "Vidéos de présentation produit et marque",
+      "Pack shots dynamiques et attractifs",
+      "Contenus réseaux sociaux (Reels, TikTok, Stories)",
+      "Publicités vidéo rapidement adaptables",
+      "Animations et motion design",
+      "Avatars IA et voix off",
+      "Prototypage vidéo pour validation de concepts"
+    ],
+    "addedValueHeading": "Ma valeur ajoutée",
+    "addedValueItems": [
+      {
+        "label": "Rapidité",
+        "description": "Production de contenus accélérée grâce à l'IA"
+      },
+      {
+        "label": "Créativité",
+        "description": "Exploration de nouvelles esthétiques impossibles avec les méthodes traditionnelles"
+      },
+      {
+        "label": "Efficacité",
+        "description": "Délais et budgets optimisés"
+      },
+      {
+        "label": "Polyvalence",
+        "description": "De la conception au montage final, une vision complète du projet"
+      }
+    ],
+    "closing": "Chez Be Graphi'x, je combine expertise technique et vision artistique pour répondre aux besoins en contenus vidéo des marques modernes. L'IA n'est pas qu'un outil — c'est une nouvelle manière de créer.",
+    "tagline": "Votre partenaire créatif pour booster votre production vidéo grâce à l'intelligence artificielle."
   },
   "footer": {
     "rights": "Tous droits réservés"
