@@ -57,7 +57,7 @@ export default async function AboutPage({
     <div className="min-h-screen px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-[calc(6.5rem+env(safe-area-inset-top))] sm:px-6 md:px-10 md:pb-24 md:pt-40">
       <div className="grid w-full gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start lg:gap-12 xl:gap-16">
         <div className="w-full">
-          <FadeIn className="flex w-full items-center justify-center lg:fixed lg:left-10 lg:top-0 lg:h-screen lg:w-[calc((100vw-8rem)/3)] xl:w-[calc((100vw-9rem)/3)]">
+          <div className="flex w-full items-center justify-center lg:fixed lg:left-10 lg:top-0 lg:h-screen lg:w-[calc((100vw-8rem)/3)] xl:w-[calc((100vw-9rem)/3)]">
             <div className="w-full max-w-[calc(100vh-8rem)]">
               <Image
                 src={DEFAULT_LOGO_PATH}
@@ -68,7 +68,7 @@ export default async function AboutPage({
                 priority
               />
             </div>
-          </FadeIn>
+          </div>
         </div>
 
         <div className="min-w-0 lg:pt-1">
