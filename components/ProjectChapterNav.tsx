@@ -102,7 +102,7 @@ export function ProjectChapterNav({
   return (
     <nav
       aria-label={ariaLabel}
-      className="fixed right-2 top-1/2 z-40 -translate-y-1/2 sm:right-4 md:right-5"
+      className="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
       onFocus={() => setExpanded(true)}

@@ -30,12 +30,14 @@ html {
   overflow-x: clip;
 }
 
-html.project-scrollbar-hidden {
-  scrollbar-width: none;
-}
+@media (min-width: 1024px) {
+  html.project-scrollbar-hidden {
+    scrollbar-width: none;
+  }
 
-html.project-scrollbar-hidden::-webkit-scrollbar {
-  display: none;
+  html.project-scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 body {
