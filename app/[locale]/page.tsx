@@ -73,7 +73,7 @@ export default async function HomePage({
 
   const bottomFade = settings?.heroBottomFade ?? 320;
   const heroBackgroundHeight = `calc(56vh + ${Math.round(bottomFade * 0.35)}px)`;
-  const projectsTopSpacing = "2.5rem";
+  const projectsFadeOffset = `${Math.round(bottomFade * 0.35)}px`;
 
   return (
     <div className="relative bg-[#080808] text-white">
@@ -110,8 +110,12 @@ export default async function HomePage({
           <HomeScrollToProjects />
         </Suspense>
         <div
-          className="mx-auto max-w-7xl"
-          style={{ paddingTop: projectsTopSpacing }}
+          className="mx-auto max-w-7xl pt-[calc(12vh+var(--projects-fade-offset)+1.5rem)] md:pt-[calc(2vh+var(--projects-fade-offset)+1.5rem)]"
+          style={
+            {
+              "--projects-fade-offset": projectsFadeOffset,
+            } as React.CSSProperties
+          }
         >
           <div id="projects" className="scroll-mt-[calc(5.5rem+env(safe-area-inset-top))]">
             <Suspense fallback={null}>
