@@ -64,22 +64,24 @@ function ProjectLayoutBlock({
 
     case "layoutText":
       return (
-        <>
-          {project.description && (
-            <FadeIn delay={delay}>
-              <p className="mx-auto mb-8 max-w-2xl px-2 text-center text-[15px] leading-relaxed sm:mb-10 sm:px-4 sm:text-base md:text-lg">
+        <FadeIn delay={delay}>
+          <section className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center px-4 py-14 text-center sm:px-6 sm:py-20 md:py-24">
+            {project.description && (
+              <p className="w-full text-[15px] leading-relaxed text-foreground sm:text-base md:text-lg">
                 {project.description}
               </p>
-            </FadeIn>
-          )}
-          {project.credits && (
-            <FadeIn delay={delay + 0.02}>
-              <p className="font-mono mx-auto mb-16 max-w-xl px-4 text-center text-[11px] leading-relaxed text-muted">
+            )}
+            {project.credits && (
+              <p
+                className={`font-mono w-full max-w-xl text-[11px] leading-relaxed text-muted ${
+                  project.description ? "mt-8" : ""
+                }`}
+              >
                 {project.credits}
               </p>
-            </FadeIn>
-          )}
-        </>
+            )}
+          </section>
+        </FadeIn>
       );
 
     case "layoutGallery":

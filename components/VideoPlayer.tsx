@@ -419,6 +419,16 @@ export function VideoPlayer({
         }}
       />
 
+      <button
+        type="button"
+        aria-label={playing ? "Pause" : "Lire la vidéo"}
+        className="absolute inset-0 z-10 cursor-pointer border-0 bg-transparent p-0"
+        onClick={(event) => {
+          event.stopPropagation();
+          void togglePlay();
+        }}
+      />
+
       {!isFullscreen && (
         <div
           className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 transition-opacity duration-300 ${
@@ -430,6 +440,7 @@ export function VideoPlayer({
       {!playing && (
         <button
           type="button"
+          data-video-control
           onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation();
@@ -452,6 +463,7 @@ export function VideoPlayer({
       )}
 
       <div
+        data-video-control
         className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-6 transition-opacity duration-300 sm:px-4 sm:pb-4 sm:pt-12 ${
           isFullscreen ? "bg-gradient-to-t from-black via-black/95 to-transparent" : ""
         } ${
@@ -502,7 +514,11 @@ export function VideoPlayer({
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
             <button
               type="button"
-              onClick={() => void togglePlay()}
+              data-video-control
+              onClick={(event) => {
+                event.stopPropagation();
+                void togglePlay();
+              }}
               className={`pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 sm:h-8 sm:w-8 ${
                 isFullscreen ? "" : "backdrop-blur-md"
               }`}
