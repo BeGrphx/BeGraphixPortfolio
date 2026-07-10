@@ -60,20 +60,18 @@ export default async function AboutPage({
   return (
     <div className="min-h-screen px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-[calc(6.5rem+env(safe-area-inset-top))] sm:px-6 md:px-10 md:pb-24 md:pt-40">
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-2 md:items-start md:gap-14 lg:gap-20">
-        {logoUrl && (
-          <FadeIn className="w-full md:sticky md:top-32 md:self-start">
-            <div className="relative aspect-square w-full overflow-hidden">
-              <Image
-                src={logoUrl}
-                alt="Be Graphi'x"
-                fill
-                className="object-contain object-center scale-[1.3] sm:scale-[1.4] md:scale-[1.45]"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-          </FadeIn>
-        )}
+        <FadeIn className="w-full md:sticky md:top-32 md:self-start">
+          <div className="relative aspect-square w-full">
+            <Image
+              src={logoUrl}
+              alt="Be Graphi'x"
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+        </FadeIn>
 
         <div className="min-w-0">
           <FadeIn>

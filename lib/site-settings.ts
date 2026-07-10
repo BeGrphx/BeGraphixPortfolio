@@ -20,8 +20,10 @@ export function resolveShowreelUrl(
   return settings.showreelVideoUrl || undefined;
 }
 
+export const DEFAULT_LOGO_PATH = "/brand/begraphix-logo.png";
+
 export function resolveLogoUrl(
   settings: SiteSettings | null,
-): string | undefined {
-  return settings?.logoUrl || undefined;
+): string {
+  return settings?.logoUrl || DEFAULT_LOGO_PATH;
 }
