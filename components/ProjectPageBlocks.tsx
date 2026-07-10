@@ -64,16 +64,16 @@ function ProjectLayoutBlock({
 
     case "layoutText":
       return (
-        <FadeIn delay={delay}>
-          <section className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center px-4 py-14 text-center sm:px-6 sm:py-20 md:py-24">
+        <FadeIn delay={delay} className="w-full">
+          <section className="mx-auto flex w-full min-h-[min(40vh,28rem)] max-w-3xl flex-col items-center justify-center px-4 py-16 text-center sm:px-6 sm:py-20 md:min-h-[min(44vh,32rem)] md:py-24">
             {project.description && (
-              <p className="w-full text-[15px] leading-relaxed text-foreground sm:text-base md:text-lg">
+              <p className="mx-auto w-full max-w-2xl text-center text-[15px] leading-relaxed text-foreground sm:text-base md:text-lg">
                 {project.description}
               </p>
             )}
             {project.credits && (
               <p
-                className={`font-mono w-full max-w-xl text-[11px] leading-relaxed text-muted ${
+                className={`font-mono mx-auto w-full max-w-xl text-center text-[11px] leading-relaxed text-muted ${
                   project.description ? "mt-8" : ""
                 }`}
               >
