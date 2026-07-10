@@ -10,7 +10,7 @@ import {
   buildLightboxSrc,
   getImageDimensions,
   isPortrait,
-  isUltrawide,
+  shouldPreserveGalleryAspect,
 } from "@/lib/sanity/image-utils";
 import {
   isImagePreloaded,
@@ -104,7 +104,7 @@ function GalleryImageTile({
   onPreload: () => void;
 }) {
   const [loaded, setLoaded] = useState(false);
-  const wide = isUltrawide(item);
+  const preserveAspect = shouldPreserveGalleryAspect(item);
 
   return (
     <button
@@ -113,9 +113,9 @@ function GalleryImageTile({
       onMouseEnter={onPreload}
       onFocus={onPreload}
       className={`group relative w-full overflow-hidden bg-neutral-900 text-left ${
-        wide ? "" : galleryTileClassName
+        preserveAspect ? "" : galleryTileClassName
       } ${className ?? ""}`}
-      style={wide ? aspectRatioStyle(item) : undefined}
+      style={preserveAspect ? aspectRatioStyle(item) : undefined}
     >
       <Image
         src={buildImageSrc(item, 1600)}
@@ -123,7 +123,9 @@ function GalleryImageTile({
         fill
         onLoad={() => setLoaded(true)}
         className={`transition-all duration-500 ${
-          wide ? "object-contain" : "object-cover group-hover:scale-[1.03]"
+          preserveAspect
+            ? "object-contain"
+            : "object-cover group-hover:scale-[1.03]"
         } ${loaded ? "opacity-100" : "opacity-0"}`}
         sizes="(max-width: 768px) 100vw, 50vw"
       />

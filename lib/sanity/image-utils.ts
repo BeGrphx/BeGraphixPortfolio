@@ -23,6 +23,13 @@ export function isUltrawide(
   return width / height >= threshold;
 }
 
+/** Portrait or ultrawide — keep native ratio instead of the 16:10 gallery tile. */
+export function shouldPreserveGalleryAspect(
+  image?: Pick<SanityGalleryImage, "width" | "height">,
+): boolean {
+  return isUltrawide(image) || isPortrait(image);
+}
+
 export function buildImageSrc(
   image: SanityGalleryImage,
   maxWidth = 1920,
