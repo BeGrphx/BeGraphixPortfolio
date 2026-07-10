@@ -3,9 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { FadeIn } from "@/components/FadeIn";
-import { ProjectGallery } from "@/components/ProjectGallery";
-import { MediaBlock } from "@/components/MediaBlock";
-import { VideoGallery } from "@/components/VideoGallery";
+import { ProjectPageBlocks } from "@/components/ProjectPageBlocks";
 import type { Locale } from "@/i18n/routing";
 import { getLocalizedAuto } from "@/lib/i18n";
 import { localizeProjectDetail } from "@/lib/localize-project";
@@ -92,13 +90,10 @@ export default async function ProjectPage({
   if (!projectRaw) notFound();
 
   const project = await localizeProjectDetail(projectRaw, locale);
-  const { title, description, credits } = project;
+  const { title } = project;
   const accent = project.dominantColor ?? "#1a1a1a";
   const homeHref = getHomeProjectsHref(
     projectTypeToHomeFilter(projectRaw.projectType),
-  );
-  const hasInstagramMedia = project.media?.some(
-    (item) => item.mediaType === "instagram",
   );
 
   return (
@@ -143,63 +138,17 @@ export default async function ProjectPage({
           </header>
         </FadeIn>
 
-        {project.gallery && project.gallery.length > 0 && (
-          <ProjectGallery items={project.gallery} />
-        )}
-
-        {description && (
-          <FadeIn delay={0.1}>
-            <p className="mx-auto mb-8 max-w-2xl px-2 text-center text-[15px] leading-relaxed sm:mb-10 sm:px-4 sm:text-base md:text-lg">
-              {description}
-            </p>
-          </FadeIn>
-        )}
-
-        {credits && (
-          <FadeIn delay={0.12}>
-            <p className="font-mono mx-auto mb-16 max-w-xl px-4 text-center text-[11px] leading-relaxed text-muted">
-              {credits}
-            </p>
-          </FadeIn>
-        )}
-
-        {project.pdfFile?.asset?.url && (
-          <FadeIn delay={0.14}>
-            <div className="mb-16 flex justify-center">
-              <a
-                href={project.pdfFile.asset.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border border-neutral-400 px-8 py-3 text-xs uppercase tracking-[0.2em] transition-opacity hover:opacity-60 dark:border-neutral-700"
-              >
-                {t("downloadPdf")} ↓
-              </a>
-            </div>
-          </FadeIn>
-        )}
-
-        {project.videoGallery && project.videoGallery.length > 0 && (
-          <VideoGallery videos={project.videoGallery} />
-        )}
-
-        {project.media && project.media.length > 0 && (
-          <div className="mx-auto max-w-5xl space-y-12 border-t border-neutral-200 px-4 pt-12 dark:border-neutral-900">
-            {project.media.map((item, index) => (
-              <MediaBlock key={item._key} item={item} index={index} />
-            ))}
-          </div>
-        )}
+        <ProjectPageBlocks
+          project={project}
+          downloadPdfLabel={t("downloadPdf")}
+        />
 
         <FadeIn delay={0.2}>
-          <div
-            className={`flex justify-center border-t border-neutral-200 px-4 pt-12 dark:border-neutral-900 ${
-              hasInstagramMedia ? "mt-10" : "mt-20"
-            }`}
-          >
+          <div className="mt-16 flex justify-center px-4 sm:mt-20">
             <Link
               href={homeHref}
               scroll={false}
-              className="inline-flex min-h-11 w-full max-w-xs items-center justify-center border border-neutral-400 px-8 py-3 text-xs uppercase tracking-[0.22em] text-muted transition-colors hover:border-neutral-600 hover:text-foreground dark:border-neutral-700 sm:w-auto sm:max-w-none sm:tracking-[0.25em]"
+              className="inline-flex min-h-12 w-full max-w-xs items-center justify-center bg-foreground px-10 py-3.5 text-xs font-medium uppercase tracking-[0.22em] text-background transition-opacity hover:opacity-85 active:opacity-75 sm:w-auto sm:max-w-none sm:tracking-[0.25em]"
             >
               {t("home")}
             </Link>

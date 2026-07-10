@@ -1,22 +1,51 @@
 import { defineField, defineType } from "sanity";
 import { BulkGalleryArrayInput } from "../components/BulkGalleryArrayInput";
 import { BulkVideoArrayInput } from "../components/BulkVideoArrayInput";
+import { ProjectLayoutInput } from "../components/ProjectLayoutInput";
+import { projectLayoutBlockMembers } from "./projectLayoutBlocks";
+
+const defaultPageBlocks = [
+  { _type: "layoutVideoGallery" as const, _key: "block-video" },
+  { _type: "layoutText" as const, _key: "block-text" },
+  { _type: "layoutGallery" as const, _key: "block-gallery" },
+  { _type: "layoutPdf" as const, _key: "block-pdf" },
+  { _type: "layoutMedia" as const, _key: "block-media" },
+];
 
 export const project = defineType({
   name: "project",
   title: "Projet",
   type: "document",
+  groups: [
+    { name: "layout", title: "Mise en page", default: true },
+    { name: "info", title: "Informations" },
+    { name: "content", title: "Contenu" },
+  ],
   fields: [
+    defineField({
+      name: "pageBlocks",
+      title: "Ordre des blocs sur la page",
+      type: "array",
+      group: "layout",
+      description:
+        "Définissez l'ordre d'affichage (vidéo, texte, images…). Utilisez l'onglet Aperçu pour visualiser le résultat.",
+      components: { input: ProjectLayoutInput },
+      of: projectLayoutBlockMembers,
+      initialValue: defaultPageBlocks,
+      validation: (rule) => rule.min(1),
+    }),
     defineField({
       name: "title",
       title: "Titre",
       type: "localizedString",
+      group: "info",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "slug",
       title: "Slug (URL)",
       type: "slug",
+      group: "info",
       options: { source: "title.fr", maxLength: 96 },
       validation: (rule) => rule.required(),
     }),
@@ -24,6 +53,7 @@ export const project = defineType({
       name: "projectType",
       title: "Type de projet",
       type: "string",
+      group: "info",
       options: {
         list: [
           { title: "Showreel", value: "showreel" },
@@ -39,12 +69,14 @@ export const project = defineType({
       name: "client",
       title: "Client",
       type: "string",
+      group: "info",
       hidden: ({ parent }) => parent?.projectType === "showreel",
     }),
     defineField({
       name: "completedAt",
       title: "Date de réalisation",
       type: "date",
+      group: "info",
       description: "Tri chronologique (récent → ancien)",
       validation: (rule) => rule.required(),
     }),
@@ -52,23 +84,27 @@ export const project = defineType({
       name: "duration",
       title: "Durée du projet",
       type: "string",
+      group: "info",
       description: 'Ex: "2 semaines", "3 mois"',
     }),
     defineField({
       name: "description",
       title: "Description",
       type: "localizedText",
+      group: "content",
     }),
     defineField({
       name: "credits",
       title: "Crédits / mentions légales",
       type: "localizedText",
+      group: "content",
       description: "Texte affiché en petit (ex: © TF1 / Endemol…)",
     }),
     defineField({
       name: "tags",
       title: "Tags / Thème",
       type: "array",
+      group: "info",
       of: [{ type: "string" }],
       options: { layout: "tags" },
       description: "Pour les showreels : indiquez le thème ici (ex: Motion Design, Vidéo IA).",
@@ -77,6 +113,7 @@ export const project = defineType({
       name: "showreelVideoUrl",
       title: "URL vidéo showreel (MP4)",
       type: "url",
+      group: "info",
       description: "Lien direct .mp4 — affiché en pleine largeur dans l'onglet Showreel.",
       hidden: ({ parent }) => parent?.projectType !== "showreel",
     }),
@@ -84,6 +121,7 @@ export const project = defineType({
       name: "showreelVideoFile",
       title: "Ou uploader la vidéo showreel",
       type: "file",
+      group: "info",
       options: { accept: "video/mp4,video/webm" },
       hidden: ({ parent }) => parent?.projectType !== "showreel",
     }),
@@ -91,6 +129,7 @@ export const project = defineType({
       name: "dominantColor",
       title: "Couleur dominante",
       type: "string",
+      group: "info",
       description: "Hex (#1a2b3c) — teinte la page projet. Laisse vide pour auto.",
       validation: (rule) =>
         rule.custom((value) => {
@@ -104,6 +143,7 @@ export const project = defineType({
       name: "thumbnail",
       title: "Vignette (grille d'accueil)",
       type: "image",
+      group: "info",
       options: { hotspot: true },
       fields: [
         defineField({ name: "alt", title: "Texte alternatif", type: "string" }),
@@ -120,12 +160,14 @@ export const project = defineType({
       name: "hoverPreviewUrl",
       title: "Vidéo preview au survol",
       type: "url",
+      group: "info",
       description: "URL MP4 ou Vimeo — jouée au survol sur la grille",
     }),
     defineField({
       name: "gallery",
       title: "Galerie (images & loops)",
       type: "array",
+      group: "content",
       description:
         "Images et vidéos en boucle — glissez-déposez, puis réordonnez la grille pour choisir l'ordre.",
       components: { input: BulkGalleryArrayInput },
@@ -182,6 +224,7 @@ export const project = defineType({
       name: "videoGallery",
       title: "Galerie vidéos (lecteur complet)",
       type: "array",
+      group: "content",
       description:
         "Vidéos avec lecteur custom en bas de page — son, plein écran, etc.",
       components: { input: BulkVideoArrayInput },
@@ -231,12 +274,14 @@ export const project = defineType({
       name: "pdfFile",
       title: "Fichier PDF",
       type: "file",
+      group: "content",
       options: { accept: "application/pdf" },
     }),
     defineField({
       name: "media",
       title: "Vidéos & liens",
       type: "array",
+      group: "content",
       of: [
         {
           type: "object",

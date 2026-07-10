@@ -1,4 +1,4 @@
-import type { Locale } from "@/i18n/routing";
+import type { ProjectLayoutBlock } from "@/lib/project-layout";
 import type { LocalizedValue } from "@/lib/i18n";
 import type { MediaType } from "@/lib/media";
 
@@ -64,6 +64,7 @@ export interface SanityProject {
   videoGallery?: SanityVideoItem[];
   pdfFile?: { asset: { _ref: string; url?: string } };
   media?: SanityMediaItem[];
+  pageBlocks?: ProjectLayoutBlock[];
 }
 
 export interface SanityAbout {
@@ -134,6 +135,10 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
     muxPlaybackId,
     "videoUrl": coalesce(url, videoFile.asset->url),
     "posterUrl": poster.asset->url
+  },
+  pageBlocks[] {
+    _key,
+    _type
   }
 }`;
 

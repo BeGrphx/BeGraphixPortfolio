@@ -1,0 +1,118 @@
+import { FadeIn } from "@/components/FadeIn";
+import { MediaBlock } from "@/components/MediaBlock";
+import { ProjectGallery } from "@/components/ProjectGallery";
+import { VideoGallery } from "@/components/VideoGallery";
+import {
+  layoutBlockHasContent,
+  resolveProjectLayout,
+  type ProjectLayoutBlockType,
+} from "@/lib/project-layout";
+import type { SanityProject } from "@/lib/sanity/queries";
+
+interface LocalizedProject extends SanityProject {
+  title: string;
+  description?: string;
+  credits?: string;
+}
+
+interface ProjectPageBlocksProps {
+  project: LocalizedProject;
+  downloadPdfLabel: string;
+}
+
+export function ProjectPageBlocks({
+  project,
+  downloadPdfLabel,
+}: ProjectPageBlocksProps) {
+  const layout = resolveProjectLayout(project.pageBlocks);
+
+  return (
+    <>
+      {layout.map((blockType, index) => (
+        <ProjectLayoutBlock
+          key={`${blockType}-${index}`}
+          type={blockType}
+          project={project}
+          index={index}
+          downloadPdfLabel={downloadPdfLabel}
+        />
+      ))}
+    </>
+  );
+}
+
+function ProjectLayoutBlock({
+  type,
+  project,
+  index,
+  downloadPdfLabel,
+}: {
+  type: ProjectLayoutBlockType;
+  project: LocalizedProject;
+  index: number;
+  downloadPdfLabel: string;
+}) {
+  if (!layoutBlockHasContent(type, project)) return null;
+
+  const delay = 0.06 + index * 0.04;
+
+  switch (type) {
+    case "layoutVideoGallery":
+      return project.videoGallery ? (
+        <VideoGallery videos={project.videoGallery} />
+      ) : null;
+
+    case "layoutText":
+      return (
+        <>
+          {project.description && (
+            <FadeIn delay={delay}>
+              <p className="mx-auto mb-8 max-w-2xl px-2 text-center text-[15px] leading-relaxed sm:mb-10 sm:px-4 sm:text-base md:text-lg">
+                {project.description}
+              </p>
+            </FadeIn>
+          )}
+          {project.credits && (
+            <FadeIn delay={delay + 0.02}>
+              <p className="font-mono mx-auto mb-16 max-w-xl px-4 text-center text-[11px] leading-relaxed text-muted">
+                {project.credits}
+              </p>
+            </FadeIn>
+          )}
+        </>
+      );
+
+    case "layoutGallery":
+      return project.gallery && project.gallery.length > 0 ? (
+        <ProjectGallery items={project.gallery} />
+      ) : null;
+
+    case "layoutPdf":
+      return project.pdfFile?.asset?.url ? (
+        <FadeIn delay={delay}>
+          <div className="mb-16 flex justify-center">
+            <a
+              href={project.pdfFile.asset.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center justify-center bg-foreground px-8 py-3 text-xs uppercase tracking-[0.2em] text-background transition-opacity hover:opacity-80"
+            >
+              {downloadPdfLabel} ↓
+            </a>
+          </div>
+        </FadeIn>
+      ) : null;
+
+    case "layoutMedia":
+      return project.media && project.media.length > 0 ? (
+        <div className="mx-auto max-w-5xl space-y-12 px-4">
+          {project.media.map((item, mediaIndex) => (
+            <MediaBlock key={item._key} item={item} index={mediaIndex} />
+          ))}
+        </div>
+      ) : null;
+
+    default:
+      return null;
+  }
+}
