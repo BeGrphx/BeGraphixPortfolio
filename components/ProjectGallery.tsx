@@ -52,36 +52,54 @@ function LoopVideoTile({
   className?: string;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
 
+    element.defaultMuted = true;
+    element.muted = true;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          setShouldLoad(true);
           void element.play().catch(() => {});
           return;
         }
         element.pause();
       },
-      { threshold: 0.25 },
+      { rootMargin: "600px 0px", threshold: 0.01 },
     );
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [videoUrl]);
+  }, []);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !shouldLoad) return;
+
+    element.load();
+    void element.play().catch(() => {});
+  }, [shouldLoad, videoUrl]);
 
   return (
     <article className={`${galleryTileClassName} ${className ?? ""}`}>
       <video
         ref={ref}
-        src={videoUrl}
+        src={shouldLoad ? videoUrl : undefined}
         poster={posterUrl}
+        autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload={shouldLoad ? "auto" : "none"}
+        disablePictureInPicture
+        onCanPlay={(event) => {
+          void event.currentTarget.play().catch(() => {});
+        }}
         className="absolute inset-0 h-full w-full object-cover"
       />
     </article>
