@@ -100,11 +100,36 @@ function GalleryImageTile({
   className?: string;
   onOpen: () => void;
 }) {
+  const tileRef = useRef<HTMLButtonElement>(null);
   const [loaded, setLoaded] = useState(false);
+  const [nearViewport, setNearViewport] = useState(false);
   const preserveAspect = shouldPreserveGalleryAspect(item);
+
+  useEffect(() => {
+    const tile = tileRef.current;
+    if (!tile) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setNearViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setNearViewport(true);
+        observer.disconnect();
+      },
+      { rootMargin: "1200px 0px", threshold: 0 },
+    );
+
+    observer.observe(tile);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <button
+      ref={tileRef}
       type="button"
       onClick={onOpen}
       className={`group relative w-full overflow-hidden bg-neutral-900 text-left ${
@@ -112,18 +137,21 @@ function GalleryImageTile({
       } ${className ?? ""}`}
       style={preserveAspect ? aspectRatioStyle(item) : undefined}
     >
-      <Image
-        src={buildImageSrc(item, 1600)}
-        alt={item.alt ?? ""}
-        fill
-        onLoad={() => setLoaded(true)}
-        className={`transition-all duration-500 ${
-          preserveAspect
-            ? "object-contain"
-            : "object-cover group-hover:scale-[1.03]"
-        } ${loaded ? "opacity-100" : "opacity-0"}`}
-        sizes="(max-width: 768px) 100vw, 50vw"
-      />
+      {nearViewport && (
+        <Image
+          src={buildImageSrc(item, 1600)}
+          alt={item.alt ?? ""}
+          fill
+          loading="eager"
+          onLoad={() => setLoaded(true)}
+          className={`transition-[opacity,transform] duration-500 ${
+            preserveAspect
+              ? "object-contain"
+              : "object-cover group-hover:scale-[1.03]"
+          } ${loaded ? "opacity-100" : "opacity-0"}`}
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+      )}
       <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
     </button>
   );
