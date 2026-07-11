@@ -29,37 +29,3 @@ export function preloadImage(src: string): Promise<void> {
   inflight.set(src, promise);
   return promise;
 }
-
-export function preloadImagesIdle(
-  sources: string[],
-  onLoaded?: (src: string) => void,
-): () => void {
-  let cancelled = false;
-  let cursor = 0;
-
-  const schedule = (fn: () => void) => {
-    if (typeof requestIdleCallback !== "undefined") {
-      requestIdleCallback(fn, { timeout: 2000 });
-      return;
-    }
-    setTimeout(fn, 80);
-  };
-
-  const loadNext = () => {
-    if (cancelled || cursor >= sources.length) return;
-
-    const src = sources[cursor++];
-    preloadImage(src)
-      .then(() => onLoaded?.(src))
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) schedule(loadNext);
-      });
-  };
-
-  schedule(loadNext);
-
-  return () => {
-    cancelled = true;
-  };
-}

@@ -12,7 +12,6 @@ import {
 import {
   isImagePreloaded,
   preloadImage,
-  preloadImagesIdle,
 } from "@/lib/preload-image";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
 import { useLightboxSwipe } from "@/hooks/useLightboxSwipe";
@@ -56,9 +55,7 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
     if (Object.keys(initialReady).length > 0) {
       setHiResReady((prev) => ({ ...prev, ...initialReady }));
     }
-
-    return preloadImagesIdle(hiResSources, markHiResReady);
-  }, [hiResSources, markHiResReady]);
+  }, [hiResSources]);
 
   useEffect(() => {
     if (!open) return;
@@ -157,14 +154,6 @@ export function ImageLightbox({ images }: ImageLightboxProps) {
                 setDirection(0);
                 setIndex(i);
                 setOpen(true);
-              }}
-              onMouseEnter={() => {
-                const src = image.fullSrc ?? image.src;
-                preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
-              }}
-              onFocus={() => {
-                const src = image.fullSrc ?? image.src;
-                preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
               }}
               className={`group relative overflow-hidden bg-neutral-900 text-left ${
                 portrait

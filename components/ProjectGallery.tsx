@@ -15,7 +15,6 @@ import {
 import {
   isImagePreloaded,
   preloadImage,
-  preloadImagesIdle,
 } from "@/lib/preload-image";
 import type { SanityGalleryImage, SanityGalleryItem } from "@/lib/sanity/queries";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
@@ -96,12 +95,10 @@ function GalleryImageTile({
   item,
   className,
   onOpen,
-  onPreload,
 }: {
   item: SanityGalleryImage & { _key: string; _type: "image" };
   className?: string;
   onOpen: () => void;
-  onPreload: () => void;
 }) {
   const [loaded, setLoaded] = useState(false);
   const preserveAspect = shouldPreserveGalleryAspect(item);
@@ -110,8 +107,6 @@ function GalleryImageTile({
     <button
       type="button"
       onClick={onOpen}
-      onMouseEnter={onPreload}
-      onFocus={onPreload}
       className={`group relative w-full overflow-hidden bg-neutral-900 text-left ${
         preserveAspect ? "" : galleryTileClassName
       } ${className ?? ""}`}
@@ -186,9 +181,7 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
     if (Object.keys(initialReady).length > 0) {
       setHiResReady((prev) => ({ ...prev, ...initialReady }));
     }
-
-    return preloadImagesIdle(hiResSources, markHiResReady);
-  }, [hiResSources, markHiResReady]);
+  }, [hiResSources]);
 
   useEffect(() => {
     if (!open) return;
@@ -313,10 +306,6 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
               item={item}
               className={isCenteredLast ? centeredLastOddItemClassName : undefined}
               onOpen={() => openImage(item._key)}
-              onPreload={() => {
-                const src = buildLightboxSrc(item);
-                preloadImage(src).then(() => markHiResReady(src)).catch(() => {});
-              }}
             />
           );
         })}

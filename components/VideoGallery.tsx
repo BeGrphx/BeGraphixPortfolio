@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
 import type { SanityVideoItem } from "@/lib/sanity/queries";
-import { preloadVideo, preloadVideosIdle } from "@/lib/preload-video";
 import { VideoPlayer } from "./VideoPlayer";
 
 interface VideoGalleryProps {
@@ -10,17 +8,6 @@ interface VideoGalleryProps {
 }
 
 export function VideoGallery({ videos }: VideoGalleryProps) {
-  const sources = videos
-    .map((video) => video.videoUrl)
-    .filter((url): url is string => Boolean(url));
-
-  useEffect(() => {
-    if (!sources.length) return;
-
-    preloadVideo(sources[0], "auto");
-    return preloadVideosIdle(sources.slice(1), "auto");
-  }, [sources]);
-
   if (!videos.length) return null;
 
   return (
@@ -34,7 +21,7 @@ export function VideoGallery({ videos }: VideoGalleryProps) {
             src={video.videoUrl}
             poster={video.posterUrl}
             title={video.title}
-            preload="auto"
+            preload="metadata"
             className="w-full rounded-sm"
           />
         );

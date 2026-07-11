@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { formatProjectDateShort } from "@/lib/media";
-import { preloadVideo, preloadVideosIdle } from "@/lib/preload-video";
 import type { ProjectWithDisplay } from "@/lib/sanity/queries";
 import { VideoPlayer } from "./VideoPlayer";
 
@@ -22,16 +20,6 @@ function getTheme(project: ProjectWithDisplay): string {
 
 export function ShowreelList({ projects }: ShowreelListProps) {
   const t = useTranslations("home");
-
-  const sources = projects
-    .map((project) => getVideoUrl(project))
-    .filter((url): url is string => Boolean(url));
-
-  useEffect(() => {
-    if (!sources.length) return;
-    preloadVideo(sources[0], "auto");
-    return preloadVideosIdle(sources.slice(1), "auto");
-  }, [sources]);
 
   if (projects.length === 0) {
     return (
@@ -53,7 +41,7 @@ export function ShowreelList({ projects }: ShowreelListProps) {
               <VideoPlayer
                 src={videoUrl}
                 title={project.displayTitle}
-                preload="auto"
+                preload="metadata"
                 className="w-full"
               />
             ) : (

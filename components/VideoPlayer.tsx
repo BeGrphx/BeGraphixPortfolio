@@ -46,7 +46,7 @@ export function VideoPlayer({
   src,
   poster,
   title,
-  preload = "auto",
+  preload = "metadata",
   fit = "auto",
   className = "",
 }: VideoPlayerProps) {
@@ -129,21 +129,25 @@ export function VideoPlayer({
       }
     };
 
-    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
       seekToPreview();
       return;
     }
 
-    video.addEventListener("loadeddata", seekToPreview, { once: true });
+    video.addEventListener("loadedmetadata", seekToPreview, { once: true });
   }, [poster]);
 
-  const effectivePreload = poster ? preload : "auto";
+  const effectivePreload = preload;
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const prime = () => {
+      if (video.preload === "none") {
+        video.preload = "metadata";
+        video.load();
+      }
       if (!poster && video.paused) primeFirstFrame(video);
     };
 
@@ -156,7 +160,7 @@ export function VideoPlayer({
       ([entry]) => {
         if (entry.isIntersecting) prime();
       },
-      { threshold: 0.2 },
+      { rootMargin: "320px 0px", threshold: 0.01 },
     );
 
     observer.observe(video);
@@ -412,10 +416,6 @@ export function VideoPlayer({
         }}
         onLoadedMetadata={(e) => {
           handleLoadedMetadata(e.currentTarget);
-          if (!poster) primeFirstFrame(e.currentTarget);
-        }}
-        onLoadedData={(e) => {
-          if (!poster) primeFirstFrame(e.currentTarget);
         }}
       />
 

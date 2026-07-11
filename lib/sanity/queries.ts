@@ -24,6 +24,8 @@ export interface SanityGalleryItem {
 }
 
 const imageDimensions = `"width": asset->metadata.dimensions.width, "height": asset->metadata.dimensions.height`;
+const optimizedPosterUrl =
+  'select(defined(poster.asset->url) => poster.asset->url + "?w=1600&fit=max&auto=format&q=75")';
 
 export interface SanityMediaItem {
   _key: string;
@@ -117,13 +119,13 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
     ${imageDimensions},
     title,
     "videoUrl": coalesce(videoUrl, videoFile.asset->url),
-    "posterUrl": poster.asset->url
+    "posterUrl": ${optimizedPosterUrl}
   },
   "videoGallery": videoGallery[] {
     _key,
     title,
     "videoUrl": coalesce(videoUrl, videoFile.asset->url),
-    "posterUrl": poster.asset->url
+    "posterUrl": ${optimizedPosterUrl}
   },
   pdfFile { asset->{ url } },
   "media": media[] {
@@ -134,7 +136,7 @@ export const projectBySlugQuery = `*[_type == "project" && slug.current == $slug
     url,
     muxPlaybackId,
     "videoUrl": coalesce(url, videoFile.asset->url),
-    "posterUrl": poster.asset->url
+    "posterUrl": ${optimizedPosterUrl}
   },
   pageBlocks[] {
     _key,

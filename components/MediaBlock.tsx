@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { parseMediaUrl, type ParsedMedia } from "@/lib/media";
-import { preloadVideo } from "@/lib/preload-video";
 import type { SanityMediaItem } from "@/lib/sanity/queries";
 import { FadeIn } from "./FadeIn";
 import { VideoPlayer } from "./VideoPlayer";
@@ -32,10 +31,6 @@ function FileMediaBlock({
   item: SanityMediaItem;
   index: number;
 }) {
-  useEffect(() => {
-    if (item.videoUrl) preloadVideo(item.videoUrl, "auto");
-  }, [item.videoUrl]);
-
   if (!item.videoUrl) {
     return (
       <FadeIn delay={index * 0.08}>
@@ -52,7 +47,7 @@ function FileMediaBlock({
         src={item.videoUrl}
         poster={item.posterUrl}
         title={item.title}
-        preload="auto"
+        preload="metadata"
         className="w-full rounded-sm"
       />
     </FadeIn>
