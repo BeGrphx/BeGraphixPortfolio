@@ -2,6 +2,7 @@ import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { translateDocumentAction } from "./actions/translateDocumentAction";
+import { mediaOptimizationBadge } from "./badges/mediaOptimizationBadge";
 import { apiVersion, dataset, projectId } from "./env";
 import { schema } from "./schemas";
 
@@ -14,6 +15,15 @@ export default defineConfig({
     actions: (prev, context) => {
       if (context.schemaType === "project" || context.schemaType === "about") {
         return [...prev, translateDocumentAction];
+      }
+      return prev;
+    },
+    badges: (prev, context) => {
+      if (
+        context.schemaType === "project" ||
+        context.schemaType === "siteSettings"
+      ) {
+        return [mediaOptimizationBadge, ...prev];
       }
       return prev;
     },

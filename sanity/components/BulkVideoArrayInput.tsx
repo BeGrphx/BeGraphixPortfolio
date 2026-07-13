@@ -68,6 +68,12 @@ export function createBulkVideoArrayInput({
           }));
 
           onChange(set([...(value ?? []), ...newItems]));
+          toast.push({
+            status: "success",
+            title: `${videos.length} vidéo${videos.length > 1 ? "s" : ""} ajoutée${videos.length > 1 ? "s" : ""}`,
+            description:
+              "Publiez le projet : la compression et la mise en ligne R2 se feront automatiquement.",
+          });
         } catch (error) {
           toast.push({
             status: "error",

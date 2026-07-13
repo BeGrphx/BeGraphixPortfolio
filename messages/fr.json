@@ -137,5 +137,19 @@
   "theme": {
     "light": "Clair",
     "dark": "Sombre"
+  },
+  "videoPlayer": {
+    "play": "Lire la vidéo",
+    "pause": "Pause",
+    "progress": "Progression",
+    "mute": "Couper le son",
+    "unmute": "Activer le son",
+    "muted": "Muet",
+    "sound": "Son",
+    "volume": "Volume",
+    "playControl": "Lecture",
+    "fullscreen": "Plein écran",
+    "exitFullscreen": "Réduire",
+    "exitFullscreenAria": "Quitter le plein écran"
   }
 }

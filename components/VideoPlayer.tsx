@@ -11,6 +11,7 @@ import {
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { useTranslations } from "next-intl";
 
 const PREVIEW_START_SECONDS = 0.02;
 
@@ -50,6 +51,7 @@ export function VideoPlayer({
   fit = "auto",
   className = "",
 }: VideoPlayerProps) {
+  const t = useTranslations("videoPlayer");
   const labelId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -421,7 +423,7 @@ export function VideoPlayer({
 
       <button
         type="button"
-        aria-label={playing ? "Pause" : "Lire la vidéo"}
+        aria-label={playing ? t("pause") : t("play")}
         className="absolute inset-0 z-10 cursor-pointer border-0 bg-transparent p-0"
         onClick={(event) => {
           event.stopPropagation();
@@ -447,7 +449,7 @@ export function VideoPlayer({
             void togglePlay();
           }}
           className="absolute left-1/2 top-1/2 z-30 h-11 w-11 -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 active:scale-95 sm:h-14 sm:w-14 md:h-[4.5rem] md:w-[4.5rem] md:hover:scale-105"
-          aria-label="Lire la vidéo"
+          aria-label={t("play")}
         >
           <span
             className={`relative flex h-full w-full items-center justify-center rounded-full border border-white/35 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_12px_40px_rgba(0,0,0,0.45)] ${
@@ -483,7 +485,7 @@ export function VideoPlayer({
 
         <div
           role="slider"
-          aria-label="Progression"
+          aria-label={t("progress")}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress)}
@@ -522,7 +524,7 @@ export function VideoPlayer({
               className={`pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 sm:h-8 sm:w-8 ${
                 isFullscreen ? "" : "backdrop-blur-md"
               }`}
-              aria-label={playing ? "Pause" : "Lecture"}
+              aria-label={playing ? t("pause") : t("playControl")}
             >
               {playing ? (
                 <span className="text-[10px] font-bold tracking-tighter">II</span>
@@ -536,9 +538,9 @@ export function VideoPlayer({
                 type="button"
                 onClick={toggleMute}
                 className="shrink-0 text-xs uppercase tracking-[0.15em] text-white/60 transition-colors hover:text-white"
-                aria-label={isMuted ? "Activer le son" : "Couper le son"}
+                aria-label={isMuted ? t("unmute") : t("mute")}
               >
-                {isMuted ? "Muet" : "Son"}
+                {isMuted ? t("muted") : t("sound")}
               </button>
               <input
                 type="range"
@@ -546,7 +548,7 @@ export function VideoPlayer({
                 max={100}
                 value={Math.round(volume * 100)}
                 onChange={onVolumeChange}
-                aria-label="Volume"
+                aria-label={t("volume")}
                 className="h-1 min-w-[72px] flex-1 cursor-pointer appearance-none rounded-full bg-white/20 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
               />
             </div>
@@ -554,9 +556,9 @@ export function VideoPlayer({
               type="button"
               onClick={toggleMute}
               className="shrink-0 text-[10px] uppercase tracking-[0.12em] text-white/60 transition-colors hover:text-white sm:hidden"
-              aria-label={isMuted ? "Activer le son" : "Couper le son"}
+              aria-label={isMuted ? t("unmute") : t("mute")}
             >
-              {isMuted ? "Muet" : "Son"}
+              {isMuted ? t("muted") : t("sound")}
             </button>
           </div>
 
@@ -568,9 +570,9 @@ export function VideoPlayer({
             type="button"
             onClick={toggleFullscreen}
             className="pointer-events-auto shrink-0 min-h-10 px-1 text-[10px] uppercase tracking-[0.12em] text-white/60 transition-colors hover:text-white sm:min-h-0 sm:text-xs sm:tracking-[0.15em]"
-            aria-label={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
+            aria-label={isFullscreen ? t("exitFullscreenAria") : t("fullscreen")}
           >
-            {isFullscreen ? "Réduire" : "Plein écran"}
+            {isFullscreen ? t("exitFullscreen") : t("fullscreen")}
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadIcon } from "@sanity/icons";
-import { Box, Card, Flex, Spinner, Stack, Text } from "@sanity/ui";
+import { Box, Card, Flex, Spinner, Stack, Text, useToast } from "@sanity/ui";
 import { useCallback, useRef, useState } from "react";
 import {
   type ArrayOfObjectsInputProps,
@@ -14,6 +14,7 @@ export function BulkGalleryArrayInput(props: ArrayOfObjectsInputProps) {
   const { onChange, value = [], readOnly, renderDefault } = props;
   const client = useClient({ apiVersion: "2024-01-01" });
   const inputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
 
@@ -66,12 +67,24 @@ export function BulkGalleryArrayInput(props: ArrayOfObjectsInputProps) {
         );
 
         onChange(set([...(value ?? []), ...newItems]));
+
+        const videoCount = newItems.filter(
+          (item) => item._type === "galleryLoopItem",
+        ).length;
+        if (videoCount > 0) {
+          toast.push({
+            status: "success",
+            title: `${videoCount} loop${videoCount > 1 ? "s" : ""} ajoutée${videoCount > 1 ? "s" : ""}`,
+            description:
+              "Publiez le projet : la compression et la mise en ligne R2 se feront automatiquement.",
+          });
+        }
       } finally {
         setUploading(false);
         setDragging(false);
       }
     },
-    [client, onChange, readOnly, value],
+    [client, onChange, readOnly, toast, value],
   );
 
   const onDrop = useCallback(
