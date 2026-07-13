@@ -23,9 +23,11 @@ function chunkText(text: string, maxLen = MYMEMORY_MAX): string[] {
 }
 
 function isBadTranslation(result: string, original: string): boolean {
-  const upper = result.toUpperCase();
+  const trimmed = result.trim();
+  const upper = trimmed.toUpperCase();
   return (
-    !result.trim() ||
+    !trimmed ||
+    /^[.,;:!?…]+$/.test(trimmed) ||
     upper.includes("QUERY LENGTH LIMIT") ||
     upper.includes("MAX ALLOWED QUERY") ||
     result === original

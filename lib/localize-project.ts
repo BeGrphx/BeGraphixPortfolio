@@ -1,6 +1,14 @@
 import type { Locale } from "@/i18n/routing";
 import { getLocalizedAuto } from "@/lib/i18n";
+import { getKnownTagLabel, shouldKeepTagAsIs } from "@/lib/tag-labels";
 import type { SanityProject } from "@/lib/sanity/queries";
+
+async function localizeTag(tag: string, locale: Locale): Promise<string> {
+  const knownLabel = getKnownTagLabel(tag, locale);
+  if (knownLabel) return knownLabel;
+  if (shouldKeepTagAsIs(tag)) return tag.trim();
+  return getLocalizedAuto(tag, locale);
+}
 
 export async function localizeTags(
   tags: string[] | undefined,
@@ -8,7 +16,7 @@ export async function localizeTags(
 ): Promise<string[] | undefined> {
   if (!tags?.length) return tags;
   if (locale === "fr") return tags;
-  return Promise.all(tags.map((tag) => getLocalizedAuto(tag, locale)));
+  return Promise.all(tags.map((tag) => localizeTag(tag, locale)));
 }
 
 export async function localizeProject(
