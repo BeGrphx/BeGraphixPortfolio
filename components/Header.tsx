@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { lockPageScroll, unlockPageScroll } from "@/lib/scroll";
 import { useLenis } from "lenis/react";
@@ -51,11 +51,15 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <LanguageSwitcher />
+          <Suspense fallback={null}>
+            <LanguageSwitcher />
+          </Suspense>
         </div>
 
         <div className="flex items-center gap-2 sm:hidden">
-          <LanguageSwitcher compact />
+          <Suspense fallback={null}>
+            <LanguageSwitcher compact />
+          </Suspense>
           <button
             type="button"
             aria-expanded={menuOpen}

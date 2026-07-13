@@ -19,6 +19,7 @@ import {
   projectSlugsQuery,
   type SanityProject,
 } from "@/lib/sanity/queries";
+import { siteTitle } from "@/lib/metadata";
 
 export const revalidate = 60;
 
@@ -50,7 +51,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, slug } = await params;
   const project = await getProject(slug);
-  if (!project) return { title: "Project" };
+  if (!project) return { title: siteTitle };
 
   const title = await getLocalizedAuto(project.title, locale);
   const description = await getLocalizedAuto(project.description, locale);
@@ -59,7 +60,7 @@ export async function generateMetadata({
     : undefined;
 
   return {
-    title,
+    title: siteTitle,
     description,
     openGraph: {
       title,

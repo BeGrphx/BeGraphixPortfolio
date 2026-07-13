@@ -1,5 +1,15 @@
 import { Syne, DM_Sans, IBM_Plex_Mono } from "next/font/google";
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
+import { siteTitle } from "@/lib/metadata";
+
+export const metadata: Metadata = {
+  title: siteTitle,
+  icons: {
+    icon: [{ url: "/brand/begraphix-logo.png", type: "image/png" }],
+    apple: [{ url: "/brand/begraphix-logo.png", type: "image/png" }],
+    shortcut: ["/brand/begraphix-logo.png"],
+  },
+};
 
 export const viewport: Viewport = {
   width: "device-width",

@@ -7,6 +7,7 @@ import type { Locale } from "@/i18n/routing";
 import { client } from "@/lib/sanity/client";
 import { aboutQuery, type SanityAbout } from "@/lib/sanity/queries";
 import { DEFAULT_LOGO_PATH } from "@/lib/site-settings";
+import { siteTitle } from "@/lib/metadata";
 
 export const revalidate = 60;
 
@@ -17,7 +18,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
-  return { title: t("title") };
+  return {
+    title: siteTitle,
+    description: t("intro"),
+    openGraph: {
+      title: t("title"),
+      description: t("intro"),
+      type: "website",
+    },
+  };
 }
 
 async function getAboutContact(): Promise<SanityAbout | null> {

@@ -13,6 +13,7 @@ import {
   getSiteSettings,
   resolveShowreelUrl,
 } from "@/lib/site-settings";
+import { siteTitle } from "@/lib/metadata";
 
 export const revalidate = 30;
 
@@ -23,13 +24,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "home" });
-  const title = `${t("titleLine1")} ${t("titleLine2")}`;
+  const pageTitle = `${t("titleLine1")} ${t("titleLine2")}`;
 
   return {
-    title: `BeGraphix — ${title}`,
+    title: siteTitle,
     description: t("subtitle"),
     openGraph: {
-      title: `BeGraphix — ${title}`,
+      title: `BeGraphix — ${pageTitle}`,
       description: t("subtitle"),
       type: "website",
     },
