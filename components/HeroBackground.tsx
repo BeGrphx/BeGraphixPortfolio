@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { HeroEffectsLayer } from "@/components/visual-effects/HeroEffectsLayer";
-import { useVisualEffectsCapabilities } from "@/hooks/useVisualEffectsCapabilities";
 import { VideoBackground } from "./VideoBackground";
 
 export interface HeroBackgroundProps {
@@ -54,10 +52,6 @@ export function HeroBackground({
   bottomFade = 320,
 }: HeroBackgroundProps) {
   const [videoFailed, setVideoFailed] = useState(false);
-  const { enabled: effectsEnabled, effects } = useVisualEffectsCapabilities();
-  const useWebGLHero =
-    effectsEnabled &&
-    (effects.heroShader || effects.hero3d || effects.heroParticles);
 
   useEffect(() => setVideoFailed(false), [videoUrl, type]);
 
@@ -80,11 +74,7 @@ export function HeroBackground({
       />
     );
   } else if (type === "organic") {
-    content = useWebGLHero ? (
-      <div className="absolute inset-0 overflow-hidden bg-neutral-950">
-        <HeroEffectsLayer />
-      </div>
-    ) : (
+    content = (
       <div className="absolute inset-0 overflow-hidden bg-neutral-950">
         <div
           className="animate-organic-spin absolute inset-[-45%] opacity-35"
@@ -96,22 +86,13 @@ export function HeroBackground({
       </div>
     );
   } else {
-    content = (
-      <div className="absolute inset-0 bg-neutral-950">
-        {useWebGLHero ? <HeroEffectsLayer /> : null}
-      </div>
-    );
+    content = <div className="absolute inset-0 bg-neutral-950" />;
   }
 
   return (
     <div className="absolute inset-0 bg-[#080808]">
       <div className="absolute inset-0" style={maskStyle}>
         {content}
-        {showVideo && useWebGLHero ? (
-          <div className="pointer-events-none absolute inset-0 opacity-30 mix-blend-screen">
-            <HeroEffectsLayer />
-          </div>
-        ) : null}
       </div>
       <div
         className="pointer-events-none absolute inset-0"

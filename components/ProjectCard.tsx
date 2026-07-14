@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { CardTilt } from "@/components/visual-effects/CardTilt";
 import { Link } from "@/i18n/navigation";
 import { formatProjectDateShort } from "@/lib/media";
 import type { Locale } from "@/i18n/routing";
@@ -54,7 +53,7 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
       >
-        <CardTilt className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-900">
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-900">
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -100,7 +99,7 @@ export function ProjectCard({ project, locale }: ProjectCardProps) {
                 : ""}
             </p>
           </div>
-        </CardTilt>
+        </div>
         <div className="mt-3 flex items-start justify-between gap-3 sm:mt-4 sm:gap-4">
           <div className="min-w-0 flex-1">
             <h2 className="text-base font-medium leading-snug tracking-tight text-white transition-opacity group-hover:opacity-60 sm:text-lg md:text-xl">
