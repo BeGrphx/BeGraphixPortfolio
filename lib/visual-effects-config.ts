@@ -1,8 +1,8 @@
 /**
  * Visual effects suite — 100 % open-source (MIT).
  *
- * ENABLE:  NEXT_PUBLIC_VISUAL_EFFECTS=true
- * REVERT:  remove the var or set NEXT_PUBLIC_VISUAL_EFFECTS=false
+ * Enabled by default on all environments.
+ * REVERT (for agent/user): set NEXT_PUBLIC_VISUAL_EFFECTS=false + redeploy.
  */
 
 export type VisualEffectKey =
@@ -16,7 +16,7 @@ export type VisualEffectKey =
   | "scrollParallax";
 
 export function isVisualEffectsEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_VISUAL_EFFECTS === "true";
+  return process.env.NEXT_PUBLIC_VISUAL_EFFECTS !== "false";
 }
 
 /** Desktop / pointer-fine — full effects */
