@@ -28,10 +28,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install pipeline dependencies
+        run: |
+          npm install --no-save --no-audit --no-fund \
+            @aws-sdk/client-s3@^3.1085.0 \
+            next-sanity@^9.9.0 \
+            next@^15.2.4
 
       - name: Ensure FFmpeg is available
         run: |
