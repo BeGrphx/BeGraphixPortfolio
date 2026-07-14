@@ -14,6 +14,7 @@ import {
   resolveShowreelUrl,
 } from "@/lib/site-settings";
 import { siteTitle } from "@/lib/metadata";
+import { HomeHeroTitle } from "@/components/visual-effects/HomeHeroTitle";
 
 export const revalidate = 30;
 
@@ -95,11 +96,11 @@ export default async function HomePage({
           <p className="mb-4 text-[11px] uppercase tracking-[0.22em] text-white/75 sm:mb-5 sm:text-sm sm:tracking-[0.35em] md:mb-6">
             {t("eyebrow")}
           </p>
-          <h1 className="font-display text-[clamp(2.125rem,9vw,5.25rem)] font-medium leading-[1.04] tracking-tight text-white">
-            {t("titleLine1")}
-            <br />
-            <span className="text-white">{t("titleLine2")}</span>
-          </h1>
+          <HomeHeroTitle
+            line1={t("titleLine1")}
+            line2={t("titleLine2")}
+            className="font-display text-[clamp(2.125rem,9vw,5.25rem)] font-medium leading-[1.04] tracking-tight text-white"
+          />
           <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-white/90 sm:mt-7 sm:text-base md:mt-9 md:text-lg md:leading-relaxed">
             {t("subtitle")}
           </p>
